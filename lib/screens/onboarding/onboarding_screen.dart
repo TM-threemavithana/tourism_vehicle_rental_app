@@ -4,7 +4,7 @@ import 'dart:math' as math;
 import 'slide_one.dart';
 import 'slide_two.dart';
 import 'slide_three.dart';
-import '../home_screen.dart';
+import '../auth/login_screen.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
@@ -19,6 +19,10 @@ class _OnboardingScreenState extends State<OnboardingScreen>
   bool isLastPage = false;
   late AnimationController _animationController;
   late Animation<double> _animation;
+
+  // For the explosion animation
+  bool _isExploding = false;
+  double _explosionRadius = 0;
 
   @override
   void initState() {
@@ -43,8 +47,32 @@ class _OnboardingScreenState extends State<OnboardingScreen>
     super.dispose();
   }
 
+  void _startExplodingAnimation() {
+    setState(() {
+      _isExploding = true;
+    });
+
+    // Wait for the animation to complete before navigating
+    Future.delayed(const Duration(milliseconds: 800), () {
+      Navigator.of(context).pushReplacement(
+        PageRouteBuilder(
+          transitionDuration: const Duration(milliseconds: 800),
+          pageBuilder: (_, __, ___) => const LoginScreen(),
+          transitionsBuilder: (_, animation, __, child) {
+            return FadeTransition(
+              opacity: animation,
+              child: child,
+            );
+          },
+        ),
+      );
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+    final screenSize = MediaQuery.of(context).size;
+
     return Scaffold(
       body: Stack(
         children: [
@@ -107,6 +135,30 @@ class _OnboardingScreenState extends State<OnboardingScreen>
               ),
             ),
           ),
+
+          // Explosion animation overlay
+          if (_isExploding)
+            TweenAnimationBuilder<double>(
+              tween: Tween(
+                  begin: 0,
+                  end: math.max(screenSize.width, screenSize.height) * 1.5),
+              duration: const Duration(milliseconds: 800),
+              curve: Curves.easeOutQuart,
+              builder: (context, value, child) {
+                return Container(
+                  color: Colors.transparent,
+                  child: CustomPaint(
+                    painter: ExplosionPainter(
+                      center:
+                          Offset(screenSize.width / 2, screenSize.height - 40),
+                      radius: value,
+                      color: Theme.of(context).colorScheme.secondary,
+                    ),
+                    size: Size(screenSize.width, screenSize.height),
+                  ),
+                );
+              },
+            ),
         ],
       ),
       bottomSheet: AnimatedContainer(
@@ -126,33 +178,13 @@ class _OnboardingScreenState extends State<OnboardingScreen>
         ),
         child: isLastPage
             ? InkWell(
-                onTap: () => Navigator.of(context).pushReplacement(
-                  PageRouteBuilder(
-                    transitionDuration: const Duration(milliseconds: 800),
-                    pageBuilder: (_, __, ___) => const HomeScreen(),
-                    transitionsBuilder: (_, animation, __, child) {
-                      return FadeTransition(
-                        opacity: animation,
-                        child: SlideTransition(
-                          position: Tween<Offset>(
-                            begin: const Offset(0, 0.1),
-                            end: Offset.zero,
-                          ).animate(CurvedAnimation(
-                            parent: animation,
-                            curve: Curves.easeOut,
-                          )),
-                          child: child,
-                        ),
-                      );
-                    },
-                  ),
-                ),
+                onTap: _isExploding ? null : _startExplodingAnimation,
                 child: Center(
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       const Text(
-                        'START EXPLORING',
+                        'GET STARTED',
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
@@ -161,11 +193,13 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                         ),
                       ),
                       const SizedBox(width: 12),
-                      Container(
+                      AnimatedContainer(
+                        duration: const Duration(milliseconds: 300),
                         padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          color: Colors.white.withOpacity(0.2),
+                          color: Colors.white
+                              .withOpacity(_isExploding ? 0.5 : 0.2),
                         ),
                         child: const Icon(
                           Icons.arrow_forward_ios_rounded,
@@ -298,4 +332,51 @@ class BackgroundPatternPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+// New explosion painter for the button animation
+class ExplosionPainter extends CustomPainter {
+  final Offset center;
+  final double radius;
+  final Color color;
+
+  ExplosionPainter({
+    required this.center,
+    required this.radius,
+    required this.color,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = color
+      ..style = PaintingStyle.fill;
+
+    canvas.drawCircle(center, radius, paint);
+
+    // Add some smaller circles for a more dynamic effect
+    for (int i = 0; i < 10; i++) {
+      final angle = i * (math.pi * 2 / 10);
+      final smallRadius = radius * 0.15;
+      final distance = radius * 0.7;
+
+      if (radius > size.width * 0.3) {
+        // Only show particles after initial expansion
+        final offsetX = center.dx + math.cos(angle) * distance;
+        final offsetY = center.dy + math.sin(angle) * distance;
+
+        canvas.drawCircle(
+          Offset(offsetX, offsetY),
+          smallRadius,
+          Paint()
+            ..color = color.withOpacity(0.7)
+            ..style = PaintingStyle.fill,
+        );
+      }
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant ExplosionPainter oldDelegate) =>
+      oldDelegate.radius != radius;
 }
