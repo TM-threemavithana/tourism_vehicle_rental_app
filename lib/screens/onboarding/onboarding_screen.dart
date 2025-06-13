@@ -53,17 +53,25 @@ class _OnboardingScreenState extends State<OnboardingScreen>
       _isExploding = true;
     });
 
-    // Wait for the animation to complete before navigating
-    Future.delayed(const Duration(milliseconds: 800), () {
+    // Reduce the animation duration to make it faster
+    Future.delayed(const Duration(milliseconds: 600), () {
       Navigator.of(context).pushReplacement(
         PageRouteBuilder(
-          transitionDuration: const Duration(milliseconds: 800),
-          pageBuilder: (_, __, ___) =>
-              const AuthWrapper(), // Changed from LoginScreen
+          transitionDuration: const Duration(milliseconds: 600),
+          pageBuilder: (_, __, ___) => const AuthWrapper(),
           transitionsBuilder: (_, animation, __, child) {
+            // Use a combined curve for smoother effect
+            final curvedAnimation = CurvedAnimation(
+              parent: animation,
+              curve: Curves.easeOutQuint,
+            );
             return FadeTransition(
-              opacity: animation,
-              child: child,
+              opacity: curvedAnimation,
+              child: ScaleTransition(
+                scale: Tween<double>(begin: 0.95, end: 1.0)
+                    .animate(curvedAnimation),
+                child: child,
+              ),
             );
           },
         ),
@@ -108,6 +116,8 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                   onPageChanged: (index) {
                     setState(() => isLastPage = index == 2);
                   },
+                  // Add physics for smoother scrolling
+                  physics: const BouncingScrollPhysics(),
                   children: const [
                     SlideOne(),
                     SlideTwo(),
@@ -144,8 +154,8 @@ class _OnboardingScreenState extends State<OnboardingScreen>
               tween: Tween(
                   begin: 0,
                   end: math.max(screenSize.width, screenSize.height) * 1.5),
-              duration: const Duration(milliseconds: 800),
-              curve: Curves.easeOutQuart,
+              duration: const Duration(milliseconds: 600),
+              curve: Curves.easeOutExpo,
               builder: (context, value, child) {
                 return Container(
                   color: Colors.transparent,
@@ -262,8 +272,10 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                     // Next button
                     TextButton(
                       onPressed: () => controller.nextPage(
-                        duration: const Duration(milliseconds: 500),
-                        curve: Curves.easeInOut,
+                        duration: const Duration(
+                            milliseconds: 400), // Reduced from 500
+                        curve: Curves
+                            .easeOutCubic, // Changed from easeInOut for smoother feel
                       ),
                       style: TextButton.styleFrom(
                         foregroundColor: Theme.of(context).colorScheme.primary,
@@ -352,18 +364,18 @@ class ExplosionPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
       ..color = color
-      ..style = PaintingStyle.fill;
+      ..style = PaintingStyle.fill
+      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 20);
 
     canvas.drawCircle(center, radius, paint);
 
     // Add some smaller circles for a more dynamic effect
-    for (int i = 0; i < 10; i++) {
-      final angle = i * (math.pi * 2 / 10);
-      final smallRadius = radius * 0.15;
-      final distance = radius * 0.7;
+    if (radius > size.width * 0.1) {
+      for (int i = 0; i < 8; i++) {
+        final angle = i * (math.pi * 2 / 8);
+        final smallRadius = radius * 0.08;
+        final distance = radius * 0.7;
 
-      if (radius > size.width * 0.3) {
-        // Only show particles after initial expansion
         final offsetX = center.dx + math.cos(angle) * distance;
         final offsetY = center.dy + math.sin(angle) * distance;
 
@@ -372,6 +384,7 @@ class ExplosionPainter extends CustomPainter {
           smallRadius,
           Paint()
             ..color = color.withOpacity(0.7)
+            ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 10)
             ..style = PaintingStyle.fill,
         );
       }

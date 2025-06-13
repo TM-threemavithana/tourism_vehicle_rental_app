@@ -75,6 +75,7 @@ flutter:
     - assets/images/image3.jpg  # Onboarding slide 3
     - assets/images/login_background.jpg
     - assets/images/signup_background.jpg
+    - assets/images/road_background.jpg
     
   
   fonts:

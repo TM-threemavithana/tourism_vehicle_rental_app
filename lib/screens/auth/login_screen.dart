@@ -30,12 +30,12 @@ class _LoginScreenState extends State<LoginScreen>
     super.initState();
     _animationController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 1200),
+      duration: const Duration(milliseconds: 800), // Reduced from 1200
     );
 
     _fadeAnimation = CurvedAnimation(
       parent: _animationController,
-      curve: Curves.easeIn,
+      curve: Curves.easeOutCubic, // Changed from easeIn
     );
 
     _animationController.forward();
@@ -64,14 +64,26 @@ class _LoginScreenState extends State<LoginScreen>
 
         // Navigate to home screen on successful login
         if (!mounted) return;
+        // Smooth navigation transitions
         Navigator.of(context).pushReplacement(
           PageRouteBuilder(
-            transitionDuration: const Duration(milliseconds: 800),
+            transitionDuration:
+                const Duration(milliseconds: 500), // Reduced from 800
             pageBuilder: (_, __, ___) => const HomeScreen(),
             transitionsBuilder: (_, animation, __, child) {
+              final curvedAnimation = CurvedAnimation(
+                parent: animation,
+                curve: Curves.easeOutQuad, // Smoother curve
+              );
               return FadeTransition(
-                opacity: animation,
-                child: child,
+                opacity: curvedAnimation,
+                child: SlideTransition(
+                  position: Tween<Offset>(
+                    begin: const Offset(0.05, 0),
+                    end: Offset.zero,
+                  ).animate(curvedAnimation),
+                  child: child,
+                ),
               );
             },
           ),
@@ -154,18 +166,21 @@ class _LoginScreenState extends State<LoginScreen>
                       Center(
                         child: Column(
                           children: [
-                            Container(
-                              width: 100,
-                              height: 100,
-                              padding: const EdgeInsets.all(5),
-                              decoration: BoxDecoration(
-                                color: Colors.white.withOpacity(0.2),
-                                shape: BoxShape.circle,
-                              ),
-                              child: ClipOval(
-                                child: Image.asset(
-                                  'assets/images/logo.png',
-                                  fit: BoxFit.cover,
+                            Hero(
+                              tag: 'appLogo',
+                              child: Container(
+                                width: 100,
+                                height: 100,
+                                padding: const EdgeInsets.all(5),
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withOpacity(0.2),
+                                  shape: BoxShape.circle,
+                                ),
+                                child: ClipOval(
+                                  child: Image.asset(
+                                    'assets/images/logo.png',
+                                    fit: BoxFit.cover,
+                                  ),
                                 ),
                               ),
                             ),
@@ -545,23 +560,32 @@ class WavePainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
       ..color = color
-      ..style = PaintingStyle.fill;
+      ..style = PaintingStyle.fill
+      ..maskFilter =
+          const MaskFilter.blur(BlurStyle.normal, 3); // Add subtle blur
 
+    // Create a more detailed wave with Path.cubicTo for smoother curves
     final path = Path();
-    path.moveTo(0, 20);
+    path.moveTo(0, 30); // Start higher
 
-    // Create a smooth wave pattern
-    path.quadraticBezierTo(
-      size.width * 0.25,
-      0,
+    // First wave segment
+    path.cubicTo(
+      size.width * 0.1,
+      10,
+      size.width * 0.3,
+      30,
       size.width * 0.5,
       20,
     );
-    path.quadraticBezierTo(
-      size.width * 0.75,
-      40,
+
+    // Second wave segment
+    path.cubicTo(
+      size.width * 0.7,
+      10,
+      size.width * 0.9,
+      25,
       size.width,
-      20,
+      15,
     );
 
     path.lineTo(size.width, size.height);

@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'dart:math' as math;
 import '../services/auth_service.dart';
-import 'auth/auth_wrapper.dart'; // Add this import
+import 'auth/auth_wrapper.dart';
+import '../widgets/side_menu.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -13,40 +14,56 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
-  final List<String> _vehicleTypes = [
-    'Motorcycles',
-    'Cars',
-    'Vans',
-    'Tuk-tuks'
-  ];
+  final List<String> _vehicleTypes = ['Bike', 'Three-wheel', 'Car'];
   final AuthService _authService = AuthService();
+  final Set<String> _selectedVehicles = <String>{};
+  final TextEditingController _locationController = TextEditingController();
+  DateTime _pickupDate = DateTime.now();
+  TimeOfDay _pickupTime = const TimeOfDay(hour: 5, minute: 0);
+  DateTime _returnDate = DateTime.now().add(const Duration(days: 7));
+  TimeOfDay _returnTime = const TimeOfDay(hour: 5, minute: 0);
+  bool _flexibleDates = false;
+  bool _showNearbyVehicles = true;
+  bool _isMenuOpen = false;
 
   @override
   void initState() {
     super.initState();
     _controller = AnimationController(
-      duration: const Duration(seconds: 20),
+      duration: const Duration(seconds: 15),
       vsync: this,
     )..repeat();
+    _locationController.text = 'Location';
   }
 
   @override
   void dispose() {
     _controller.dispose();
+    _locationController.dispose();
     super.dispose();
+  }
+
+  void _toggleMenu() {
+    setState(() {
+      _isMenuOpen = !_isMenuOpen;
+    });
+  }
+
+  void _closeMenu() {
+    setState(() {
+      _isMenuOpen = false;
+    });
   }
 
   Future<void> _signOut() async {
     try {
       await _authService.signOut();
-
-      // Force navigation back to the auth wrapper
       if (!mounted) return;
       Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(
           builder: (context) => const AuthWrapper(),
         ),
-        (route) => false, // This clears the navigation stack
+        (route) => false,
       );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -58,25 +75,85 @@ class _HomeScreenState extends State<HomeScreen>
     }
   }
 
+  Future<void> _selectDate(BuildContext context, bool isPickup) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: isPickup ? _pickupDate : _returnDate,
+      firstDate: DateTime.now(),
+      lastDate: DateTime.now().add(const Duration(days: 365)),
+    );
+    if (picked != null) {
+      setState(() {
+        if (isPickup) {
+          _pickupDate = picked;
+        } else {
+          _returnDate = picked;
+        }
+      });
+    }
+  }
+
+  Future<void> _selectTime(BuildContext context, bool isPickup) async {
+    final TimeOfDay? picked = await showTimePicker(
+      context: context,
+      initialTime: isPickup ? _pickupTime : _returnTime,
+    );
+    if (picked != null) {
+      setState(() {
+        if (isPickup) {
+          _pickupTime = picked;
+        } else {
+          _returnTime = picked;
+        }
+      });
+    }
+  }
+
+  String _formatDate(DateTime date) {
+    return '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
+  }
+
+  String _formatTime(TimeOfDay time) {
+    final hour = time.hour.toString().padLeft(2, '0');
+    final minute = time.minute.toString().padLeft(2, '0');
+    return '$hour:$minute';
+  }
+
+  void _toggleVehicleSelection(String type) {
+    setState(() {
+      if (_selectedVehicles.contains(type)) {
+        _selectedVehicles.remove(type);
+      } else {
+        _selectedVehicles.add(type);
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+    // Get the screen size to help with responsive layout
+    final Size screenSize = MediaQuery.of(context).size;
+    final double screenHeight = screenSize.height;
+    final double screenWidth = screenSize.width;
+
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
-        title: const Text(
-          'WayZ',
-          style: TextStyle(fontWeight: FontWeight.bold, letterSpacing: 1.5),
-        ),
-        backgroundColor: Theme.of(context).colorScheme.primary.withOpacity(0.9),
-        foregroundColor: Colors.white,
+        backgroundColor: Colors.transparent,
         elevation: 0,
-        centerTitle: true,
-        shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(bottom: Radius.circular(20)),
+        leading: IconButton(
+          icon: Icon(
+            _isMenuOpen ? Icons.menu : Icons.menu,
+            color: _isMenuOpen
+                ? Colors.black
+                : Colors.white, // Black when menu is open
+            size: 24,
+          ),
+          onPressed: _toggleMenu,
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.logout),
+            icon: const Icon(Icons.logout, color: Colors.white, size: 22),
             onPressed: _signOut,
             tooltip: 'Sign Out',
           ),
@@ -84,253 +161,447 @@ class _HomeScreenState extends State<HomeScreen>
       ),
       body: Stack(
         children: [
-          // Animated background
-          Positioned.fill(
-            child: AnimatedBuilder(
-              animation: _controller,
-              builder: (context, child) {
-                return CustomPaint(
-                  painter: BackgroundPainter(
-                    animation: _controller,
-                    color1: const Color(0xFF1B7BC8),
-                    color2: const Color(0xFF2CDCAD),
-                  ),
-                );
-              },
+          // Background image with increased brightness
+          Container(
+            decoration: const BoxDecoration(
+              image: DecorationImage(
+                image: AssetImage('assets/images/road_background.jpg'),
+                fit: BoxFit.cover,
+              ),
+            ),
+            child: Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Colors.black.withOpacity(0.15),
+                    Colors.black.withOpacity(0.4),
+                  ],
+                ),
+              ),
             ),
           ),
 
+          // Main content
           SafeArea(
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20.0),
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const SizedBox(height: 20),
-                  // Welcome card
-                  Card(
-                    elevation: 5,
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(15)),
-                    color: Colors.white.withOpacity(0.9),
-                    child: Padding(
-                      padding: const EdgeInsets.all(20.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              Icon(
-                                Icons.waves,
-                                color: Theme.of(context).colorScheme.primary,
-                                size: 28,
-                              ),
-                              const SizedBox(width: 10),
-                              const Text(
-                                'Welcome to WayZ',
-                                style: TextStyle(
-                                  fontSize: 24,
-                                  fontWeight: FontWeight.bold,
+                  // Top section with logo and title - reduced spacing
+                  Column(
+                    children: [
+                      SizedBox(height: screenHeight * 0.02), // Reduced space
+                      Container(
+                        padding: const EdgeInsets.all(8), // Reduced padding
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.2),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Image.asset(
+                          'assets/images/logo.png',
+                          height: screenHeight * 0.06, // Smaller logo
+                          width: screenHeight * 0.06,
+                          fit: BoxFit.contain,
+                        ),
+                      ),
+                      SizedBox(height: screenHeight * 0.01), // Reduced space
+                      const Text(
+                        'Your next adventure starts here',
+                        style: TextStyle(
+                          fontSize: 18, // Smaller font
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                          shadows: [
+                            Shadow(
+                              color: Colors.black54,
+                              offset: Offset(0, 1),
+                              blurRadius: 2,
+                            ),
+                          ],
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
+                  ),
+
+                  // Vehicle selection section
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Vehicle type selection header
+                      const Padding(
+                        padding: EdgeInsets.only(bottom: 6.0),
+                        child: Text(
+                          'Select one or more vehicles:',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 15,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+
+                      // Vehicle type selection grid - more compact
+                      SizedBox(
+                        height: screenHeight * 0.12, // Fixed height
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: _vehicleTypes.map((type) {
+                            final isSelected = _selectedVehicles.contains(type);
+                            return GestureDetector(
+                              onTap: () => _toggleVehicleSelection(type),
+                              child: Container(
+                                width:
+                                    screenWidth * 0.28, // Width based on screen
+                                decoration: BoxDecoration(
+                                  color: isSelected
+                                      ? const Color(0xFFFFA500)
+                                      : Colors.white.withOpacity(0.1),
+                                  border: Border.all(
+                                    color: isSelected
+                                        ? Colors.white
+                                        : Colors.white38,
+                                    width: 2,
+                                  ),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      _getVehicleIcon(type),
+                                      color: isSelected
+                                          ? Colors.black
+                                          : Colors.white,
+                                      size: 20, // Smaller icon
+                                    ),
+                                    const SizedBox(height: 4), // Less space
+                                    Text(
+                                      type,
+                                      style: TextStyle(
+                                        color: isSelected
+                                            ? Colors.black
+                                            : Colors.white,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 12, // Smaller text
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
-                            ],
-                          ),
-                          const SizedBox(height: 15),
+                            );
+                          }).toList(),
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  // Location field
+                  SizedBox(
+                    height: screenHeight * 0.06, // Fixed height
+                    child: _buildInputField(
+                      controller: _locationController,
+                      hintText: 'Location',
+                    ),
+                  ),
+
+                  // Date and time section - more compact
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Pick up section
+                      Row(
+                        children: [
                           const Text(
-                            'Discover the coastal beauty of Sri Lanka at your own pace. Rent the perfect vehicle for your adventure today!',
+                            'Pick up: ',
                             style: TextStyle(
-                              fontSize: 16,
-                              height: 1.5,
+                              color: Colors.white,
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          Expanded(
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: GestureDetector(
+                                    onTap: () => _selectDate(context, true),
+                                    child: _buildDateTimeField(
+                                        _formatDate(_pickupDate)),
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: GestureDetector(
+                                    onTap: () => _selectTime(context, true),
+                                    child: _buildDateTimeField(
+                                        _formatTime(_pickupTime)),
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                         ],
                       ),
-                    ),
-                  ),
 
-                  const SizedBox(height: 30),
-                  const Padding(
-                    padding: EdgeInsets.only(left: 10.0),
-                    child: Text(
-                      'Choose Your Ride',
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                        shadows: [
-                          Shadow(
-                            color: Colors.black26,
-                            offset: Offset(0, 1),
-                            blurRadius: 3,
+                      SizedBox(height: screenHeight * 0.01), // Minimal space
+
+                      // Return section
+                      Row(
+                        children: [
+                          const Text(
+                            'Return:  ',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          Expanded(
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: GestureDetector(
+                                    onTap: () => _selectDate(context, false),
+                                    child: _buildDateTimeField(
+                                        _formatDate(_returnDate)),
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: GestureDetector(
+                                    onTap: () => _selectTime(context, false),
+                                    child: _buildDateTimeField(
+                                        _formatTime(_returnTime)),
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ],
                       ),
-                    ),
+                    ],
                   ),
-                  const SizedBox(height: 20),
 
-                  // Vehicle category cards
-                  Expanded(
-                    child: GridView.builder(
-                      gridDelegate:
-                          const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2,
-                        crossAxisSpacing: 15,
-                        mainAxisSpacing: 15,
+                  // Options section
+                  Row(
+                    children: [
+                      // Flexible dates option
+                      Expanded(
+                        child: Row(
+                          children: [
+                            GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  _flexibleDates = !_flexibleDates;
+                                });
+                              },
+                              child: Container(
+                                width: 18, // Smaller checkbox
+                                height: 18,
+                                decoration: BoxDecoration(
+                                  color: _flexibleDates
+                                      ? const Color(0xFFFFA500)
+                                      : Colors.transparent,
+                                  border: Border.all(
+                                      color: Colors.white, width: 1.5),
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                                child: _flexibleDates
+                                    ? const Icon(Icons.check,
+                                        color: Colors.black, size: 12)
+                                    : null,
+                              ),
+                            ),
+                            const SizedBox(width: 6),
+                            const Text(
+                              'Flexible',
+                              style:
+                                  TextStyle(color: Colors.white, fontSize: 13),
+                            ),
+                          ],
+                        ),
                       ),
-                      itemCount: _vehicleTypes.length,
-                      itemBuilder: (context, index) {
-                        return _buildVehicleCard(_vehicleTypes[index]);
-                      },
+                      // Nearby vehicles option
+                      Expanded(
+                        child: Row(
+                          children: [
+                            GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  _showNearbyVehicles = !_showNearbyVehicles;
+                                });
+                              },
+                              child: Container(
+                                width: 18, // Smaller checkbox
+                                height: 18,
+                                decoration: BoxDecoration(
+                                  color: _showNearbyVehicles
+                                      ? const Color(0xFFA0522D)
+                                      : Colors.transparent,
+                                  border: Border.all(
+                                      color: Colors.white, width: 1.5),
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                                child: _showNearbyVehicles
+                                    ? const Icon(Icons.check,
+                                        color: Colors.white, size: 12)
+                                    : null,
+                              ),
+                            ),
+                            const SizedBox(width: 6),
+                            const Text(
+                              'Show Nearby',
+                              style:
+                                  TextStyle(color: Colors.white, fontSize: 13),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  // Search button
+                  SizedBox(
+                    width: double.infinity,
+                    height: screenHeight * 0.065,
+                    child: ElevatedButton(
+                      onPressed: _selectedVehicles.isNotEmpty
+                          ? () {
+                              // Handle search with selected vehicles
+                              print('Selected vehicles: $_selectedVehicles');
+                            }
+                          : null,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.black,
+                        disabledBackgroundColor: Colors.grey.shade700,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                      child: const Text(
+                        'SEARCH',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 1.5,
+                        ),
+                      ),
                     ),
                   ),
+                  SizedBox(height: screenHeight * 0.02), // Bottom padding
                 ],
               ),
             ),
           ),
+
+          // Side Menu and Overlay
+          if (_isMenuOpen) ...[
+            // Semi-transparent overlay that covers the remaining screen
+            Positioned.fill(
+              child: GestureDetector(
+                onTap: _closeMenu,
+                child: Container(
+                  color: Colors.black.withOpacity(0.5),
+                ),
+              ),
+            ),
+
+            // Side Menu on the left
+            Positioned(
+              top: 0,
+              left: 0,
+              bottom: 0,
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.easeInOut,
+                transform: Matrix4.translationValues(
+                  _isMenuOpen ? 0 : -MediaQuery.of(context).size.width * 0.7,
+                  0,
+                  0,
+                ),
+                child: SideMenu(
+                  onClose: _closeMenu,
+                  onSignOut: _signOut,
+                  width: 0.7, // 70% of screen width
+                ),
+              ),
+            ),
+
+            // Menu icon overlay to show black icon when menu is open
+            Positioned(
+              top: MediaQuery.of(context).padding.top, // Account for status bar
+              left: 4, // Align with the original menu icon
+              child: IconButton(
+                icon: const Icon(
+                  Icons.menu,
+                  color: Colors.black,
+                  size: 24,
+                ),
+                onPressed: _toggleMenu,
+              ),
+            ),
+          ],
         ],
-      ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {},
-        icon: const Icon(Icons.qr_code_scanner),
-        label: const Text('Scan QR'),
-        backgroundColor: Theme.of(context).colorScheme.secondary,
-        foregroundColor: Colors.white,
       ),
     );
   }
 
-  Widget _buildVehicleCard(String vehicleType) {
-    IconData iconData;
-    switch (vehicleType) {
-      case 'Motorcycles':
-        iconData = Icons.motorcycle;
-        break;
-      case 'Cars':
-        iconData = Icons.directions_car;
-        break;
-      case 'Vans':
-        iconData = Icons.airport_shuttle;
-        break;
-      case 'Tuk-tuks':
-        iconData = Icons.electric_rickshaw;
-        break;
-      default:
-        iconData = Icons.directions_car;
-    }
+  Widget _buildInputField({
+    required TextEditingController controller,
+    required String hintText,
+  }) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: TextField(
+        controller: controller,
+        decoration: InputDecoration(
+          hintText: hintText,
+          hintStyle: TextStyle(color: Colors.grey[600], fontSize: 14),
+          border: InputBorder.none,
+          contentPadding:
+              const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        ),
+      ),
+    );
+  }
 
-    return Card(
-      elevation: 5,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-      child: InkWell(
-        onTap: () {},
-        borderRadius: BorderRadius.circular(15),
-        child: Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(15),
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                Theme.of(context).colorScheme.primary.withOpacity(0.8),
-                Theme.of(context).colorScheme.tertiary.withOpacity(0.8),
-              ],
-            ),
-          ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                iconData,
-                size: 50,
-                color: Colors.white,
-              ),
-              const SizedBox(height: 10),
-              Text(
-                vehicleType,
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
-              ),
-            ],
+  Widget _buildDateTimeField(String text) {
+    return Container(
+      height: 40, // Reduced height
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Center(
+        child: Text(
+          text,
+          style: TextStyle(
+            color: Colors.grey[700],
+            fontSize: 14, // Smaller font
           ),
         ),
       ),
     );
   }
-}
 
-// Background painter for animated gradient
-class BackgroundPainter extends CustomPainter {
-  final Animation<double> animation;
-  final Color color1;
-  final Color color2;
-
-  BackgroundPainter({
-    required this.animation,
-    required this.color1,
-    required this.color2,
-  }) : super(repaint: animation);
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint();
-    final rect = Rect.fromLTWH(0, 0, size.width, size.height);
-
-    // Create gradient with moving pattern
-    final gradient = LinearGradient(
-      begin: Alignment.topLeft,
-      end: Alignment.bottomRight,
-      colors: [
-        color1.withOpacity(0.8),
-        color2.withOpacity(0.6),
-        color1.withOpacity(0.4),
-      ],
-      stops: [
-        0.0,
-        animation.value % 1.0,
-        1.0,
-      ],
-      transform: GradientRotation(animation.value * 2 * math.pi),
-    );
-
-    paint.shader = gradient.createShader(rect);
-
-    // Draw water-inspired pattern
-    for (int i = 0; i < 5; i++) {
-      double offset = i * 60;
-      Path path = Path();
-      path.moveTo(0, size.height - offset);
-
-      for (double x = 0; x < size.width; x += 40) {
-        double normalizedX = x / size.width;
-        double phase = animation.value * 2 * math.pi + (i * math.pi / 3);
-        double y = size.height -
-            offset +
-            math.sin(normalizedX * 4 * math.pi + phase) * 15;
-        path.lineTo(x, y);
-      }
-
-      path.lineTo(size.width, size.height);
-      path.lineTo(0, size.height);
-      path.close();
-
-      canvas.drawPath(
-        path,
-        Paint()
-          ..color = Colors.white.withOpacity(0.05 + (i * 0.02))
-          ..style = PaintingStyle.fill,
-      );
+  IconData _getVehicleIcon(String type) {
+    switch (type) {
+      case 'Bike':
+        return Icons.directions_bike;
+      case 'Three-wheel':
+        return Icons.directions_railway_filled_outlined;
+      case 'Car':
+        return Icons.directions_car;
+      default:
+        return Icons.directions_car;
     }
-
-    canvas.drawRect(rect, paint);
   }
-
-  @override
-  bool shouldRepaint(covariant BackgroundPainter oldDelegate) =>
-      oldDelegate.animation.value != animation.value ||
-      oldDelegate.color1 != color1 ||
-      oldDelegate.color2 != color2;
 }

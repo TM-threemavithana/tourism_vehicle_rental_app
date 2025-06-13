@@ -34,16 +34,16 @@ class _SplashScreenState extends State<SplashScreen>
 
     // Wave animation controller
     _waveController = AnimationController(
-      duration: const Duration(seconds: 3),
+      duration: const Duration(seconds: 2), // Reduced from 3
       vsync: this,
     )..repeat(reverse: true);
 
     _waveAnimation = Tween<double>(
       begin: 0.0,
-      end: 15.0,
+      end: 12.0, // Reduced from 15.0 for more subtle effect
     ).animate(CurvedAnimation(
       parent: _waveController,
-      curve: Curves.easeInOut,
+      curve: Curves.easeInOutSine, // Changed from easeInOut
     ));
 
     // Logo animations
@@ -52,7 +52,8 @@ class _SplashScreenState extends State<SplashScreen>
       end: 1.0,
     ).animate(CurvedAnimation(
       parent: _logoController,
-      curve: Curves.elasticOut,
+      curve: const Interval(0.0, 0.8,
+          curve: Curves.elasticOut), // Adjusted interval
     ));
 
     _logoSlideAnimation = Tween<Offset>(
@@ -191,30 +192,33 @@ class _SplashScreenState extends State<SplashScreen>
                   position: _logoSlideAnimation,
                   child: ScaleTransition(
                     scale: _logoScaleAnimation,
-                    child: Container(
-                      width: 160, // Slightly increased for better proportion
-                      height: 160, // Matching width for perfect circle
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.2),
-                        shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.3),
-                            blurRadius: 25,
-                            spreadRadius: 5,
-                          ),
-                        ],
-                      ),
-                      child: Center(
-                        // Center widget ensures perfect centering
-                        child: ClipOval(
-                          // ClipOval ensures the image stays within circular bounds
-                          child: Image.asset(
-                            'assets/images/logo.png',
-                            width:
-                                120, // Slightly smaller than container for padding effect
-                            height: 120,
-                            fit: BoxFit.contain, // Maintains aspect ratio
+                    child: Hero(
+                      tag: 'appLogo',
+                      child: Container(
+                        width: 160, // Slightly increased for better proportion
+                        height: 160, // Matching width for perfect circle
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.2),
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.3),
+                              blurRadius: 25,
+                              spreadRadius: 5,
+                            ),
+                          ],
+                        ),
+                        child: Center(
+                          // Center widget ensures perfect centering
+                          child: ClipOval(
+                            // ClipOval ensures the image stays within circular bounds
+                            child: Image.asset(
+                              'assets/images/logo.png',
+                              width:
+                                  120, // Slightly smaller than container for padding effect
+                              height: 120,
+                              fit: BoxFit.contain, // Maintains aspect ratio
+                            ),
                           ),
                         ),
                       ),
