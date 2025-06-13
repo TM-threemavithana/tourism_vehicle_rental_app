@@ -3,6 +3,7 @@ import 'package:animated_text_kit/animated_text_kit.dart';
 import 'dart:async';
 import 'dart:math' as math;
 import 'onboarding/onboarding_screen.dart';
+import 'auth/auth_wrapper.dart'; // Import AuthWrapper
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -84,13 +85,19 @@ class _SplashScreenState extends State<SplashScreen>
       _fadeController.forward();
     });
 
-    // Navigate to onboarding screen
+    // Navigate to onboarding screen or auth wrapper based on whether user has seen onboarding
     Timer(const Duration(seconds: 5), () {
+      // Check if user has seen onboarding before
+      final bool hasSeenOnboarding =
+          false; // Replace with actual logic (using SharedPreferences)
+
       Navigator.pushReplacement(
         context,
         PageRouteBuilder(
           transitionDuration: const Duration(milliseconds: 1200),
-          pageBuilder: (_, __, ___) => const OnboardingScreen(),
+          pageBuilder: (_, __, ___) => hasSeenOnboarding
+              ? const AuthWrapper()
+              : const OnboardingScreen(),
           transitionsBuilder: (_, animation, __, child) {
             return FadeTransition(
               opacity: animation,

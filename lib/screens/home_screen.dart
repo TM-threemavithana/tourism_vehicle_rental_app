@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:math' as math;
+import '../services/auth_service.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -17,6 +18,7 @@ class _HomeScreenState extends State<HomeScreen>
     'Vans',
     'Tuk-tuks'
   ];
+  final AuthService _authService = AuthService();
 
   @override
   void initState() {
@@ -31,6 +33,20 @@ class _HomeScreenState extends State<HomeScreen>
   void dispose() {
     _controller.dispose();
     super.dispose();
+  }
+
+  Future<void> _signOut() async {
+    try {
+      await _authService.signOut();
+      // Navigation will be handled by the AuthWrapper
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error signing out: $e'),
+          backgroundColor: Colors.red.shade800,
+        ),
+      );
+    }
   }
 
   @override
@@ -49,6 +65,13 @@ class _HomeScreenState extends State<HomeScreen>
         shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(bottom: Radius.circular(20)),
         ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.logout),
+            onPressed: _signOut,
+            tooltip: 'Sign Out',
+          ),
+        ],
       ),
       body: Stack(
         children: [

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../services/auth_service.dart';
 import 'login_screen.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
@@ -13,6 +14,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   final _emailController = TextEditingController();
   bool _isSubmitting = false;
   bool _resetEmailSent = false;
+  final AuthService _authService = AuthService();
 
   @override
   void dispose() {
@@ -26,13 +28,30 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         _isSubmitting = true;
       });
 
-      // Simulate network delay
-      await Future.delayed(const Duration(seconds: 2));
+      try {
+        // Send password reset email
+        await _authService.resetPassword(_emailController.text.trim());
 
-      setState(() {
-        _isSubmitting = false;
-        _resetEmailSent = true;
-      });
+        if (!mounted) return;
+        setState(() {
+          _isSubmitting = false;
+          _resetEmailSent = true;
+        });
+      } catch (e) {
+        if (!mounted) return;
+        setState(() {
+          _isSubmitting = false;
+        });
+
+        // Show error message
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(e.toString().replaceAll('Exception: ', '')),
+            backgroundColor: Colors.red.shade800,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
     }
   }
 

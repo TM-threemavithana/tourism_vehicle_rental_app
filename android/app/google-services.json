@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "112419920911",
+    "project_id": "vehicle-rental-app-aba3c",
+    "storage_bucket": "vehicle-rental-app-aba3c.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:112419920911:android:3db434901fc1dc6f51577a",
+        "android_client_info": {
+          "package_name": "com.example.tourism_vehicle_rental_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB8zdbH32dE_6CVEEb7HACuWFyLkZqwiP0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

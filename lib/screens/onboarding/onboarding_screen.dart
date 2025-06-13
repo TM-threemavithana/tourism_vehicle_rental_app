@@ -5,6 +5,7 @@ import 'slide_one.dart';
 import 'slide_two.dart';
 import 'slide_three.dart';
 import '../auth/login_screen.dart';
+import '../auth/auth_wrapper.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
@@ -22,7 +23,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
 
   // For the explosion animation
   bool _isExploding = false;
-  double _explosionRadius = 0;
+  final double _explosionRadius = 0;
 
   @override
   void initState() {
@@ -57,7 +58,8 @@ class _OnboardingScreenState extends State<OnboardingScreen>
       Navigator.of(context).pushReplacement(
         PageRouteBuilder(
           transitionDuration: const Duration(milliseconds: 800),
-          pageBuilder: (_, __, ___) => const LoginScreen(),
+          pageBuilder: (_, __, ___) =>
+              const AuthWrapper(), // Changed from LoginScreen
           transitionsBuilder: (_, animation, __, child) {
             return FadeTransition(
               opacity: animation,
