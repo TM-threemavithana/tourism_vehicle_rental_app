@@ -20,7 +20,7 @@ class _GoogleSignInButtonState extends State<GoogleSignInButton> {
   bool _isLoading = false;
   // Google logo URL - using the official logo
   final String googleLogoUrl =
-      'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/google/google-original.svg';
+      'https://developers.google.com/identity/images/g-logo.png';
 
   Future<void> _signInWithGoogle() async {
     setState(() {
