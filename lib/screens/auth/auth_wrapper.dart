@@ -14,6 +14,9 @@ class AuthWrapper extends StatelessWidget {
     return StreamBuilder<User?>(
       stream: _authService.authStateChanges,
       builder: (context, snapshot) {
+        // Debug print to verify state changes
+        print('Auth state changed: ${snapshot.data?.uid}');
+
         if (snapshot.connectionState == ConnectionState.active) {
           final User? user = snapshot.data;
 

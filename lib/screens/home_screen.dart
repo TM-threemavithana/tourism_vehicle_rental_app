@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:math' as math;
 import '../services/auth_service.dart';
+import 'auth/auth_wrapper.dart'; // Add this import
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -38,7 +39,15 @@ class _HomeScreenState extends State<HomeScreen>
   Future<void> _signOut() async {
     try {
       await _authService.signOut();
-      // Navigation will be handled by the AuthWrapper
+
+      // Force navigation back to the auth wrapper
+      if (!mounted) return;
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(
+          builder: (context) => const AuthWrapper(),
+        ),
+        (route) => false, // This clears the navigation stack
+      );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
