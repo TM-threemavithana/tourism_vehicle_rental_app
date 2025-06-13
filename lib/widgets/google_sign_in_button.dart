@@ -1,0 +1,130 @@
+import 'package:flutter/material.dart';
+import '../services/auth_service.dart';
+
+class GoogleSignInButton extends StatefulWidget {
+  final Function? onSuccess;
+  final bool isLogin;
+
+  const GoogleSignInButton({
+    super.key,
+    this.onSuccess,
+    this.isLogin = true,
+  });
+
+  @override
+  State<GoogleSignInButton> createState() => _GoogleSignInButtonState();
+}
+
+class _GoogleSignInButtonState extends State<GoogleSignInButton> {
+  final AuthService _authService = AuthService();
+  bool _isLoading = false;
+  // Google logo URL - using the official logo
+  final String googleLogoUrl =
+      'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/google/google-original.svg';
+
+  Future<void> _signInWithGoogle() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      // Sign in with Google
+      await _authService.signInWithGoogle();
+
+      // Call the success callback if provided
+      if (widget.onSuccess != null && mounted) {
+        widget.onSuccess!();
+      }
+    } catch (e) {
+      if (!mounted) return;
+      // Show error message
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(e.toString().replaceAll('Exception: ', '')),
+          backgroundColor: Colors.red.shade800,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ElevatedButton(
+      onPressed: _isLoading ? null : _signInWithGoogle,
+      style: ElevatedButton.styleFrom(
+        backgroundColor: Colors.white,
+        foregroundColor: Colors.black87,
+        elevation: 2,
+        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+          side: BorderSide(color: Colors.grey.shade300),
+        ),
+      ),
+      child: _isLoading
+          ? SizedBox(
+              height: 20,
+              width: 20,
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                valueColor: AlwaysStoppedAnimation<Color>(
+                    Theme.of(context).colorScheme.primary),
+              ),
+            )
+          : Row(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                // Google logo from network image
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(2),
+                  child: Image.network(
+                    googleLogoUrl,
+                    height: 24,
+                    width: 24,
+                    errorBuilder: (context, error, stackTrace) {
+                      // Fallback to the Google "G" icon if network image fails
+                      return Container(
+                        height: 24,
+                        width: 24,
+                        decoration: const BoxDecoration(
+                          color: Colors.white,
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Center(
+                          child: Text(
+                            'G',
+                            style: TextStyle(
+                              color: Colors.blue,
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+                const SizedBox(width: 12),
+                // The button text changes based on whether it's used for login or signup
+                Text(
+                  widget.isLogin
+                      ? 'Sign in with Google'
+                      : 'Sign up with Google',
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            ),
+    );
+  }
+}

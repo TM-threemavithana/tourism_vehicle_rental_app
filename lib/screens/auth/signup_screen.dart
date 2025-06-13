@@ -3,6 +3,7 @@ import 'package:flutter/gestures.dart';
 import '../home_screen.dart';
 import 'login_screen.dart';
 import '../../services/auth_service.dart';
+import '../../widgets/google_sign_in_button.dart'; // Add this import if it's not already there
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
@@ -518,6 +519,80 @@ class _SignupScreenState extends State<SignupScreen>
                                 ),
                               ],
                             ),
+                          ),
+                        ),
+                      ),
+
+                      const SizedBox(height: 30),
+
+                      // Add the divider and Google sign-in button
+                      Card(
+                        elevation: 8,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        color: Colors.white.withOpacity(0.9),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 20.0, horizontal: 24.0),
+                          child: Column(
+                            children: [
+                              // Divider with "Or" text
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: Divider(
+                                      color: Colors.grey[400],
+                                      thickness: 1,
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 16),
+                                    child: Text(
+                                      'Or sign up with',
+                                      style: TextStyle(
+                                        color: Colors.grey[600],
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                  ),
+                                  Expanded(
+                                    child: Divider(
+                                      color: Colors.grey[400],
+                                      thickness: 1,
+                                    ),
+                                  ),
+                                ],
+                              ),
+
+                              const SizedBox(height: 20),
+
+                              // Google sign-in button
+                              Center(
+                                child: GoogleSignInButton(
+                                  isLogin: false,
+                                  onSuccess: () {
+                                    Navigator.of(context).pushAndRemoveUntil(
+                                      PageRouteBuilder(
+                                        transitionDuration:
+                                            const Duration(milliseconds: 800),
+                                        pageBuilder: (_, __, ___) =>
+                                            const HomeScreen(),
+                                        transitionsBuilder:
+                                            (_, animation, __, child) {
+                                          return FadeTransition(
+                                            opacity: animation,
+                                            child: child,
+                                          );
+                                        },
+                                      ),
+                                      (route) => false,
+                                    );
+                                  },
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                       ),

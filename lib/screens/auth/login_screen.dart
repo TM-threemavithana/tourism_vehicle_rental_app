@@ -4,6 +4,7 @@ import '../home_screen.dart';
 import 'signup_screen.dart';
 import 'forgot_password_screen.dart';
 import '../../services/auth_service.dart';
+import '../../widgets/google_sign_in_button.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -422,6 +423,63 @@ class _LoginScreenState extends State<LoginScreen>
                                               letterSpacing: 0.5,
                                             ),
                                           ),
+                                  ),
+                                ),
+
+                                const SizedBox(height: 20),
+
+                                // Divider with "Or" text
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: Divider(
+                                        color: Colors.grey[400],
+                                        thickness: 1,
+                                      ),
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 16),
+                                      child: Text(
+                                        'Or',
+                                        style: TextStyle(
+                                          color: Colors.grey[600],
+                                          fontSize: 14,
+                                        ),
+                                      ),
+                                    ),
+                                    Expanded(
+                                      child: Divider(
+                                        color: Colors.grey[400],
+                                        thickness: 1,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+
+                                const SizedBox(height: 20),
+
+                                // Center the Google sign-in button
+                                Center(
+                                  child: GoogleSignInButton(
+                                    isLogin: true,
+                                    onSuccess: () {
+                                      Navigator.of(context).pushReplacement(
+                                        PageRouteBuilder(
+                                          transitionDuration:
+                                              const Duration(milliseconds: 800),
+                                          pageBuilder: (_, __, ___) =>
+                                              const HomeScreen(),
+                                          transitionsBuilder:
+                                              (_, animation, __, child) {
+                                            return FadeTransition(
+                                              opacity: animation,
+                                              child: child,
+                                            );
+                                          },
+                                        ),
+                                      );
+                                    },
                                   ),
                                 ),
                               ],
