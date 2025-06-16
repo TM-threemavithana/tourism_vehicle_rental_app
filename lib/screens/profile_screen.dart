@@ -3,10 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import '../services/cloudinary_service.dart';
+import '../services/auth_service.dart';
 import '../screens/auth/auth_wrapper.dart';
 import '../widgets/side_menu.dart';
 import '../utils/app_colors.dart';
 import '../screens/home_screen.dart';
+import 'owner/owner_dashboard_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   final User? user;
@@ -25,6 +27,7 @@ class _ProfileScreenState extends State<ProfileScreen>
   bool _isMenuOpen = false;
   final TextEditingController _nameController = TextEditingController();
   final CloudinaryService _cloudinaryService = CloudinaryService();
+  final AuthService _authService = AuthService();
 
   // Add a controller for the AnimatedIcon
   late AnimationController _menuIconController;
@@ -411,6 +414,50 @@ class _ProfileScreenState extends State<ProfileScreen>
     }
   }
 
+  // Add this method to the _ProfileScreenState class
+  Future<void> _switchUserType() async {
+    // First get the current user type
+    final currentUserType = await _authService.getUserType();
+
+    // Toggle the user type
+    final newUserType = currentUserType == 'renter' ? 'owner' : 'renter';
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      await _authService.updateUserType(newUserType);
+
+      // Navigate to the appropriate screen
+      if (!mounted) return;
+
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(
+          builder: (context) => newUserType == 'owner'
+              ? const OwnerDashboardScreen()
+              : const HomeScreen(),
+        ),
+        (route) => false,
+      );
+    } catch (e) {
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error switching user type: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -702,6 +749,14 @@ class _ProfileScreenState extends State<ProfileScreen>
                               iconColor: Colors.orange,
                               theme: theme,
                             ),
+                            _buildDivider(),
+                            _buildMenuOption(
+                              icon: Icons.swap_horiz,
+                              title: 'Switch Account Type',
+                              subtitle: 'Toggle between renter and owner modes',
+                              iconColor: Colors.purple,
+                              theme: theme,
+                            ),
                           ],
                         ),
                       ),
@@ -795,7 +850,7 @@ class _ProfileScreenState extends State<ProfileScreen>
               ],
             ),
           ),
-          
+
           // Side Menu and Overlay
           if (_isMenuOpen) ...[
             // Semi-transparent overlay
@@ -1211,6 +1266,11 @@ class _ProfileScreenState extends State<ProfileScreen>
       case 'Delete Account':
         onTap = () {
           _showDeleteAccountConfirmation();
+        };
+        break;
+      case 'Switch Account Type':
+        onTap = () {
+          _switchUserType();
         };
         break;
     }

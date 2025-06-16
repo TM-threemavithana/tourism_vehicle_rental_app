@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'screens/splash_screen.dart';
+import 'screens/home_screen.dart';
+import 'screens/auth/auth_wrapper.dart';
+import 'screens/auth/user_type_selection_screen.dart'
+    show UserTypeSelectionScreen;
+import 'screens/owner/owner_dashboard_screen.dart' show OwnerDashboardScreen;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -53,7 +58,14 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
         fontFamily: 'Montserrat',
       ),
-      home: const SplashScreen(),
+      initialRoute: '/',
+      routes: {
+        '/': (context) => const SplashScreen(),
+        '/home': (context) => const HomeScreen(),
+        '/auth': (context) => const AuthWrapper(),
+        '/user-type': (context) => const UserTypeSelectionScreen(),
+        '/owner-dashboard': (context) => const OwnerDashboardScreen(),
+      },
     );
   }
 }

@@ -1,9 +1,11 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final GoogleSignIn _googleSignIn = GoogleSignIn();
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   // Get current user
   User? get currentUser => _auth.currentUser;
@@ -33,6 +35,9 @@ class AuthService {
       // Update display name
       await userCredential.user?.updateDisplayName(fullName);
 
+      // Create user document in Firestore with default userType as 'renter'
+      await _createUserDocument(userCredential.user!, 'renter');
+
       return userCredential;
     } on FirebaseAuthException catch (e) {
       throw _handleAuthException(e);
@@ -60,7 +65,15 @@ class AuthService {
       );
 
       // Sign in to Firebase with the Google credential
-      return await _auth.signInWithCredential(credential);
+      final userCredential = await _auth.signInWithCredential(credential);
+
+      // Check if this is a new user (first time sign in)
+      if (userCredential.additionalUserInfo?.isNewUser ?? false) {
+        // Create user document with default userType
+        await _createUserDocument(userCredential.user!, 'renter');
+      }
+
+      return userCredential;
     } catch (e) {
       if (e is FirebaseAuthException) {
         throw _handleAuthException(e);
@@ -69,13 +82,66 @@ class AuthService {
     }
   }
 
+  // Create or update user document in Firestore
+  Future<void> _createUserDocument(User user, String defaultUserType) async {
+    final userDoc = await _firestore.collection('users').doc(user.uid).get();
+
+    if (!userDoc.exists) {
+      await _firestore.collection('users').doc(user.uid).set({
+        'displayName': user.displayName,
+        'email': user.email,
+        'photoURL': user.photoURL,
+        'userType': defaultUserType,
+        'vehiclesRented': 0,
+        'totalReviews': 0,
+        'vehiclesListed': 0,
+        'activeRentals': 0,
+        'createdAt': FieldValue.serverTimestamp(),
+        'lastUpdated': FieldValue.serverTimestamp(),
+      });
+    }
+  }
+
+  // Update user type
+  Future<void> updateUserType(String userType) async {
+    if (currentUser == null) return;
+
+    // First check if user document exists
+    final userDoc =
+        await _firestore.collection('users').doc(currentUser!.uid).get();
+
+    if (!userDoc.exists) {
+      // Create user document if it doesn't exist
+      await _createUserDocument(currentUser!, userType);
+    } else {
+      // Update existing document
+      await _firestore.collection('users').doc(currentUser!.uid).update({
+        'userType': userType,
+        'lastUpdated': FieldValue.serverTimestamp(),
+      });
+    }
+  }
+
+  // Get current user type
+  Future<String> getUserType() async {
+    if (currentUser == null) return 'renter';
+
+    final userDoc =
+        await _firestore.collection('users').doc(currentUser!.uid).get();
+    if (userDoc.exists) {
+      return userDoc.data()?['userType'] ?? 'renter';
+    }
+
+    return 'renter';
+  }
+
   // Sign out
   Future<void> signOut() async {
     try {
-      await _googleSignIn.signOut(); // Sign out from Google first
-      await _auth.signOut(); // Then sign out from Firebase
+      await _googleSignIn.signOut();
+      await _auth.signOut();
     } catch (e) {
-      throw Exception('Error signing out: ${e.toString()}');
+      throw Exception('Failed to sign out: ${e.toString()}');
     }
   }
 
@@ -91,7 +157,6 @@ class AuthService {
   // Handle Firebase Auth exceptions
   Exception _handleAuthException(FirebaseAuthException e) {
     String message;
-
     switch (e.code) {
       case 'user-not-found':
         message = 'No user found with this email.';
@@ -100,24 +165,23 @@ class AuthService {
         message = 'Incorrect password.';
         break;
       case 'email-already-in-use':
-        message = 'The email address is already in use.';
+        message = 'An account already exists with this email.';
         break;
       case 'invalid-email':
-        message = 'The email address is invalid.';
+        message = 'The email address is not valid.';
         break;
       case 'weak-password':
-        message = 'Password is too weak.';
+        message = 'The password is too weak.';
         break;
       case 'operation-not-allowed':
         message = 'This operation is not allowed.';
         break;
-      case 'account-exists-with-different-credential':
-        message = 'An account already exists with the same email address.';
+      case 'too-many-requests':
+        message = 'Too many attempts. Please try again later.';
         break;
       default:
-        message = 'An error occurred. Please try again.';
+        message = e.message ?? 'An unknown error occurred.';
     }
-
     return Exception(message);
   }
 }
