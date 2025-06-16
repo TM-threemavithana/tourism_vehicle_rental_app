@@ -18,9 +18,9 @@ class GoogleSignInButton extends StatefulWidget {
 class _GoogleSignInButtonState extends State<GoogleSignInButton> {
   final AuthService _authService = AuthService();
   bool _isLoading = false;
-  // Google logo - using a local asset image
-  final AssetImage googleLogo =
-      const AssetImage('assets/images/google_logo.png');
+  // Google logo URL instead of asset
+  final String googleLogoUrl =
+      'https://developers.google.com/identity/images/g-logo.png';
 
   Future<void> _signInWithGoogle() async {
     setState(() {
@@ -82,15 +82,22 @@ class _GoogleSignInButtonState extends State<GoogleSignInButton> {
               mainAxisSize: MainAxisSize.min,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                // Use local Google logo image instead of network image
+                // Use network image for Google logo
                 Container(
                   width: 24,
                   height: 24,
                   margin: const EdgeInsets.only(right: 12),
-                  child: Image(
-                    image: googleLogo,
+                  child: Image.network(
+                    googleLogoUrl,
                     width: 24,
                     height: 24,
+                    errorBuilder: (context, error, stackTrace) {
+                      return Icon(
+                        Icons.add_circle,
+                        color: Colors.red,
+                        size: 24,
+                      );
+                    },
                   ),
                 ),
                 // The button text changes based on whether it's used for login or signup
