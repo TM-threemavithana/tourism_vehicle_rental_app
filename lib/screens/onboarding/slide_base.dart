@@ -23,7 +23,7 @@ class SlideBase extends StatelessWidget {
       color: bgColor,
       child: Stack(
         children: [
-          // Background image with gradient overlay
+          // Background image with gradient overlay - simplified without loading state
           if (imageUrl != null)
             Positioned.fill(
               child: ShaderMask(
@@ -38,7 +38,7 @@ class SlideBase extends StatelessWidget {
                   ).createShader(rect);
                 },
                 blendMode: BlendMode.srcATop,
-                child: _buildNetworkImage(imageUrl!, BoxFit.cover),
+                child: _buildImage(imageUrl!, BoxFit.cover),
               ),
             ),
 
@@ -62,7 +62,7 @@ class SlideBase extends StatelessWidget {
               children: [
                 const SizedBox(height: 30),
 
-                // Main visual (Either network image or icon)
+                // Main visual - simplified image loading
                 if (imageUrl != null)
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 30),
@@ -81,7 +81,7 @@ class SlideBase extends StatelessWidget {
                       ),
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(20),
-                        child: _buildNetworkImage(imageUrl!, BoxFit.cover),
+                        child: _buildImage(imageUrl!, BoxFit.cover),
                       ),
                     ),
                   )
@@ -170,47 +170,34 @@ class SlideBase extends StatelessWidget {
     );
   }
 
-  // Helper method for consistently building network images
-  Widget _buildNetworkImage(String url, BoxFit fit) {
-    // Check if the URL is a network URL or an asset path
-    if (url.startsWith('http://') || url.startsWith('https://')) {
-      // This is a network image, use CachedNetworkImage
-      return CachedNetworkImage(
-        imageUrl: url,
-        fit: fit,
-        placeholder: (context, url) => Center(
-          child: CircularProgressIndicator(
-            color: Colors.white.withOpacity(0.7),
-          ),
-        ),
-        errorWidget: (context, url, error) => Container(
-          color: bgColor.withOpacity(0.2),
+  // Helper method for displaying images
+  Widget _buildImage(String url, BoxFit fit) {
+    return Image.asset(
+      url,
+      fit: fit,
+      gaplessPlayback: true, // Prevents flashes between slides
+      frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
+        // This ensures we always show something, even if image isn't fully loaded
+        if (wasSynchronouslyLoaded || frame != null) {
+          return child;
+        }
+
+        // Show a placeholder with fade-in when the image loads
+        return Container(
+          color: bgColor.withOpacity(0.5),
           child: Center(
-            child: Icon(
-              iconData ?? Icons.image,
-              size: 80,
-              color: Colors.white70,
+            child: SizedBox(
+              width: 30,
+              height: 30,
+              child: CircularProgressIndicator(
+                color: Colors.white,
+                strokeWidth: 2,
+              ),
             ),
           ),
-        ),
-      );
-    } else {
-      // This is an asset image, use Image.asset
-      return Image.asset(
-        url,
-        fit: fit,
-        errorBuilder: (context, error, stackTrace) => Container(
-          color: bgColor.withOpacity(0.2),
-          child: Center(
-            child: Icon(
-              iconData ?? Icons.image,
-              size: 80,
-              color: Colors.white70,
-            ),
-          ),
-        ),
-      );
-    }
+        );
+      },
+    );
   }
 }
 

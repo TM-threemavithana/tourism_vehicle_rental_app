@@ -4,6 +4,7 @@ import 'auth/auth_wrapper.dart';
 import '../widgets/side_menu.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'profile_screen.dart'; // Import the ProfileScreen
+import '../services/image_preloader.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -162,10 +163,8 @@ class _HomeScreenState extends State<HomeScreen>
         elevation: 0,
         leading: IconButton(
           icon: Icon(
-            _isMenuOpen ? Icons.menu : Icons.menu,
-            color: _isMenuOpen
-                ? Colors.black
-                : Colors.white, // Black when menu is open
+            _isMenuOpen ? Icons.close : Icons.menu,
+            color: _isMenuOpen ? Colors.black : Colors.white,
             size: 24,
           ),
           onPressed: _toggleMenu,
@@ -180,12 +179,14 @@ class _HomeScreenState extends State<HomeScreen>
       ),
       body: Stack(
         children: [
-          // Background image with increased brightness
+          // Direct background image display - no loading state needed as images are preloaded
           Container(
             decoration: const BoxDecoration(
               image: DecorationImage(
                 image: AssetImage('assets/images/road_background.jpg'),
                 fit: BoxFit.cover,
+                // Add these for smoother rendering
+                filterQuality: FilterQuality.medium,
               ),
             ),
             child: Container(

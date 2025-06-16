@@ -3,36 +3,12 @@ import 'package:firebase_core/firebase_core.dart';
 import 'screens/splash_screen.dart';
 import 'screens/home_screen.dart';
 import 'screens/auth/auth_wrapper.dart';
-import 'screens/auth/user_type_selection_screen.dart'
-    show UserTypeSelectionScreen;
-import 'screens/owner/owner_dashboard_screen.dart' show OwnerDashboardScreen;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
+
   runApp(const MyApp());
-}
-
-// Replace or update the _precacheImages function
-Future<void> _precacheImages(BuildContext context) async {
-  final assets = [
-    'assets/images/logo.png',
-    'assets/images/image1.jpg',
-    'assets/images/image2.jpg',
-    'assets/images/image3.jpg',
-    'assets/images/splash_background.png',
-    'assets/images/road_background.jpg',
-    // Add other frequently used images
-  ];
-
-  for (final asset in assets) {
-    try {
-      await precacheImage(AssetImage(asset), context);
-      print('Precached: $asset');
-    } catch (e) {
-      print('Failed to precache $asset: $e');
-    }
-  }
 }
 
 class MyApp extends StatelessWidget {
@@ -40,11 +16,6 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Precache images when app starts
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _precacheImages(context);
-    });
-
     return MaterialApp(
       title: 'WayZ',
       debugShowCheckedModeBanner: false,
@@ -63,8 +34,6 @@ class MyApp extends StatelessWidget {
         '/': (context) => const SplashScreen(),
         '/home': (context) => const HomeScreen(),
         '/auth': (context) => const AuthWrapper(),
-        '/user-type': (context) => const UserTypeSelectionScreen(),
-        '/owner-dashboard': (context) => const OwnerDashboardScreen(),
       },
     );
   }

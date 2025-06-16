@@ -29,12 +29,13 @@ class _OnboardingScreenState extends State<OnboardingScreen>
     super.initState();
     _animationController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 1200),
+      duration:
+          const Duration(milliseconds: 800), // Reduced for faster animation
     );
 
     _animation = CurvedAnimation(
       parent: _animationController,
-      curve: Curves.easeInOut,
+      curve: Curves.easeOutQuad, // More responsive curve
     );
 
     _animationController.forward();
@@ -53,10 +54,10 @@ class _OnboardingScreenState extends State<OnboardingScreen>
     });
 
     // Reduce the animation duration to make it faster
-    Future.delayed(const Duration(milliseconds: 600), () {
+    Future.delayed(const Duration(milliseconds: 400), () {
       Navigator.of(context).pushReplacement(
         PageRouteBuilder(
-          transitionDuration: const Duration(milliseconds: 600),
+          transitionDuration: const Duration(milliseconds: 400),
           pageBuilder: (_, __, ___) => const AuthWrapper(),
           transitionsBuilder: (_, animation, __, child) {
             // Use a combined curve for smoother effect
@@ -67,7 +68,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
             return FadeTransition(
               opacity: curvedAnimation,
               child: ScaleTransition(
-                scale: Tween<double>(begin: 0.95, end: 1.0)
+                scale: Tween<double>(begin: 0.98, end: 1.0)
                     .animate(curvedAnimation),
                 child: child,
               ),

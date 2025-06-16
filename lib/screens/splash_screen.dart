@@ -3,7 +3,8 @@ import 'package:animated_text_kit/animated_text_kit.dart';
 import 'dart:async';
 import 'dart:math' as math;
 import 'onboarding/onboarding_screen.dart';
-import 'auth/auth_wrapper.dart'; // Import AuthWrapper
+import 'auth/auth_wrapper.dart';
+import '../services/image_preloader.dart'; // Add this import
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -21,6 +22,13 @@ class _SplashScreenState extends State<SplashScreen>
   late Animation<double> _logoScaleAnimation;
   late Animation<Offset> _logoSlideAnimation;
   late Animation<double> _waveAnimation;
+
+  // Add loading tracker
+  bool _imagesPreloaded = false;
+
+  // Navigation control variables
+  bool _navigatedAway = false;
+  bool _minimumTimeElapsed = false;
 
   @override
   void initState() {
@@ -82,32 +90,81 @@ class _SplashScreenState extends State<SplashScreen>
     _logoController.forward();
 
     // Start fade animation after logo animation
-    Future.delayed(const Duration(milliseconds: 1000), () {
+    Future.delayed(const Duration(milliseconds: 800), () {
       _fadeController.forward();
     });
 
-    // Navigate to onboarding screen or auth wrapper based on whether user has seen onboarding
-    Timer(const Duration(seconds: 5), () {
-      // Check if user has seen onboarding before
-      final bool hasSeenOnboarding =
-          false; // Replace with actual logic (using SharedPreferences)
-
-      Navigator.pushReplacement(
-        context,
-        PageRouteBuilder(
-          transitionDuration: const Duration(milliseconds: 1200),
-          pageBuilder: (_, __, ___) => hasSeenOnboarding
-              ? const AuthWrapper()
-              : const OnboardingScreen(),
-          transitionsBuilder: (_, animation, __, child) {
-            return FadeTransition(
-              opacity: animation,
-              child: child,
-            );
-          },
-        ),
-      );
+    // Start preloading immediately but don't wait for it here
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _preloadAllImages();
     });
+
+    // Add a minimum display time for the splash screen
+    _ensureMinimumSplashTime();
+  }
+
+  // New method to ensure splash screen shows for minimum time
+  void _ensureMinimumSplashTime() {
+    Future.delayed(const Duration(seconds: 3), () {
+      if (mounted) {
+        setState(() {
+          _minimumTimeElapsed = true;
+        });
+        _checkNavigationConditions();
+      }
+    });
+  }
+
+  // Update the preloading method
+  Future<void> _preloadAllImages() async {
+    try {
+      await ImagePreloader.instance.preloadImages(context);
+
+      if (mounted) {
+        setState(() {
+          _imagesPreloaded = true;
+        });
+        _checkNavigationConditions();
+      }
+    } catch (e) {
+      debugPrint('Error preloading images: $e');
+      // Ensure navigation still happens if image loading fails
+      if (mounted) {
+        setState(() {
+          _imagesPreloaded = true;
+        });
+        _checkNavigationConditions();
+      }
+    }
+  }
+
+  // New method to check if we should navigate
+  void _checkNavigationConditions() {
+    if (_imagesPreloaded && _minimumTimeElapsed && !_navigatedAway) {
+      _navigatedAway = true;
+      _navigateToNextScreen();
+    }
+  }
+
+  // Method to handle navigation
+  void _navigateToNextScreen() {
+    // Check if user has seen onboarding before
+    final bool hasSeenOnboarding = false; // Replace with actual logic
+
+    Navigator.pushReplacement(
+      context,
+      PageRouteBuilder(
+        transitionDuration: const Duration(milliseconds: 800),
+        pageBuilder: (_, __, ___) =>
+            hasSeenOnboarding ? const AuthWrapper() : const OnboardingScreen(),
+        transitionsBuilder: (_, animation, __, child) {
+          return FadeTransition(
+            opacity: animation,
+            child: child,
+          );
+        },
+      ),
+    );
   }
 
   @override
@@ -125,23 +182,9 @@ class _SplashScreenState extends State<SplashScreen>
         fit: StackFit.expand,
         children: [
           // Background image with overlay gradient
-          ShaderMask(
-            shaderCallback: (rect) {
-              return LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [
-                  Colors.transparent,
-                  Colors.black.withOpacity(0.7),
-                ],
-                stops: const [0.5, 1.0],
-              ).createShader(rect);
-            },
-            blendMode: BlendMode.darken,
-            child: Image.asset(
-              'assets/images/splash_background.png',
-              fit: BoxFit.cover,
-            ),
+          Image.asset(
+            'assets/images/splash_background.png',
+            fit: BoxFit.cover,
           ),
 
           // Animated waves at the bottom
@@ -334,15 +377,27 @@ class _SplashScreenState extends State<SplashScreen>
             right: 0,
             child: FadeTransition(
               opacity: _fadeAnimation,
-              child: const Center(
-                child: Text(
-                  '© 2025 WayZ.lk | Sri Lanka',
-                  style: TextStyle(
-                    color: Colors.white60,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w300,
+              child: Column(
+                children: [
+                  if (!_imagesPreloaded)
+                    SizedBox(
+                      width: 60,
+                      child: LinearProgressIndicator(
+                        color: Theme.of(context).colorScheme.secondary,
+                        backgroundColor: Colors.white24,
+                        minHeight: 3,
+                      ),
+                    ),
+                  const SizedBox(height: 10),
+                  const Text(
+                    '© 2025 WayZ.lk | Sri Lanka',
+                    style: TextStyle(
+                      color: Colors.white60,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w300,
+                    ),
                   ),
-                ),
+                ],
               ),
             ),
           ),
