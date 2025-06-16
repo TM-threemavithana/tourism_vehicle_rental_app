@@ -5,6 +5,7 @@ import 'auth/auth_wrapper.dart';
 import '../widgets/side_menu.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'profile_screen.dart'; // Import the ProfileScreen
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -137,6 +138,16 @@ class _HomeScreenState extends State<HomeScreen>
       _currentTab = tabName;
     });
     _closeMenu(); // Close the menu after selecting a tab
+  }
+
+  void _navigateToProfile() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) =>
+            ProfileScreen(user: FirebaseAuth.instance.currentUser),
+      ),
+    );
   }
 
   @override
@@ -551,7 +562,8 @@ class _HomeScreenState extends State<HomeScreen>
                 child: SideMenu(
                   onClose: _closeMenu,
                   onSignOut: _signOut,
-                  onTabChange: _updateCurrentTab, // Pass the callback
+                  onTabChange: _updateCurrentTab,
+                  onProfileTap: _navigateToProfile, // Add this callback
                   width: 0.7,
                   user: FirebaseAuth.instance.currentUser,
                   currentTab: _currentTab,

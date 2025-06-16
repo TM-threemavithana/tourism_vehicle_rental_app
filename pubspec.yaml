@@ -34,10 +34,13 @@ dependencies:
   flutter_native_splash: ^2.3.10  # Add this for splash screen
   animated_text_kit: ^4.2.2       # For text animations
   smooth_page_indicator: ^1.1.0
-  firebase_core: ^2.25.5
-  firebase_auth: ^4.17.6
+  firebase_core: ^2.25.4
+  firebase_auth: ^4.17.4
   google_sign_in: ^6.2.1  # Add this line
-  cached_network_image: ^3.4.0
+  cached_network_image: ^3.3.1
+  cloud_firestore: ^4.15.5  # Add this line
+  cloudinary_public: ^0.21.0   # Add this for Cloudinary upload
+  image_picker: ^1.0.7         # Add this for picking images from gallery/camera
 
 dev_dependencies:
   flutter_test:

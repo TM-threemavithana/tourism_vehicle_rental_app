@@ -5,19 +5,21 @@ import 'package:cached_network_image/cached_network_image.dart';
 class SideMenu extends StatelessWidget {
   final Function onClose;
   final Function onSignOut;
-  final Function(String)? onTabChange; // Add this callback
+  final Function(String)? onTabChange;
+  final Function? onProfileTap; // Add this callback for profile navigation
   final double width;
   final User? user;
-  final String currentTab; // Add this parameter to track current tab
+  final String currentTab;
 
   const SideMenu({
     Key? key,
     required this.onClose,
     required this.onSignOut,
     this.onTabChange,
+    this.onProfileTap, // Add this parameter
     this.width = 0.8,
     required this.user,
-    this.currentTab = 'Search', // Changed default from 'Home' to 'Search'
+    this.currentTab = 'Search',
   }) : super(key: key);
 
   @override
@@ -73,107 +75,127 @@ class SideMenu extends StatelessWidget {
             // User Profile Section
             Container(
               padding: const EdgeInsets.all(20.0),
-              child: Row(
-                children: [
-                  // Profile Avatar - using initials or photoURL
-                  user?.photoURL != null
-                      ? Container(
-                          width: 50,
-                          height: 50,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(25),
-                          ),
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(25),
-                            child: CachedNetworkImage(
-                              imageUrl: user!.photoURL!,
-                              fit: BoxFit.cover,
-                              placeholder: (context, url) => Container(
-                                color: Colors.grey[300],
-                                child: const Center(
-                                  child: SizedBox(
-                                    width: 24,
-                                    height: 24,
-                                    child: CircularProgressIndicator(
-                                        strokeWidth: 2.0),
+              child: InkWell(
+                onTap: () {
+                  // Close the menu and navigate to profile
+                  onClose();
+                  if (onProfileTap != null) {
+                    onProfileTap!();
+                  }
+                },
+                borderRadius: BorderRadius.circular(10),
+                child: Row(
+                  children: [
+                    // Profile Avatar - using initials or photoURL
+                    user?.photoURL != null
+                        ? Container(
+                            width: 50,
+                            height: 50,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(25),
+                            ),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(25),
+                              child: CachedNetworkImage(
+                                imageUrl: user!.photoURL!,
+                                fit: BoxFit.cover,
+                                placeholder: (context, url) => Container(
+                                  color: Colors.grey[300],
+                                  child: const Center(
+                                    child: SizedBox(
+                                      width: 24,
+                                      height: 24,
+                                      child: CircularProgressIndicator(
+                                          strokeWidth: 2.0),
+                                    ),
                                   ),
                                 ),
-                              ),
-                              errorWidget: (context, url, error) => Container(
-                                width: 50,
-                                height: 50,
-                                decoration: BoxDecoration(
-                                  color: Colors.orange,
-                                  borderRadius: BorderRadius.circular(25),
-                                ),
-                                child: Center(
-                                  child: Text(
-                                    getInitials(),
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold,
+                                errorWidget: (context, url, error) => Container(
+                                  width: 50,
+                                  height: 50,
+                                  decoration: BoxDecoration(
+                                    color: Colors.orange,
+                                    borderRadius: BorderRadius.circular(25),
+                                  ),
+                                  child: Center(
+                                    child: Text(
+                                      getInitials(),
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                      ),
                                     ),
                                   ),
                                 ),
                               ),
                             ),
-                          ),
-                        )
-                      : Container(
-                          width: 50,
-                          height: 50,
-                          decoration: BoxDecoration(
-                            color: Colors.orange,
-                            borderRadius: BorderRadius.circular(25),
-                          ),
-                          child: Center(
-                            child: Text(
-                              getInitials(),
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
+                          )
+                        : Container(
+                            width: 50,
+                            height: 50,
+                            decoration: BoxDecoration(
+                              color: Colors.orange,
+                              borderRadius: BorderRadius.circular(25),
+                            ),
+                            child: Center(
+                              child: Text(
+                                getInitials(),
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
                             ),
                           ),
-                        ),
-                  const SizedBox(width: 12),
-                  // User Info - Dynamic from user data
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          getDisplayName(),
-                          style: const TextStyle(
-                            color: Colors.black,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
+                    const SizedBox(width: 12),
+                    // User Info - Dynamic from user data
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            getDisplayName(),
+                            style: const TextStyle(
+                              color: Colors.black,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                            ),
                           ),
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          getEmail(),
-                          style: const TextStyle(
-                            color: Colors.black,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
+                          const SizedBox(height: 2),
+                          Text(
+                            getEmail(),
+                            style: const TextStyle(
+                              color: Colors.black,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                            ),
+                            overflow: TextOverflow.ellipsis,
                           ),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        const SizedBox(height: 2),
-                        const Text(
-                          'Profile',
-                          style: TextStyle(
-                            color: Colors.grey,
-                            fontSize: 12,
+                          const SizedBox(height: 2),
+                          Row(
+                            children: [
+                              const Text(
+                                'View Profile',
+                                style: TextStyle(
+                                  color: Colors.grey,
+                                  fontSize: 12,
+                                ),
+                              ),
+                              const SizedBox(width: 4),
+                              Icon(
+                                Icons.arrow_forward_ios,
+                                size: 10,
+                                color: Theme.of(context).colorScheme.primary,
+                              ),
+                            ],
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
 
