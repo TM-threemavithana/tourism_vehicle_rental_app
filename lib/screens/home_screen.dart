@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
-import 'dart:math' as math;
 import '../services/auth_service.dart';
 import 'auth/auth_wrapper.dart';
 import '../widgets/side_menu.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'profile_screen.dart'; // Import the ProfileScreen
 
 class HomeScreen extends StatefulWidget {

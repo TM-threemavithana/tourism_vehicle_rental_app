@@ -12,7 +12,7 @@ class SideMenu extends StatelessWidget {
   final String currentTab;
 
   const SideMenu({
-    Key? key,
+    super.key,
     required this.onClose,
     required this.onSignOut,
     this.onTabChange,
@@ -20,7 +20,7 @@ class SideMenu extends StatelessWidget {
     this.width = 0.8,
     required this.user,
     this.currentTab = 'Search',
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

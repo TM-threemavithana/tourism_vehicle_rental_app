@@ -2,23 +2,35 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import '../services/cloudinary_service.dart'; // Import the new service
+import '../services/cloudinary_service.dart';
 import '../screens/auth/auth_wrapper.dart';
+import '../widgets/side_menu.dart';
+import '../utils/app_colors.dart';
+import '../screens/home_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   final User? user;
 
-  const ProfileScreen({Key? key, required this.user}) : super(key: key);
+  const ProfileScreen({super.key, required this.user});
 
   @override
   State<ProfileScreen> createState() => _ProfileScreenState();
 }
 
-class _ProfileScreenState extends State<ProfileScreen> {
+// Add the SingleTickerProviderStateMixin here
+class _ProfileScreenState extends State<ProfileScreen>
+    with SingleTickerProviderStateMixin {
   bool _isLoading = false;
   bool _isUploadingImage = false;
+  bool _isMenuOpen = false;
   final TextEditingController _nameController = TextEditingController();
   final CloudinaryService _cloudinaryService = CloudinaryService();
+
+  // Add a controller for the AnimatedIcon
+  late AnimationController _menuIconController;
+
+  // Add current tab tracking
+  final String _currentTab = 'Profile';
 
   // Hardcoded stats until Firestore is set up
   final Map<String, String> _userStats = {
@@ -32,12 +44,81 @@ class _ProfileScreenState extends State<ProfileScreen> {
   void initState() {
     super.initState();
     _nameController.text = widget.user?.displayName ?? '';
+
+    // Initialize the animation controller
+    _menuIconController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 300),
+    );
   }
 
   @override
   void dispose() {
     _nameController.dispose();
+    _menuIconController.dispose(); // Don't forget to dispose the controller
     super.dispose();
+  }
+
+  // Add these methods to handle menu functionality
+  void _toggleMenu() {
+    setState(() {
+      _isMenuOpen = !_isMenuOpen;
+      if (_isMenuOpen) {
+        _menuIconController.forward();
+      } else {
+        _menuIconController.reverse();
+      }
+    });
+  }
+
+  void _closeMenu() {
+    setState(() {
+      _isMenuOpen = false;
+    });
+  }
+
+  void _updateCurrentTab(String tab) {
+    _closeMenu();
+    if (tab == _currentTab) return;
+
+    // Navigate based on tab selection
+    switch (tab) {
+      case 'Search':
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const HomeScreen()),
+        );
+        break;
+      case 'Vehicle Bookings':
+        // Navigate to bookings
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Bookings Screen - Coming Soon')),
+        );
+        break;
+      case 'Your Vehicles':
+        // Navigate to vehicles
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Your Vehicles Screen - Coming Soon')),
+        );
+        break;
+      // Handle other tabs...
+    }
+  }
+
+  // Add sign out method
+  Future<void> _signOut() async {
+    try {
+      await FirebaseAuth.instance.signOut();
+      if (!mounted) return;
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (context) => const AuthWrapper()),
+        (route) => false,
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error signing out: $e')),
+      );
+    }
   }
 
   Future<void> _updateUserName() async {
@@ -79,7 +160,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
   }
 
-  // New method to handle profile picture update
+  // Method to handle profile picture update
   Future<void> _updateProfilePicture() async {
     if (widget.user == null) return;
 
@@ -95,11 +176,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text(
+            Text(
               'Update Profile Picture',
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
+                color: Theme.of(context).colorScheme.primary,
               ),
             ),
             const SizedBox(height: 20),
@@ -122,20 +204,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     _getImageFromSource(false);
                   },
                 ),
+                if (widget.user?.photoURL != null)
+                  _buildImageSourceOption(
+                    icon: Icons.delete,
+                    title: 'Remove',
+                    onTap: () {
+                      Navigator.pop(context);
+                      _removeProfilePicture();
+                    },
+                  ),
               ],
             ),
-            const SizedBox(height: 20),
-            if (widget.user?.photoURL != null)
-              TextButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                  _removeProfilePicture();
-                },
-                style: TextButton.styleFrom(
-                  foregroundColor: Colors.red,
-                ),
-                child: const Text('Remove Current Photo'),
-              ),
           ],
         ),
       ),
@@ -154,24 +233,25 @@ class _ProfileScreenState extends State<ProfileScreen> {
           : onTap, // Disable when either loading state is true
       borderRadius: BorderRadius.circular(15),
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
           Container(
-            padding: const EdgeInsets.all(20),
+            padding: const EdgeInsets.all(15),
             decoration: BoxDecoration(
               color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
               shape: BoxShape.circle,
             ),
             child: Icon(
               icon,
-              size: 30,
               color: Theme.of(context).colorScheme.primary,
+              size: 30,
             ),
           ),
           const SizedBox(height: 8),
           Text(
             title,
             style: TextStyle(
-              fontSize: 16,
+              fontWeight: FontWeight.w500,
               color: Theme.of(context).colorScheme.primary,
             ),
           ),
@@ -257,9 +337,34 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
   }
 
-  // Method to remove the profile picture
+  // Method to remove the profile picture with confirmation
   Future<void> _removeProfilePicture() async {
     if (widget.user == null || widget.user!.photoURL == null) return;
+
+    // Show confirmation dialog
+    final bool confirm = await showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Remove Profile Picture'),
+        content:
+            const Text('Are you sure you want to remove your profile picture?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text(
+              'Remove',
+              style: TextStyle(color: Colors.red),
+            ),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm != true) return;
 
     setState(() {
       _isLoading = true;
@@ -277,15 +382,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
             backgroundColor: Colors.green,
           ),
         );
-
-        // Update UI
-        setState(() {});
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Error removing profile picture: $e'),
+            content: Text('Error: ${e.toString()}'),
             backgroundColor: Colors.red,
           ),
         );
@@ -315,6 +417,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     return Scaffold(
       backgroundColor: Colors.grey[100],
+      extendBodyBehindAppBar: true, // Important for menu overlay
       appBar: AppBar(
         title: const Text(
           'My Profile',
@@ -323,390 +426,406 @@ class _ProfileScreenState extends State<ProfileScreen> {
             fontSize: 20,
           ),
         ),
-        backgroundColor: theme.colorScheme.primary,
+        backgroundColor: Colors.transparent, // Make transparent to see gradient
         foregroundColor: Colors.white,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios),
-          onPressed: () => Navigator.of(context).pop(),
+          icon: AnimatedIcon(
+            icon: AnimatedIcons.menu_close,
+            progress: _menuIconController,
+          ),
+          onPressed: _toggleMenu,
         ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.arrow_back_ios),
+            onPressed: () => Navigator.of(context).pop(),
+          ),
+        ],
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            // Profile Header Section with Gradient Background
-            Container(
-              width: double.infinity,
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    theme.colorScheme.primary,
-                    theme.colorScheme.primary.withOpacity(0.8),
-                  ],
-                ),
-              ),
-              child: Column(
-                children: [
-                  const SizedBox(height: 30),
-
-                  // Profile Picture with Edit Button
-                  Stack(
-                    children: [
-                      Container(
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: Colors.white,
-                            width: 4,
-                          ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.2),
-                              blurRadius: 10,
-                              spreadRadius: 2,
-                            ),
-                          ],
-                        ),
-                        child: _isUploadingImage
-                            ? Container(
-                                width: 140,
-                                height: 140,
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: theme.colorScheme.secondary
-                                      .withOpacity(0.2),
-                                ),
-                                child: Center(
-                                  child: CircularProgressIndicator(
-                                    color: theme.colorScheme.secondary,
-                                    strokeWidth: 3,
-                                  ),
-                                ),
-                              )
-                            : CircleAvatar(
-                                radius: 70,
-                                backgroundColor: theme.colorScheme.secondary,
-                                backgroundImage: widget.user?.photoURL != null
-                                    ? CachedNetworkImageProvider(
-                                        widget.user!.photoURL!)
-                                    : null,
-                                child: widget.user?.photoURL == null
-                                    ? Text(
-                                        _getInitials(),
-                                        style: const TextStyle(
-                                          fontSize: 50,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.white,
-                                        ),
-                                      )
-                                    : null,
-                              ),
+      body: Stack(
+        children: [
+          // Main content
+          SingleChildScrollView(
+            child: Column(
+              children: [
+                // Profile header with user info and stats
+                Container(
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    gradient: AppColors.profileHeaderGradient,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.1),
+                        blurRadius: 10,
+                        spreadRadius: 0,
+                        offset: const Offset(0, 4),
                       ),
-                      Positioned(
-                        bottom: 5,
-                        right: 5,
-                        child: InkWell(
-                          onTap: _isUploadingImage || _isLoading
-                              ? null
-                              : _updateProfilePicture, // Disable when either loading state is true
-                          child: Container(
-                            height: 40,
-                            width: 40,
+                    ],
+                  ),
+                  child: Column(
+                    children: [
+                      const SizedBox(height: 100), // Increased space from top
+
+                      // Profile avatar with edit button
+                      Stack(
+                        alignment: Alignment.center,
+                        clipBehavior: Clip.none, // Ensure nothing gets clipped
+                        children: [
+                          // Container for the avatar
+                          Container(
                             decoration: BoxDecoration(
-                              color: theme.colorScheme.secondary,
                               shape: BoxShape.circle,
                               border: Border.all(
                                 color: Colors.white,
-                                width: 2,
+                                width: 4,
                               ),
                               boxShadow: [
                                 BoxShadow(
                                   color: Colors.black.withOpacity(0.2),
-                                  blurRadius: 5,
+                                  blurRadius: 10,
+                                  spreadRadius: 2,
                                 ),
                               ],
                             ),
                             child: _isUploadingImage
-                                ? const CircularProgressIndicator(
-                                    color: Colors.white,
-                                    strokeWidth: 2,
+                                ? Container(
+                                    width: 140,
+                                    height: 140,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: theme.colorScheme.secondary
+                                          .withOpacity(0.2),
+                                    ),
+                                    child: Center(
+                                      child: CircularProgressIndicator(
+                                        color: theme.colorScheme.secondary,
+                                        strokeWidth: 3,
+                                      ),
+                                    ),
                                   )
-                                : const Icon(
-                                    Icons.camera_alt,
-                                    color: Colors.white,
-                                    size: 20,
+                                : CircleAvatar(
+                                    radius: 70,
+                                    backgroundColor: theme.colorScheme.primary
+                                        .withOpacity(0.3),
+                                    backgroundImage:
+                                        widget.user?.photoURL != null
+                                            ? CachedNetworkImageProvider(
+                                                widget.user!.photoURL!)
+                                            : null,
+                                    child: widget.user?.photoURL == null
+                                        ? Text(
+                                            _getInitials(),
+                                            style: const TextStyle(
+                                              fontSize: 42,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.white,
+                                            ),
+                                          )
+                                        : null,
                                   ),
+                          ),
+
+                          // Edit button - positioned outside the avatar area
+                          Positioned(
+                            bottom: 5,
+                            right: 5,
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                shape: BoxShape.circle,
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withOpacity(0.2),
+                                    blurRadius: 5,
+                                    spreadRadius: 1,
+                                  ),
+                                ],
+                              ),
+                              child: IconButton(
+                                icon: Icon(
+                                  Icons.camera_alt,
+                                  color: theme.colorScheme.primary,
+                                  size: 20,
+                                ),
+                                onPressed: _isUploadingImage || _isLoading
+                                    ? null
+                                    : _updateProfilePicture,
+                                constraints: const BoxConstraints(
+                                  minWidth: 40,
+                                  minHeight: 40,
+                                ),
+                                padding: const EdgeInsets.all(8),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+
+                      const SizedBox(height: 20),
+
+                      // User name
+                      Text(
+                        widget.user?.displayName ?? 'User',
+                        style: const TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+
+                      // User email
+                      Text(
+                        widget.user?.email ?? '',
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Colors.white.withOpacity(0.8),
+                        ),
+                      ),
+
+                      const SizedBox(height: 30),
+
+                      // Curved bottom edge
+                      Container(
+                        height: 30,
+                        decoration: BoxDecoration(
+                          color: Colors.grey[100],
+                          borderRadius: const BorderRadius.only(
+                            topLeft: Radius.circular(30),
+                            topRight: Radius.circular(30),
                           ),
                         ),
                       ),
                     ],
                   ),
+                ),
 
-                  const SizedBox(height: 20),
-
-                  // User Name - from Firebase Auth
-                  Text(
-                    widget.user?.displayName ?? 'User',
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      shadows: [
-                        Shadow(
-                          color: Colors.black26,
-                          offset: Offset(0, 1),
-                          blurRadius: 2,
+                // Info Cards Section
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Personal Information',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black87,
                         ),
-                      ],
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
+                      ),
+                      const SizedBox(height: 16),
 
-                  const SizedBox(height: 12),
-
-                  // Email with Verification - from Firebase Auth
-                  Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.2),
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          widget.user?.emailVerified ?? false
-                              ? Icons.check_circle
-                              : Icons.info_outline,
-                          color: Colors.white,
-                          size: 16,
+                      // Personal Info Card
+                      Card(
+                        elevation: 2,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(15),
                         ),
-                        const SizedBox(width: 8),
-                        Text(
-                          widget.user?.email ?? 'No email',
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 14,
+                        child: Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: Column(
+                            children: [
+                              _buildInfoField(
+                                label: 'Full Name',
+                                value: _nameController.text,
+                                icon: Icons.person_outline,
+                                color: theme.colorScheme.primary,
+                                isEditable: true,
+                                onTap: () {
+                                  _showEditNameDialog(context);
+                                },
+                              ),
+                              const Divider(height: 24),
+                              _buildInfoField(
+                                label: 'Email',
+                                value: widget.user?.email ?? 'No email',
+                                icon: Icons.email_outlined,
+                                color: theme.colorScheme.primary,
+                                verified: widget.user?.emailVerified ?? false,
+                              ),
+                            ],
                           ),
                         ),
-                      ],
-                    ),
-                  ),
-
-                  const SizedBox(height: 30),
-
-                  // Curved bottom edge
-                  Container(
-                    height: 30,
-                    decoration: BoxDecoration(
-                      color: Colors.grey[100],
-                      borderRadius: const BorderRadius.only(
-                        topLeft: Radius.circular(30),
-                        topRight: Radius.circular(30),
                       ),
-                    ),
+
+                      const SizedBox(height: 24),
+
+                      const Text(
+                        'Account & Security',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black87,
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+
+                      // Security Options
+                      Card(
+                        elevation: 2,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(15),
+                        ),
+                        child: Column(
+                          children: [
+                            _buildMenuOption(
+                              icon: Icons.credit_card_outlined,
+                              title: 'Payment Methods',
+                              subtitle: 'Add or remove payment options',
+                              iconColor: Colors.indigo,
+                              theme: theme,
+                            ),
+                            _buildDivider(),
+                            _buildMenuOption(
+                              icon: Icons.account_balance_outlined,
+                              title: 'Bank Account',
+                              subtitle: 'Set up for deposits and withdrawals',
+                              iconColor: Colors.blue,
+                              theme: theme,
+                            ),
+                            _buildDivider(),
+                            _buildMenuOption(
+                              icon: Icons.verified_user_outlined,
+                              title: 'License Verification',
+                              subtitle:
+                                  'Upload your driving license for verification',
+                              iconColor: Colors.green,
+                              theme: theme,
+                              showBadge: true,
+                            ),
+                            _buildDivider(),
+                            _buildMenuOption(
+                              icon: Icons.lock_outline,
+                              title: 'Change Password',
+                              subtitle: 'Update your security credentials',
+                              iconColor: Colors.orange,
+                              theme: theme,
+                            ),
+                          ],
+                        ),
+                      ),
+
+                      const SizedBox(height: 24),
+
+                      // Statistics Section - Data from Firestore
+                      const Text(
+                        'Activity Statistics',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black87,
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+
+                      Card(
+                        elevation: 2,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(15),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: Column(
+                            children: [
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: _buildStatItem(
+                                        _userStats['vehiclesRented'] ?? '0',
+                                        'Vehicles\nRented',
+                                        AppColors.rentedColor,
+                                        Icons.directions_car_outlined),
+                                  ),
+                                  Expanded(
+                                    child: _buildStatItem(
+                                        _userStats['totalReviews'] ?? '0',
+                                        'Total\nReviews',
+                                        AppColors.reviewColor,
+                                        Icons.star_outline),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 20),
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: _buildStatItem(
+                                        _userStats['vehiclesListed'] ?? '0',
+                                        'Vehicles\nListed',
+                                        AppColors.listedColor,
+                                        Icons.add_circle_outline),
+                                  ),
+                                  Expanded(
+                                    child: _buildStatItem(
+                                        _userStats['activeRentals'] ?? '0',
+                                        'Active\nRentals',
+                                        AppColors.activeRentalsColor,
+                                        Icons.local_activity_outlined),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+
+                      const SizedBox(height: 24),
+
+                      // Delete Account Option
+                      Card(
+                        elevation: 2,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(15),
+                        ),
+                        child: _buildMenuOption(
+                          icon: Icons.delete_outline,
+                          title: 'Delete Account',
+                          subtitle: 'Permanently remove your account and data',
+                          iconColor: Colors.red,
+                          theme: theme,
+                          isDanger: true,
+                        ),
+                      ),
+
+                      const SizedBox(height: 30),
+                    ],
                   ),
-                ],
+                ),
+              ],
+            ),
+          ),
+          
+          // Side Menu and Overlay
+          if (_isMenuOpen) ...[
+            // Semi-transparent overlay
+            Positioned.fill(
+              child: GestureDetector(
+                onTap: _closeMenu,
+                child: Container(
+                  color: Colors.black.withOpacity(0.5),
+                ),
               ),
             ),
 
-            // Info Cards Section
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'Personal Information',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black87,
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-
-                  // Personal Info Card
-                  Card(
-                    elevation: 2,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(15),
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: Column(
-                        children: [
-                          _buildInfoField(
-                            label: 'Full Name',
-                            value: _nameController.text,
-                            icon: Icons.person_outline,
-                            color: theme.colorScheme.primary,
-                            isEditable: true,
-                            onTap: () {
-                              _showEditNameDialog(context);
-                            },
-                          ),
-                          const Divider(height: 24),
-                          _buildInfoField(
-                            label: 'Email',
-                            value: widget.user?.email ?? 'No email',
-                            icon: Icons.email_outlined,
-                            color: theme.colorScheme.primary,
-                            verified: widget.user?.emailVerified ?? false,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-
-                  const SizedBox(height: 24),
-
-                  const Text(
-                    'Account & Security',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black87,
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-
-                  // Security Options
-                  Card(
-                    elevation: 2,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(15),
-                    ),
-                    child: Column(
-                      children: [
-                        _buildMenuOption(
-                          icon: Icons.credit_card_outlined,
-                          title: 'Payment Methods',
-                          subtitle: 'Add or remove payment options',
-                          iconColor: Colors.indigo,
-                          theme: theme,
-                        ),
-                        _buildDivider(),
-                        _buildMenuOption(
-                          icon: Icons.account_balance_outlined,
-                          title: 'Bank Account',
-                          subtitle: 'Set up for deposits and withdrawals',
-                          iconColor: Colors.blue,
-                          theme: theme,
-                        ),
-                        _buildDivider(),
-                        _buildMenuOption(
-                          icon: Icons.verified_user_outlined,
-                          title: 'License Verification',
-                          subtitle:
-                              'Upload your driving license for verification',
-                          iconColor: Colors.green,
-                          theme: theme,
-                          showBadge: true,
-                        ),
-                        _buildDivider(),
-                        _buildMenuOption(
-                          icon: Icons.lock_outline,
-                          title: 'Change Password',
-                          subtitle: 'Update your security credentials',
-                          iconColor: Colors.orange,
-                          theme: theme,
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  const SizedBox(height: 24),
-
-                  // Statistics Section - Data from Firestore
-                  const Text(
-                    'Activity Statistics',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black87,
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-
-                  Card(
-                    elevation: 2,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(15),
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: Column(
-                        children: [
-                          Row(
-                            children: [
-                              Expanded(
-                                child: _buildStatItem(
-                                    _userStats['vehiclesRented'] ?? '0',
-                                    'Vehicles\nRented',
-                                    Colors.deepPurple,
-                                    Icons.directions_car_outlined),
-                              ),
-                              Expanded(
-                                child: _buildStatItem(
-                                    _userStats['totalReviews'] ?? '0',
-                                    'Total\nReviews',
-                                    Colors.amber,
-                                    Icons.star_outline),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 20),
-                          Row(
-                            children: [
-                              Expanded(
-                                child: _buildStatItem(
-                                    _userStats['vehiclesListed'] ?? '0',
-                                    'Vehicles\nListed',
-                                    Colors.teal,
-                                    Icons.add_circle_outline),
-                              ),
-                              Expanded(
-                                child: _buildStatItem(
-                                    _userStats['activeRentals'] ?? '0',
-                                    'Active\nRentals',
-                                    Colors.red,
-                                    Icons.local_activity_outlined),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-
-                  const SizedBox(height: 24),
-
-                  // Delete Account Option
-                  Card(
-                    elevation: 2,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(15),
-                    ),
-                    child: _buildMenuOption(
-                      icon: Icons.delete_outline,
-                      title: 'Delete Account',
-                      subtitle: 'Permanently remove your account and data',
-                      iconColor: Colors.red,
-                      theme: theme,
-                      isDanger: true,
-                    ),
-                  ),
-
-                  const SizedBox(height: 30),
-                ],
+            // Side Menu
+            Positioned(
+              top: 0,
+              left: 0,
+              bottom: 0,
+              width: MediaQuery.of(context).size.width * 0.7,
+              child: SideMenu(
+                onClose: _closeMenu,
+                onSignOut: _signOut,
+                onTabChange: _updateCurrentTab,
+                onProfileTap: () => _closeMenu(), // We're already on profile
+                width: 0.7,
+                user: widget.user,
+                currentTab: _currentTab,
               ),
             ),
           ],
-        ),
+        ],
       ),
     );
   }

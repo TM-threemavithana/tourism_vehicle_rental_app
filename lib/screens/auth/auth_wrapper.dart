@@ -9,10 +9,10 @@ class AuthWrapper extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final AuthService _authService = AuthService();
+    final AuthService authService = AuthService();
 
     return StreamBuilder<User?>(
-      stream: _authService.authStateChanges,
+      stream: authService.authStateChanges,
       builder: (context, snapshot) {
         // Debug print to verify state changes
         print('Auth state changed: ${snapshot.data?.uid}');

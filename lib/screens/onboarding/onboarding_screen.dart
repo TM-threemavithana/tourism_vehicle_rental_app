@@ -4,7 +4,6 @@ import 'dart:math' as math;
 import 'slide_one.dart';
 import 'slide_two.dart';
 import 'slide_three.dart';
-import '../auth/login_screen.dart';
 import '../auth/auth_wrapper.dart';
 
 class OnboardingScreen extends StatefulWidget {
