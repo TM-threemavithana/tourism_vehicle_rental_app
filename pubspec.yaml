@@ -37,6 +37,7 @@ dependencies:
   firebase_core: ^2.25.5
   firebase_auth: ^4.17.6
   google_sign_in: ^6.2.1  # Add this line
+  cached_network_image: ^3.4.0
 
 dev_dependencies:
   flutter_test:
@@ -76,6 +77,8 @@ flutter:
     - assets/images/login_background.jpg
     - assets/images/signup_background.jpg
     - assets/images/road_background.jpg
+    - assets/images/  # Add this line to include all images in the directory
+    - assets/icons/   # If you have an icons directory
     
   
   fonts:

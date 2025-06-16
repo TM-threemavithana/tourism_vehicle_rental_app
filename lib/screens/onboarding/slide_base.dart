@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 class SlideBase extends StatelessWidget {
   final String title;
@@ -171,11 +172,18 @@ class SlideBase extends StatelessWidget {
 
   // Helper method for consistently building network images
   Widget _buildNetworkImage(String url, BoxFit fit) {
-    return Image.asset(
-      url,
-      fit: fit,
-      errorBuilder: (context, error, stackTrace) {
-        return Container(
+    // Check if the URL is a network URL or an asset path
+    if (url.startsWith('http://') || url.startsWith('https://')) {
+      // This is a network image, use CachedNetworkImage
+      return CachedNetworkImage(
+        imageUrl: url,
+        fit: fit,
+        placeholder: (context, url) => Center(
+          child: CircularProgressIndicator(
+            color: Colors.white.withOpacity(0.7),
+          ),
+        ),
+        errorWidget: (context, url, error) => Container(
           color: bgColor.withOpacity(0.2),
           child: Center(
             child: Icon(
@@ -184,9 +192,25 @@ class SlideBase extends StatelessWidget {
               color: Colors.white70,
             ),
           ),
-        );
-      },
-    );
+        ),
+      );
+    } else {
+      // This is an asset image, use Image.asset
+      return Image.asset(
+        url,
+        fit: fit,
+        errorBuilder: (context, error, stackTrace) => Container(
+          color: bgColor.withOpacity(0.2),
+          child: Center(
+            child: Icon(
+              iconData ?? Icons.image,
+              size: 80,
+              color: Colors.white70,
+            ),
+          ),
+        ),
+      );
+    }
   }
 }
 

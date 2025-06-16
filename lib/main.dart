@@ -8,11 +8,38 @@ void main() async {
   runApp(const MyApp());
 }
 
+// Replace or update the _precacheImages function
+Future<void> _precacheImages(BuildContext context) async {
+  final assets = [
+    'assets/images/logo.png',
+    'assets/images/image1.jpg',
+    'assets/images/image2.jpg',
+    'assets/images/image3.jpg',
+    'assets/images/splash_background.png',
+    'assets/images/road_background.jpg',
+    // Add other frequently used images
+  ];
+
+  for (final asset in assets) {
+    try {
+      await precacheImage(AssetImage(asset), context);
+      print('Precached: $asset');
+    } catch (e) {
+      print('Failed to precache $asset: $e');
+    }
+  }
+}
+
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
+    // Precache images when app starts
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _precacheImages(context);
+    });
+
     return MaterialApp(
       title: 'WayZ',
       debugShowCheckedModeBanner: false,

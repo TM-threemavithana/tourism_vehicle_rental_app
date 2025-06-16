@@ -18,9 +18,9 @@ class GoogleSignInButton extends StatefulWidget {
 class _GoogleSignInButtonState extends State<GoogleSignInButton> {
   final AuthService _authService = AuthService();
   bool _isLoading = false;
-  // Google logo URL - using the official logo
-  final String googleLogoUrl =
-      'https://developers.google.com/identity/images/g-logo.png';
+  // Google logo - using a local asset image
+  final AssetImage googleLogo =
+      const AssetImage('assets/images/google_logo.png');
 
   Future<void> _signInWithGoogle() async {
     setState(() {
@@ -82,37 +82,17 @@ class _GoogleSignInButtonState extends State<GoogleSignInButton> {
               mainAxisSize: MainAxisSize.min,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                // Google logo from network image
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(2),
-                  child: Image.network(
-                    googleLogoUrl,
-                    height: 24,
+                // Use local Google logo image instead of network image
+                Container(
+                  width: 24,
+                  height: 24,
+                  margin: const EdgeInsets.only(right: 12),
+                  child: Image(
+                    image: googleLogo,
                     width: 24,
-                    errorBuilder: (context, error, stackTrace) {
-                      // Fallback to the Google "G" icon if network image fails
-                      return Container(
-                        height: 24,
-                        width: 24,
-                        decoration: const BoxDecoration(
-                          color: Colors.white,
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Center(
-                          child: Text(
-                            'G',
-                            style: TextStyle(
-                              color: Colors.blue,
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                      );
-                    },
+                    height: 24,
                   ),
                 ),
-                const SizedBox(width: 12),
                 // The button text changes based on whether it's used for login or signup
                 Text(
                   widget.isLogin

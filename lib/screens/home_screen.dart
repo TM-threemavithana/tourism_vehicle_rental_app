@@ -4,6 +4,7 @@ import '../services/auth_service.dart';
 import 'auth/auth_wrapper.dart';
 import '../widgets/side_menu.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -211,9 +212,23 @@ class _HomeScreenState extends State<HomeScreen>
                         ),
                         child: Image.asset(
                           'assets/images/logo.png',
-                          height: screenHeight * 0.06, // Smaller logo
+                          height: screenHeight * 0.06,
                           width: screenHeight * 0.06,
                           fit: BoxFit.contain,
+                          // Add loading builder if needed
+                          frameBuilder:
+                              (context, child, frame, wasSynchronouslyLoaded) {
+                            if (wasSynchronouslyLoaded || frame != null) {
+                              return child;
+                            }
+                            return Container(
+                              height: screenHeight * 0.06,
+                              width: screenHeight * 0.06,
+                              padding: const EdgeInsets.all(8.0),
+                              child: const CircularProgressIndicator(
+                                  strokeWidth: 2.0),
+                            );
+                          },
                         ),
                       ),
                       SizedBox(height: screenHeight * 0.01), // Reduced space
