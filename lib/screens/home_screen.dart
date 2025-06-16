@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import '../services/auth_service.dart';
 import 'auth/auth_wrapper.dart';
 import '../widgets/side_menu.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -25,6 +26,7 @@ class _HomeScreenState extends State<HomeScreen>
   bool _flexibleDates = false;
   bool _showNearbyVehicles = true;
   bool _isMenuOpen = false;
+  String _currentTab = 'Search'; // Changed from 'Home' to 'Search'
 
   @override
   void initState() {
@@ -127,6 +129,13 @@ class _HomeScreenState extends State<HomeScreen>
         _selectedVehicles.add(type);
       }
     });
+  }
+
+  void _updateCurrentTab(String tabName) {
+    setState(() {
+      _currentTab = tabName;
+    });
+    _closeMenu(); // Close the menu after selecting a tab
   }
 
   @override
@@ -527,7 +536,10 @@ class _HomeScreenState extends State<HomeScreen>
                 child: SideMenu(
                   onClose: _closeMenu,
                   onSignOut: _signOut,
-                  width: 0.7, // 70% of screen width
+                  onTabChange: _updateCurrentTab, // Pass the callback
+                  width: 0.7,
+                  user: FirebaseAuth.instance.currentUser,
+                  currentTab: _currentTab,
                 ),
               ),
             ),
