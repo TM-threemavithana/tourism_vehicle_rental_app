@@ -83,7 +83,7 @@ class _OwnerDashboardScreenState extends State<OwnerDashboardScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Owner Dashboard'),
+        title: const Text('Vehicle Owner Dashboard'),
         backgroundColor: theme.colorScheme.primary,
         foregroundColor: Colors.white,
         leading: IconButton(

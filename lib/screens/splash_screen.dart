@@ -379,16 +379,6 @@ class _SplashScreenState extends State<SplashScreen>
               opacity: _fadeAnimation,
               child: Column(
                 children: [
-                  if (!_imagesPreloaded)
-                    SizedBox(
-                      width: 60,
-                      child: LinearProgressIndicator(
-                        color: Theme.of(context).colorScheme.secondary,
-                        backgroundColor: Colors.white24,
-                        minHeight: 3,
-                      ),
-                    ),
-                  const SizedBox(height: 10),
                   const Text(
                     '© 2025 WayZ.lk | Sri Lanka',
                     style: TextStyle(
