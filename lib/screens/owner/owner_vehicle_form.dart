@@ -33,6 +33,8 @@ class _OwnerVehicleFormState extends State<OwnerVehicleForm> {
   late VehicleExtras _vehicleExtras;
   late VehicleInsurance _vehicleInsurance; // Add to your state variables
   late VehicleImages _vehicleImages;
+  bool _agreementChecked =
+      false; // Add this to your state variables in _OwnerVehicleFormState
 
   @override
   void initState() {
@@ -353,21 +355,83 @@ class _OwnerVehicleFormState extends State<OwnerVehicleForm> {
                     ),
                     const SizedBox(height: 24),
 
+                    // Agreement Checkbox
+                    Container(
+                      decoration: BoxDecoration(
+                        color: Colors.grey[100],
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: Colors.grey[300]!),
+                      ),
+                      padding: const EdgeInsets.all(16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Checkbox(
+                                value: _agreementChecked,
+                                onChanged: (value) {
+                                  setState(() {
+                                    _agreementChecked = value ?? false;
+                                  });
+                                },
+                                activeColor: theme.colorScheme.primary,
+                              ),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const Text(
+                                      'I have read and agree to the vehicle owners agreement.',
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    GestureDetector(
+                                      onTap: () {
+                                        // Show the full agreement
+                                        _showAgreement(context);
+                                      },
+                                      child: Text(
+                                        'View Agreement',
+                                        style: TextStyle(
+                                          color: theme.colorScheme.primary,
+                                          decoration: TextDecoration.underline,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+
                     // Submit Button
                     SizedBox(
                       width: double.infinity,
                       height: 50,
                       child: ElevatedButton(
-                        onPressed: _isLoading ? null : _submitForm,
+                        onPressed: (_isLoading || !_agreementChecked)
+                            ? null
+                            : _submitForm,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: theme.colorScheme.secondary,
                           foregroundColor: Colors.white,
+                          disabledBackgroundColor: Colors.grey[300],
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8),
                           ),
                         ),
                         child: const Text(
-                          'LIST MY VEHICLE',
+                          'SUBMIT',
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
@@ -380,6 +444,104 @@ class _OwnerVehicleFormState extends State<OwnerVehicleForm> {
                 ),
               ),
             ),
+    );
+  }
+
+  // Add this method to show the agreement dialog
+  void _showAgreement(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: Container(
+            padding: const EdgeInsets.all(16),
+            constraints: const BoxConstraints(maxWidth: 500, maxHeight: 500),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      'Vehicle Owner Agreement',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.close),
+                      onPressed: () => Navigator.of(context).pop(),
+                    ),
+                  ],
+                ),
+                const Divider(),
+                Expanded(
+                  child: ListView(
+                    children: const [
+                      Text(
+                        'This Vehicle Owner Agreement (the "Agreement") is made and entered into between you ("Owner") and our Tourism Vehicle Rental Platform ("Platform").',
+                        style: TextStyle(fontSize: 16),
+                      ),
+                      SizedBox(height: 16),
+                      Text(
+                        '1. Vehicle Information',
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 16),
+                      ),
+                      Text(
+                        'You confirm that all information provided about your vehicle is accurate and complete. Any misrepresentation may result in termination of this agreement.',
+                      ),
+                      SizedBox(height: 16),
+                      Text(
+                        '2. Vehicle Condition',
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 16),
+                      ),
+                      Text(
+                        'You agree to maintain your vehicle in safe and roadworthy condition at all times. This includes regular servicing, addressing any mechanical issues promptly, and ensuring the vehicle meets all legal requirements.',
+                      ),
+                      SizedBox(height: 16),
+                      Text(
+                        '3. Insurance Requirements',
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 16),
+                      ),
+                      Text(
+                        'You are responsible for maintaining appropriate insurance coverage for your vehicle that specifically allows for rental use.',
+                      ),
+                      SizedBox(height: 16),
+                      Text(
+                        '4. Liability',
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 16),
+                      ),
+                      Text(
+                        'The Platform acts only as an intermediary and is not liable for any damages, losses, or injuries related to the rental of your vehicle.',
+                      ),
+                      // Add more terms as needed
+                    ],
+                  ),
+                ),
+                const Divider(),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    TextButton(
+                      onPressed: () => Navigator.of(context).pop(),
+                      child: const Text('Close'),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }
