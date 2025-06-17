@@ -28,7 +28,7 @@ class VehicleDetailsSection extends StatefulWidget {
   final Function(String?) onColorChanged;
 
   const VehicleDetailsSection({
-    Key? key,
+    super.key,
     required this.vehicleType,
     required this.selectedMake,
     required this.selectedModel,
@@ -52,7 +52,7 @@ class VehicleDetailsSection extends StatefulWidget {
     required this.onTransmissionChanged,
     required this.onFuelTypeChanged,
     required this.onColorChanged,
-  }) : super(key: key);
+  });
 
   @override
   State<VehicleDetailsSection> createState() => _VehicleDetailsSectionState();

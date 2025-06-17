@@ -7,7 +7,7 @@ import '../profile_screen.dart';
 import 'add_vehicle_screen.dart';
 
 class OwnerDashboardScreen extends StatefulWidget {
-  const OwnerDashboardScreen({Key? key}) : super(key: key);
+  const OwnerDashboardScreen({super.key});
 
   @override
   State<OwnerDashboardScreen> createState() => _OwnerDashboardScreenState();

@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../../services/cloudinary_service.dart';
-import '../../utils/form_data_constants.dart';
 import '../../models/vehicle_form_models.dart';
-import '../../widgets/form_widgets.dart';
 import 'sections/vehicle_details_section.dart';
 import 'sections/collection_point_section.dart';
 import 'sections/rental_conditions_section.dart';

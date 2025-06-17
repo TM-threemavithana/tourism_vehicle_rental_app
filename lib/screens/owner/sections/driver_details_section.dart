@@ -7,10 +7,10 @@ class DriverDetailsSection extends StatefulWidget {
   final Function(DriverDetails) onDriverDetailsChanged;
 
   const DriverDetailsSection({
-    Key? key,
+    super.key,
     required this.driverDetails,
     required this.onDriverDetailsChanged,
-  }) : super(key: key);
+  });
 
   @override
   _DriverDetailsSectionState createState() => _DriverDetailsSectionState();

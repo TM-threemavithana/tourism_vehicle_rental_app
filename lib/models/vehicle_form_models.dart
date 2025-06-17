@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 
 // Vehicle data model
 class VehicleFormData {

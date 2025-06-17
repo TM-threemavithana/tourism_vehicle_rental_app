@@ -4,6 +4,8 @@ import '../../../widgets/form_widgets.dart';
 import '../../../utils/form_data_constants.dart';
 import 'pricing_components/hourly_pricing.dart';
 import 'pricing_components/daily_pricing.dart';
+import 'pricing_components/weekly_pricing.dart';
+import 'pricing_components/monthly_pricing.dart';
 
 class PricingSection extends StatefulWidget {
   final VehiclePricing pricing;
@@ -27,7 +29,8 @@ class _PricingSectionState extends State<PricingSection> {
   @override
   void initState() {
     super.initState();
-    _vehicleValueController = TextEditingController(text: widget.pricing.vehicleValue);
+    _vehicleValueController =
+        TextEditingController(text: widget.pricing.vehicleValue);
 
     _setupControllerListeners();
   }
@@ -45,22 +48,21 @@ class _PricingSectionState extends State<PricingSection> {
       weekly: widget.pricing.weekly,
       monthly: widget.pricing.monthly,
     );
-    
+
     widget.onPricingChanged(updatedPricing);
   }
-  
+
   void _togglePeriod(String period) {
     if (widget.rentMode == null) {
       // Show message that rent mode must be selected first
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please select a rent mode first'))
-      );
+          const SnackBar(content: Text('Please select a rent mode first')));
       return;
     }
-    
+
     Map<String, bool> updatedPeriods = Map.from(widget.pricing.rentalPeriods);
     updatedPeriods[period] = !updatedPeriods[period]!;
-    
+
     final updatedPricing = VehiclePricing(
       vehicleValue: widget.pricing.vehicleValue,
       rentalPeriods: updatedPeriods,
@@ -69,7 +71,7 @@ class _PricingSectionState extends State<PricingSection> {
       weekly: widget.pricing.weekly,
       monthly: widget.pricing.monthly,
     );
-    
+
     widget.onPricingChanged(updatedPricing);
   }
 
@@ -104,13 +106,13 @@ class _PricingSectionState extends State<PricingSection> {
             child: const Text(
               'Please select a rent mode to add pricing.',
               style: TextStyle(
-                color: Colors.amber, 
+                color: Colors.amber,
                 fontStyle: FontStyle.italic,
               ),
             ),
           ),
         ] else ...[
-          // Show vehicle value input first when rent mode is selected
+          // Vehicle Value field - always shown if rent mode is selected
           TextFormField(
             controller: _vehicleValueController,
             decoration: const InputDecoration(
@@ -124,8 +126,7 @@ class _PricingSectionState extends State<PricingSection> {
               if (value == null || value.isEmpty) {
                 return 'Please enter vehicle value';
               }
-              if (double.tryParse(value) == null ||
-                  double.parse(value) <= 0) {
+              if (double.tryParse(value) == null || double.parse(value) <= 0) {
                 return 'Please enter a valid positive number';
               }
               return null;
@@ -133,7 +134,7 @@ class _PricingSectionState extends State<PricingSection> {
           ),
           const SizedBox(height: 24),
 
-          // Rental Time Period Selection
+          // Rental Period Selection section
           const Text(
             'Please select at least one rental time period',
             style: TextStyle(
@@ -142,27 +143,29 @@ class _PricingSectionState extends State<PricingSection> {
             ),
           ),
           const SizedBox(height: 12),
-          
+
           // Display rental period options as chips
           Wrap(
             spacing: 8,
             runSpacing: 8,
             children: VehicleFormConstants.rentalPeriods.map((period) {
               final isSelected = widget.pricing.rentalPeriods[period] ?? false;
-              
+
               return FilterChip(
                 label: Text(period),
                 selected: isSelected,
                 onSelected: (selected) => _togglePeriod(period),
-                selectedColor: Theme.of(context).colorScheme.primary.withOpacity(0.2),
+                selectedColor:
+                    Theme.of(context).colorScheme.primary.withOpacity(0.2),
                 checkmarkColor: Theme.of(context).colorScheme.primary,
               );
             }).toList(),
           ),
           const SizedBox(height: 24),
-          
+
           // Show pricing components based on selected periods
           if (!_isAnyRentalPeriodSelected()) ...[
+            // Message to select at least one rental period
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
@@ -173,13 +176,15 @@ class _PricingSectionState extends State<PricingSection> {
               child: const Text(
                 'Please select at least one rental time period.',
                 style: TextStyle(
-                  color: Colors.amber, 
+                  color: Colors.amber,
                   fontStyle: FontStyle.italic,
                 ),
               ),
             ),
           ] else ...[
-            // Hourly pricing
+            // Show pricing forms based on rent mode and selected rental periods
+
+            // Hourly pricing section
             if (widget.pricing.rentalPeriods['Hourly'] == true) ...[
               HourlyPricingComponent(
                 hourlyPricing: widget.pricing.hourly ?? PeriodPricing(),
@@ -194,9 +199,11 @@ class _PricingSectionState extends State<PricingSection> {
                   );
                   widget.onPricingChanged(updatedPricing);
                 },
+                rentMode: widget.rentMode, // Pass the rent mode
               ),
             ],
-            // Daily pricing
+
+            // Daily pricing section
             if (widget.pricing.rentalPeriods['Daily'] == true) ...[
               DailyPricingComponent(
                 dailyPricing: widget.pricing.daily ?? PeriodPricing(),
@@ -211,10 +218,47 @@ class _PricingSectionState extends State<PricingSection> {
                   );
                   widget.onPricingChanged(updatedPricing);
                 },
+                rentMode: widget.rentMode, // Pass the rent mode
               ),
             ],
-            // Weekly pricing would go here
-            // Monthly pricing would go here
+
+            // Weekly pricing section
+            if (widget.pricing.rentalPeriods['Weekly'] == true) ...[
+              WeeklyPricingComponent(
+                weeklyPricing: widget.pricing.weekly ?? PeriodPricing(),
+                onPricingChanged: (pricing) {
+                  final updatedPricing = VehiclePricing(
+                    vehicleValue: widget.pricing.vehicleValue,
+                    rentalPeriods: widget.pricing.rentalPeriods,
+                    hourly: widget.pricing.hourly,
+                    daily: widget.pricing.daily,
+                    weekly: pricing,
+                    monthly: widget.pricing.monthly,
+                  );
+                  widget.onPricingChanged(updatedPricing);
+                },
+                rentMode: widget.rentMode,
+              ),
+            ],
+
+            // Monthly pricing section
+            if (widget.pricing.rentalPeriods['Monthly'] == true) ...[
+              MonthlyPricingComponent(
+                monthlyPricing: widget.pricing.monthly ?? PeriodPricing(),
+                onPricingChanged: (pricing) {
+                  final updatedPricing = VehiclePricing(
+                    vehicleValue: widget.pricing.vehicleValue,
+                    rentalPeriods: widget.pricing.rentalPeriods,
+                    hourly: widget.pricing.hourly,
+                    daily: widget.pricing.daily,
+                    weekly: widget.pricing.weekly,
+                    monthly: pricing,
+                  );
+                  widget.onPricingChanged(updatedPricing);
+                },
+                rentMode: widget.rentMode,
+              ),
+            ],
           ],
         ],
       ],

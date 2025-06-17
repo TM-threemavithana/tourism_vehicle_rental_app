@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:tourism_vehicle_rental_app/screens/owner/owner_vehicle_form.dart';
 import 'package:tourism_vehicle_rental_app/screens/owner/non_owner_vehicle_form.dart';
-import '../../utils/app_colors.dart';
 
 class AddVehicleScreen extends StatefulWidget {
   const AddVehicleScreen({super.key});

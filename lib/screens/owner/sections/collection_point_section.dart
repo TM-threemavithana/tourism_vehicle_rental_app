@@ -8,10 +8,10 @@ class CollectionPointSection extends StatefulWidget {
   final Function(CollectionPoint) onCollectionPointChanged;
 
   const CollectionPointSection({
-    Key? key,
+    super.key,
     required this.collectionPoint,
     required this.onCollectionPointChanged,
-  }) : super(key: key);
+  });
 
   @override
   _CollectionPointSectionState createState() => _CollectionPointSectionState();

@@ -2,23 +2,23 @@ import 'package:flutter/material.dart';
 import '../../../../models/vehicle_form_models.dart';
 import '../../../../widgets/form_widgets.dart';
 
-class DailyPricingComponent extends StatefulWidget {
-  final PeriodPricing dailyPricing;
+class WeeklyPricingComponent extends StatefulWidget {
+  final PeriodPricing weeklyPricing;
   final Function(PeriodPricing) onPricingChanged;
-  final String? rentMode; // Add this parameter
+  final String? rentMode;
 
-  const DailyPricingComponent({
-    super.key,
-    required this.dailyPricing,
+  const WeeklyPricingComponent({
+    Key? key,
+    required this.weeklyPricing,
     required this.onPricingChanged,
-    this.rentMode, // Add this parameter
-  });
+    this.rentMode,
+  }) : super(key: key);
 
   @override
-  _DailyPricingComponentState createState() => _DailyPricingComponentState();
+  _WeeklyPricingComponentState createState() => _WeeklyPricingComponentState();
 }
 
-class _DailyPricingComponentState extends State<DailyPricingComponent> {
+class _WeeklyPricingComponentState extends State<WeeklyPricingComponent> {
   late TextEditingController _vehicleOnlyPriceController;
   late TextEditingController _vehicleOnlyMileageLimitController;
   late TextEditingController _vehicleOnlyExtraMileageController;
@@ -30,18 +30,18 @@ class _DailyPricingComponentState extends State<DailyPricingComponent> {
   void initState() {
     super.initState();
 
-    _vehicleOnlyPriceController =
-        TextEditingController(text: widget.dailyPricing.vehicleOnlyPrice ?? '');
+    _vehicleOnlyPriceController = TextEditingController(
+        text: widget.weeklyPricing.vehicleOnlyPrice ?? '');
     _vehicleOnlyMileageLimitController = TextEditingController(
-        text: widget.dailyPricing.vehicleOnlyMileageLimit ?? '');
+        text: widget.weeklyPricing.vehicleOnlyMileageLimit ?? '');
     _vehicleOnlyExtraMileageController = TextEditingController(
-        text: widget.dailyPricing.vehicleOnlyExtraMileage ?? '');
+        text: widget.weeklyPricing.vehicleOnlyExtraMileage ?? '');
     _withDriverPriceController =
-        TextEditingController(text: widget.dailyPricing.withDriverPrice ?? '');
+        TextEditingController(text: widget.weeklyPricing.withDriverPrice ?? '');
     _withDriverMileageLimitController = TextEditingController(
-        text: widget.dailyPricing.withDriverMileageLimit ?? '');
+        text: widget.weeklyPricing.withDriverMileageLimit ?? '');
     _withDriverExtraMileageController = TextEditingController(
-        text: widget.dailyPricing.withDriverExtraMileage ?? '');
+        text: widget.weeklyPricing.withDriverExtraMileage ?? '');
 
     _setupControllerListeners();
   }
@@ -114,7 +114,7 @@ class _DailyPricingComponentState extends State<DailyPricingComponent> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            FormWidgets.buildSectionSubheader('Daily Pricing'),
+            FormWidgets.buildSectionSubheader('Weekly Pricing'),
             const SizedBox(height: 16),
 
             // Vehicle Only Pricing - only show if applicable
@@ -125,14 +125,14 @@ class _DailyPricingComponentState extends State<DailyPricingComponent> {
               ),
               const SizedBox(height: 8),
 
-              // Price per day
+              // Price per week
               FormWidgets.buildPricingField(
                 controller: _vehicleOnlyPriceController,
-                label: 'Price Per Day',
+                label: 'Price Per Week',
                 isRequired: true,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Please enter daily price';
+                    return 'Please enter weekly price';
                   }
                   if (double.tryParse(value) == null ||
                       double.parse(value) < 0) {
@@ -190,14 +190,14 @@ class _DailyPricingComponentState extends State<DailyPricingComponent> {
               ),
               const SizedBox(height: 8),
 
-              // Price per day
+              // Price per week
               FormWidgets.buildPricingField(
                 controller: _withDriverPriceController,
-                label: 'Price Per Day (With Driver)',
+                label: 'Price Per Week (With Driver)',
                 isRequired: true,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Please enter daily price with driver';
+                    return 'Please enter weekly price with driver';
                   }
                   if (double.tryParse(value) == null ||
                       double.parse(value) < 0) {

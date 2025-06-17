@@ -5,11 +5,13 @@ import '../../../../widgets/form_widgets.dart';
 class HourlyPricingComponent extends StatefulWidget {
   final PeriodPricing hourlyPricing;
   final Function(PeriodPricing) onPricingChanged;
+  final String? rentMode; // Add this parameter
 
   const HourlyPricingComponent({
     Key? key,
     required this.hourlyPricing,
     required this.onPricingChanged,
+    this.rentMode, // Include rent mode
   }) : super(key: key);
 
   @override
@@ -27,13 +29,19 @@ class _HourlyPricingComponentState extends State<HourlyPricingComponent> {
   @override
   void initState() {
     super.initState();
-    
-    _vehicleOnlyPriceController = TextEditingController(text: widget.hourlyPricing.vehicleOnlyPrice ?? '');
-    _vehicleOnlyMileageLimitController = TextEditingController(text: widget.hourlyPricing.vehicleOnlyMileageLimit ?? '');
-    _vehicleOnlyExtraMileageController = TextEditingController(text: widget.hourlyPricing.vehicleOnlyExtraMileage ?? '');
-    _withDriverPriceController = TextEditingController(text: widget.hourlyPricing.withDriverPrice ?? '');
-    _withDriverMileageLimitController = TextEditingController(text: widget.hourlyPricing.withDriverMileageLimit ?? '');
-    _withDriverExtraMileageController = TextEditingController(text: widget.hourlyPricing.withDriverExtraMileage ?? '');
+
+    _vehicleOnlyPriceController = TextEditingController(
+        text: widget.hourlyPricing.vehicleOnlyPrice ?? '');
+    _vehicleOnlyMileageLimitController = TextEditingController(
+        text: widget.hourlyPricing.vehicleOnlyMileageLimit ?? '');
+    _vehicleOnlyExtraMileageController = TextEditingController(
+        text: widget.hourlyPricing.vehicleOnlyExtraMileage ?? '');
+    _withDriverPriceController =
+        TextEditingController(text: widget.hourlyPricing.withDriverPrice ?? '');
+    _withDriverMileageLimitController = TextEditingController(
+        text: widget.hourlyPricing.withDriverMileageLimit ?? '');
+    _withDriverExtraMileageController = TextEditingController(
+        text: widget.hourlyPricing.withDriverExtraMileage ?? '');
 
     _setupControllerListeners();
   }
@@ -49,14 +57,28 @@ class _HourlyPricingComponentState extends State<HourlyPricingComponent> {
 
   void _updatePricing() {
     final PeriodPricing updatedPricing = PeriodPricing(
-      vehicleOnlyPrice: _vehicleOnlyPriceController.text.isNotEmpty ? _vehicleOnlyPriceController.text : null,
-      vehicleOnlyMileageLimit: _vehicleOnlyMileageLimitController.text.isNotEmpty ? _vehicleOnlyMileageLimitController.text : null,
-      vehicleOnlyExtraMileage: _vehicleOnlyExtraMileageController.text.isNotEmpty ? _vehicleOnlyExtraMileageController.text : null,
-      withDriverPrice: _withDriverPriceController.text.isNotEmpty ? _withDriverPriceController.text : null,
-      withDriverMileageLimit: _withDriverMileageLimitController.text.isNotEmpty ? _withDriverMileageLimitController.text : null,
-      withDriverExtraMileage: _withDriverExtraMileageController.text.isNotEmpty ? _withDriverExtraMileageController.text : null,
+      vehicleOnlyPrice: _vehicleOnlyPriceController.text.isNotEmpty
+          ? _vehicleOnlyPriceController.text
+          : null,
+      vehicleOnlyMileageLimit:
+          _vehicleOnlyMileageLimitController.text.isNotEmpty
+              ? _vehicleOnlyMileageLimitController.text
+              : null,
+      vehicleOnlyExtraMileage:
+          _vehicleOnlyExtraMileageController.text.isNotEmpty
+              ? _vehicleOnlyExtraMileageController.text
+              : null,
+      withDriverPrice: _withDriverPriceController.text.isNotEmpty
+          ? _withDriverPriceController.text
+          : null,
+      withDriverMileageLimit: _withDriverMileageLimitController.text.isNotEmpty
+          ? _withDriverMileageLimitController.text
+          : null,
+      withDriverExtraMileage: _withDriverExtraMileageController.text.isNotEmpty
+          ? _withDriverExtraMileageController.text
+          : null,
     );
-    
+
     widget.onPricingChanged(updatedPricing);
   }
 
@@ -71,6 +93,17 @@ class _HourlyPricingComponentState extends State<HourlyPricingComponent> {
     super.dispose();
   }
 
+  // Add methods to check which sections to show
+  bool _shouldShowVehicleOnlyPricing() {
+    return widget.rentMode == 'Vehicle Only' ||
+        widget.rentMode == 'With or Without Driver';
+  }
+
+  bool _shouldShowWithDriverPricing() {
+    return widget.rentMode == 'With Driver' ||
+        widget.rentMode == 'With or Without Driver';
+  }
+
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -83,125 +116,133 @@ class _HourlyPricingComponentState extends State<HourlyPricingComponent> {
           children: [
             FormWidgets.buildSectionSubheader('Hourly Pricing'),
             const SizedBox(height: 16),
-            
-            // Vehicle Only Pricing
-            const Text(
-              'Vehicle Only Pricing',
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 8),
-            
-            // Price per hour
-            FormWidgets.buildPricingField(
-              controller: _vehicleOnlyPriceController,
-              label: 'Price Per Hour',
-              isRequired: true,
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Please enter hourly price';
-                }
-                if (double.tryParse(value) == null || double.parse(value) < 0) {
-                  return 'Please enter a valid price';
-                }
-                return null;
-              },
-            ),
-            const SizedBox(height: 12),
-            
-            // Mileage limit
-            FormWidgets.buildMileageField(
-              controller: _vehicleOnlyMileageLimitController,
-              label: 'Mileage Limit (km)',
-              isRequired: true,
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Please enter mileage limit';
-                }
-                if (int.tryParse(value) == null || int.parse(value) < 0) {
-                  return 'Please enter a valid non-negative number';
-                }
-                return null;
-              },
-            ),
-            const SizedBox(height: 12),
-            
-            // Extra mileage charge
-            FormWidgets.buildPricingField(
-              controller: _vehicleOnlyExtraMileageController,
-              label: 'Extra Mileage Charge (per km)',
-              isRequired: true,
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Please enter extra mileage charge';
-                }
-                if (double.tryParse(value) == null || double.parse(value) < 0) {
-                  return 'Please enter a valid non-negative number';
-                }
-                return null;
-              },
-            ),
-            const SizedBox(height: 8),
-            FormWidgets.buildMileageNote(),
-            const Divider(height: 32),
-            
-            // With Driver Pricing
-            const Text(
-              'With Driver Pricing',
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 8),
-            
-            // Price per hour
-            FormWidgets.buildPricingField(
-              controller: _withDriverPriceController,
-              label: 'Price Per Hour (With Driver)',
-              isRequired: true,
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Please enter hourly price with driver';
-                }
-                if (double.tryParse(value) == null || double.parse(value) < 0) {
-                  return 'Please enter a valid price';
-                }
-                return null;
-              },
-            ),
-            const SizedBox(height: 12),
-            
-            // Mileage limit
-            FormWidgets.buildMileageField(
-              controller: _withDriverMileageLimitController,
-              label: 'Mileage Limit (km)',
-              isRequired: true,
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Please enter mileage limit';
-                }
-                if (int.tryParse(value) == null || int.parse(value) < 0) {
-                  return 'Please enter a valid non-negative number';
-                }
-                return null;
-              },
-            ),
-            const SizedBox(height: 12),
-            
-            // Extra mileage charge
-            FormWidgets.buildPricingField(
-              controller: _withDriverExtraMileageController,
-              label: 'Extra Mileage Charge (per km)',
-              isRequired: true,
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Please enter extra mileage charge';
-                }
-                if (double.tryParse(value) == null || double.parse(value) < 0) {
-                  return 'Please enter a valid non-negative number';
-                }
-                return null;
-              },
-            ),
-            const SizedBox(height: 8),
-            FormWidgets.buildMileageNote(),
+
+            // Vehicle Only Pricing - only show if applicable based on rent mode
+            if (_shouldShowVehicleOnlyPricing()) ...[
+              const Text(
+                'Vehicle Only Pricing',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 8),
+
+              // Price per hour
+              FormWidgets.buildPricingField(
+                controller: _vehicleOnlyPriceController,
+                label: 'Price Per Hour',
+                isRequired: true,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter hourly price';
+                  }
+                  if (double.tryParse(value) == null ||
+                      double.parse(value) < 0) {
+                    return 'Please enter a valid price';
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 12),
+
+              // Mileage limit
+              FormWidgets.buildMileageField(
+                controller: _vehicleOnlyMileageLimitController,
+                label: 'Mileage Limit (km)',
+                isRequired: true,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter mileage limit';
+                  }
+                  if (int.tryParse(value) == null || int.parse(value) < 0) {
+                    return 'Please enter a valid non-negative number';
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 12),
+
+              // Extra mileage charge
+              FormWidgets.buildPricingField(
+                controller: _vehicleOnlyExtraMileageController,
+                label: 'Extra Mileage Charge (per km)',
+                isRequired: true,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter extra mileage charge';
+                  }
+                  if (double.tryParse(value) == null ||
+                      double.parse(value) < 0) {
+                    return 'Please enter a valid non-negative number';
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 8),
+              FormWidgets.buildMileageNote(),
+              const Divider(height: 32),
+            ],
+
+            // With Driver Pricing - only show if applicable based on rent mode
+            if (_shouldShowWithDriverPricing()) ...[
+              const Text(
+                'With Driver Pricing',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 8),
+
+              // Price per hour with driver
+              FormWidgets.buildPricingField(
+                controller: _withDriverPriceController,
+                label: 'Price Per Hour (With Driver)',
+                isRequired: true,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter hourly price with driver';
+                  }
+                  if (double.tryParse(value) == null ||
+                      double.parse(value) < 0) {
+                    return 'Please enter a valid price';
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 12),
+
+              // Mileage limit
+              FormWidgets.buildMileageField(
+                controller: _withDriverMileageLimitController,
+                label: 'Mileage Limit (km)',
+                isRequired: true,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter mileage limit';
+                  }
+                  if (int.tryParse(value) == null || int.parse(value) < 0) {
+                    return 'Please enter a valid non-negative number';
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 12),
+
+              // Extra mileage charge
+              FormWidgets.buildPricingField(
+                controller: _withDriverExtraMileageController,
+                label: 'Extra Mileage Charge (per km)',
+                isRequired: true,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter extra mileage charge';
+                  }
+                  if (double.tryParse(value) == null ||
+                      double.parse(value) < 0) {
+                    return 'Please enter a valid non-negative number';
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 8),
+              FormWidgets.buildMileageNote(),
+            ],
           ],
         ),
       ),

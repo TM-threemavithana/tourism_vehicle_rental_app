@@ -8,10 +8,10 @@ class VehicleDetailsSection extends StatefulWidget {
   final Function(VehicleBasicDetails) onVehicleDetailsChanged;
 
   const VehicleDetailsSection({
-    Key? key,
+    super.key,
     required this.vehicleDetails,
     required this.onVehicleDetailsChanged,
-  }) : super(key: key);
+  });
 
   @override
   _VehicleDetailsSectionState createState() => _VehicleDetailsSectionState();

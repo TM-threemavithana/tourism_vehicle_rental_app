@@ -8,10 +8,10 @@ class RentalConditionsSection extends StatefulWidget {
   final Function(RentalConditions) onRentalConditionsChanged;
 
   const RentalConditionsSection({
-    Key? key,
+    super.key,
     required this.rentalConditions,
     required this.onRentalConditionsChanged,
-  }) : super(key: key);
+  });
 
   @override
   _RentalConditionsSectionState createState() =>

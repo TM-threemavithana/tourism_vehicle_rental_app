@@ -4,7 +4,6 @@ import 'auth/auth_wrapper.dart';
 import '../widgets/side_menu.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'profile_screen.dart'; // Import the ProfileScreen
-import '../services/image_preloader.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});

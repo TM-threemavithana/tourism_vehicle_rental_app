@@ -6,7 +6,7 @@ import 'package:image_picker/image_picker.dart';
 import '../../services/cloudinary_service.dart';
 
 class NonOwnerVehicleForm extends StatefulWidget {
-  const NonOwnerVehicleForm({Key? key}) : super(key: key);
+  const NonOwnerVehicleForm({super.key});
 
   @override
   State<NonOwnerVehicleForm> createState() => _NonOwnerVehicleFormState();

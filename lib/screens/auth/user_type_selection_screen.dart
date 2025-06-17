@@ -8,7 +8,7 @@ import '../home_screen.dart';
 import '../owner/owner_dashboard_screen.dart' show OwnerDashboardScreen;
 
 class RenterDashboardScreen extends StatefulWidget {
-  const RenterDashboardScreen({Key? key}) : super(key: key);
+  const RenterDashboardScreen({super.key});
 
   @override
   State<RenterDashboardScreen> createState() => _RenterDashboardScreenState();
@@ -273,7 +273,7 @@ class _RenterDashboardScreenState extends State<RenterDashboardScreen> {
 }
 
 class UserTypeSelectionScreen extends StatefulWidget {
-  const UserTypeSelectionScreen({Key? key}) : super(key: key);
+  const UserTypeSelectionScreen({super.key});
 
   @override
   State<UserTypeSelectionScreen> createState() =>
