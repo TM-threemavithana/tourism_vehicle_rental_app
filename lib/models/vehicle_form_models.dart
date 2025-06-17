@@ -430,3 +430,32 @@ class VehicleImages {
     };
   }
 }
+
+// Add this class to your vehicle_form_models.dart file
+
+class OwnerDetails {
+  String name;
+  String address;
+  String contactNo;
+  String email;
+  String nicNo;
+
+  OwnerDetails({
+    this.name = '',
+    this.address = '',
+    this.contactNo = '',
+    this.email = '',
+    this.nicNo = '',
+  });
+
+  // Convert to a map for storing in Firebase
+  Map<String, dynamic> toMap() {
+    return {
+      'name': name,
+      'address': address,
+      'contactNo': contactNo,
+      'email': email,
+      'nicNo': nicNo,
+    };
+  }
+}
