@@ -60,6 +60,12 @@ flutter_launcher_icons:
   image_path: "assets/icon/logo.png"  # Change from icon.png to logo.png
   remove_alpha_ios: true
 
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "assets/icon/logo.png"
+  
+
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 

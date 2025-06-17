@@ -16,18 +16,18 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
-  final List<String> _vehicleTypes = ['Bike', 'Three-wheel', 'Car'];
+  final List<String> _vehicleTypes = ['Bike','Three-Wheeler' ,'Car']; // Updated to match image
   final AuthService _authService = AuthService();
   final Set<String> _selectedVehicles = <String>{};
   final TextEditingController _locationController = TextEditingController();
-  DateTime _pickupDate = DateTime.now();
-  TimeOfDay _pickupTime = const TimeOfDay(hour: 5, minute: 0);
-  DateTime _returnDate = DateTime.now().add(const Duration(days: 7));
-  TimeOfDay _returnTime = const TimeOfDay(hour: 5, minute: 0);
+  DateTime _pickupDate = DateTime(2025, 6, 14); // Match image date
+  TimeOfDay _pickupTime = const TimeOfDay(hour: 17, minute: 0); // 05:00 pm
+  DateTime _returnDate = DateTime(2025, 6, 21); // Match image date
+  TimeOfDay _returnTime = const TimeOfDay(hour: 17, minute: 0); // 05:00 pm
   bool _flexibleDates = false;
   bool _showNearbyVehicles = true;
   bool _isMenuOpen = false;
-  String _currentTab = 'Search'; // Changed from 'Home' to 'Search'
+  String _currentTab = 'Search';
 
   @override
   void initState() {
@@ -119,7 +119,7 @@ class _HomeScreenState extends State<HomeScreen>
   String _formatTime(TimeOfDay time) {
     final hour = time.hour.toString().padLeft(2, '0');
     final minute = time.minute.toString().padLeft(2, '0');
-    return '$hour:$minute';
+    return '$hour:$minute ${time.period == DayPeriod.pm ? 'pm' : 'am'}'; // Adjusted for am/pm
   }
 
   void _toggleVehicleSelection(String type) {
@@ -136,7 +136,7 @@ class _HomeScreenState extends State<HomeScreen>
     setState(() {
       _currentTab = tabName;
     });
-    _closeMenu(); // Close the menu after selecting a tab
+    _closeMenu();
   }
 
   void _navigateToProfile() {
@@ -151,7 +151,6 @@ class _HomeScreenState extends State<HomeScreen>
 
   @override
   Widget build(BuildContext context) {
-    // Get the screen size to help with responsive layout
     final Size screenSize = MediaQuery.of(context).size;
     final double screenHeight = screenSize.height;
     final double screenWidth = screenSize.width;
@@ -179,13 +178,12 @@ class _HomeScreenState extends State<HomeScreen>
       ),
       body: Stack(
         children: [
-          // Direct background image display - no loading state needed as images are preloaded
+          // Background image and gradient
           Container(
             decoration: const BoxDecoration(
               image: DecorationImage(
                 image: AssetImage('assets/images/road_background.jpg'),
                 fit: BoxFit.cover,
-                // Add these for smoother rendering
                 filterQuality: FilterQuality.medium,
               ),
             ),
@@ -202,20 +200,18 @@ class _HomeScreenState extends State<HomeScreen>
               ),
             ),
           ),
-
-          // Main content
           SafeArea(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  // Top section with logo and title - reduced spacing
+                  // Top section with logo and title
                   Column(
                     children: [
-                      SizedBox(height: screenHeight * 0.02), // Reduced space
+                      SizedBox(height: screenHeight * 0.02),
                       Container(
-                        padding: const EdgeInsets.all(8), // Reduced padding
+                        padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
                           color: Colors.white.withOpacity(0.2),
                           borderRadius: BorderRadius.circular(12),
@@ -225,7 +221,6 @@ class _HomeScreenState extends State<HomeScreen>
                           height: screenHeight * 0.06,
                           width: screenHeight * 0.06,
                           fit: BoxFit.contain,
-                          // Add loading builder if needed
                           frameBuilder:
                               (context, child, frame, wasSynchronouslyLoaded) {
                             if (wasSynchronouslyLoaded || frame != null) {
@@ -241,11 +236,11 @@ class _HomeScreenState extends State<HomeScreen>
                           },
                         ),
                       ),
-                      SizedBox(height: screenHeight * 0.01), // Reduced space
+                      SizedBox(height: screenHeight * 0.01),
                       const Text(
                         'Your next adventure starts here',
                         style: TextStyle(
-                          fontSize: 18, // Smaller font
+                          fontSize: 18,
                           fontWeight: FontWeight.bold,
                           color: Colors.white,
                           shadows: [
@@ -260,12 +255,10 @@ class _HomeScreenState extends State<HomeScreen>
                       ),
                     ],
                   ),
-
                   // Vehicle selection section
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Vehicle type selection header
                       const Padding(
                         padding: EdgeInsets.only(bottom: 6.0),
                         child: Text(
@@ -277,10 +270,8 @@ class _HomeScreenState extends State<HomeScreen>
                           ),
                         ),
                       ),
-
-                      // Vehicle type selection grid - more compact
                       SizedBox(
-                        height: screenHeight * 0.12, // Fixed height
+                        height: screenHeight * 0.12,
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: _vehicleTypes.map((type) {
@@ -288,16 +279,14 @@ class _HomeScreenState extends State<HomeScreen>
                             return GestureDetector(
                               onTap: () => _toggleVehicleSelection(type),
                               child: Container(
-                                width:
-                                    screenWidth * 0.28, // Width based on screen
+                                width: screenWidth * 0.22,
                                 decoration: BoxDecoration(
                                   color: isSelected
                                       ? const Color(0xFFFFA500)
                                       : Colors.white.withOpacity(0.1),
                                   border: Border.all(
-                                    color: isSelected
-                                        ? Colors.white
-                                        : Colors.white38,
+                                    color:
+                                        isSelected ? Colors.white : Colors.white38,
                                     width: 2,
                                   ),
                                   borderRadius: BorderRadius.circular(8),
@@ -310,9 +299,9 @@ class _HomeScreenState extends State<HomeScreen>
                                       color: isSelected
                                           ? Colors.black
                                           : Colors.white,
-                                      size: 20, // Smaller icon
+                                      size: 20,
                                     ),
-                                    const SizedBox(height: 4), // Less space
+                                    const SizedBox(height: 4),
                                     Text(
                                       type,
                                       style: TextStyle(
@@ -320,7 +309,7 @@ class _HomeScreenState extends State<HomeScreen>
                                             ? Colors.black
                                             : Colors.white,
                                         fontWeight: FontWeight.bold,
-                                        fontSize: 12, // Smaller text
+                                        fontSize: 12,
                                       ),
                                     ),
                                   ],
@@ -332,21 +321,18 @@ class _HomeScreenState extends State<HomeScreen>
                       ),
                     ],
                   ),
-
                   // Location field
                   SizedBox(
-                    height: screenHeight * 0.06, // Fixed height
+                    height: screenHeight * 0.06,
                     child: _buildInputField(
                       controller: _locationController,
                       hintText: 'Location',
                     ),
                   ),
-
-                  // Date and time section - more compact
+                  // Date and time section
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Pick up section
                       Row(
                         children: [
                           const Text(
@@ -380,10 +366,7 @@ class _HomeScreenState extends State<HomeScreen>
                           ),
                         ],
                       ),
-
-                      SizedBox(height: screenHeight * 0.01), // Minimal space
-
-                      // Return section
+                      SizedBox(height: screenHeight * 0.01),
                       Row(
                         children: [
                           const Text(
@@ -419,11 +402,9 @@ class _HomeScreenState extends State<HomeScreen>
                       ),
                     ],
                   ),
-
                   // Options section
                   Row(
                     children: [
-                      // Flexible dates option
                       Expanded(
                         child: Row(
                           children: [
@@ -434,32 +415,28 @@ class _HomeScreenState extends State<HomeScreen>
                                 });
                               },
                               child: Container(
-                                width: 18, // Smaller checkbox
+                                width: 18,
                                 height: 18,
                                 decoration: BoxDecoration(
                                   color: _flexibleDates
                                       ? const Color(0xFFFFA500)
                                       : Colors.transparent,
-                                  border: Border.all(
-                                      color: Colors.white, width: 1.5),
+                                  border: Border.all(color: Colors.white, width: 1.5),
                                   borderRadius: BorderRadius.circular(4),
                                 ),
                                 child: _flexibleDates
-                                    ? const Icon(Icons.check,
-                                        color: Colors.black, size: 12)
+                                    ? const Icon(Icons.check, color: Colors.black, size: 12)
                                     : null,
                               ),
                             ),
                             const SizedBox(width: 6),
                             const Text(
-                              'Flexible',
-                              style:
-                                  TextStyle(color: Colors.white, fontSize: 13),
+                              'My dates are flexible',
+                              style: TextStyle(color: Colors.white, fontSize: 13),
                             ),
                           ],
                         ),
                       ),
-                      // Nearby vehicles option
                       Expanded(
                         child: Row(
                           children: [
@@ -470,34 +447,30 @@ class _HomeScreenState extends State<HomeScreen>
                                 });
                               },
                               child: Container(
-                                width: 18, // Smaller checkbox
+                                width: 18,
                                 height: 18,
                                 decoration: BoxDecoration(
                                   color: _showNearbyVehicles
                                       ? const Color(0xFFA0522D)
                                       : Colors.transparent,
-                                  border: Border.all(
-                                      color: Colors.white, width: 1.5),
+                                  border: Border.all(color: Colors.white, width: 1.5),
                                   borderRadius: BorderRadius.circular(4),
                                 ),
                                 child: _showNearbyVehicles
-                                    ? const Icon(Icons.check,
-                                        color: Colors.white, size: 12)
+                                    ? const Icon(Icons.check, color: Colors.white, size: 12)
                                     : null,
                               ),
                             ),
                             const SizedBox(width: 6),
                             const Text(
-                              'Show Nearby',
-                              style:
-                                  TextStyle(color: Colors.white, fontSize: 13),
+                              'Show Nearby Vehicles',
+                              style: TextStyle(color: Colors.white, fontSize: 13),
                             ),
                           ],
                         ),
                       ),
                     ],
                   ),
-
                   // Search button
                   SizedBox(
                     width: double.infinity,
@@ -505,7 +478,6 @@ class _HomeScreenState extends State<HomeScreen>
                     child: ElevatedButton(
                       onPressed: _selectedVehicles.isNotEmpty
                           ? () {
-                              // Handle search with selected vehicles
                               print('Selected vehicles: $_selectedVehicles');
                             }
                           : null,
@@ -527,15 +499,13 @@ class _HomeScreenState extends State<HomeScreen>
                       ),
                     ),
                   ),
-                  SizedBox(height: screenHeight * 0.02), // Bottom padding
+                  SizedBox(height: screenHeight * 0.02),
                 ],
               ),
             ),
           ),
-
-          // Side Menu and Overlay
+          // Side menu and overlay
           if (_isMenuOpen) ...[
-            // Semi-transparent overlay that covers the remaining screen
             Positioned.fill(
               child: GestureDetector(
                 onTap: _closeMenu,
@@ -544,8 +514,6 @@ class _HomeScreenState extends State<HomeScreen>
                 ),
               ),
             ),
-
-            // Side Menu on the left
             Positioned(
               top: 0,
               left: 0,
@@ -562,18 +530,16 @@ class _HomeScreenState extends State<HomeScreen>
                   onClose: _closeMenu,
                   onSignOut: _signOut,
                   onTabChange: _updateCurrentTab,
-                  onProfileTap: _navigateToProfile, // Add this callback
+                  onProfileTap: _navigateToProfile,
                   width: 0.7,
                   user: FirebaseAuth.instance.currentUser,
                   currentTab: _currentTab,
                 ),
               ),
             ),
-
-            // Menu icon overlay to show black icon when menu is open
             Positioned(
-              top: MediaQuery.of(context).padding.top, // Account for status bar
-              left: 4, // Align with the original menu icon
+              top: MediaQuery.of(context).padding.top,
+              left: 4,
               child: IconButton(
                 icon: const Icon(
                   Icons.menu,
@@ -586,6 +552,7 @@ class _HomeScreenState extends State<HomeScreen>
           ],
         ],
       ),
+     
     );
   }
 
@@ -604,8 +571,7 @@ class _HomeScreenState extends State<HomeScreen>
           hintText: hintText,
           hintStyle: TextStyle(color: Colors.grey[600], fontSize: 14),
           border: InputBorder.none,
-          contentPadding:
-              const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         ),
       ),
     );
@@ -613,7 +579,7 @@ class _HomeScreenState extends State<HomeScreen>
 
   Widget _buildDateTimeField(String text) {
     return Container(
-      height: 40, // Reduced height
+      height: 40,
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(8),
@@ -623,7 +589,7 @@ class _HomeScreenState extends State<HomeScreen>
           text,
           style: TextStyle(
             color: Colors.grey[700],
-            fontSize: 14, // Smaller font
+            fontSize: 14,
           ),
         ),
       ),
@@ -634,10 +600,11 @@ class _HomeScreenState extends State<HomeScreen>
     switch (type) {
       case 'Bike':
         return Icons.directions_bike;
-      case 'Three-wheel':
-        return Icons.directions_railway_filled_outlined;
+      case 'Three-Wheeler':
+        return Icons.directions_car_filled;
       case 'Car':
         return Icons.directions_car;
+      
       default:
         return Icons.directions_car;
     }

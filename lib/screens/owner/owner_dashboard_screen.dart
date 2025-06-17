@@ -4,6 +4,7 @@ import '../../services/auth_service.dart';
 import '../auth/auth_wrapper.dart';
 import '../../widgets/side_menu.dart';
 import '../profile_screen.dart';
+import 'add_vehicle_screen.dart';
 
 class OwnerDashboardScreen extends StatefulWidget {
   const OwnerDashboardScreen({Key? key}) : super(key: key);
@@ -146,13 +147,15 @@ class _OwnerDashboardScreenState extends State<OwnerDashboardScreen> {
                   // Action buttons
                   ElevatedButton.icon(
                     onPressed: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                            content: Text('Coming soon: Add Vehicle feature')),
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const AddVehicleScreen(),
+                        ),
                       );
                     },
                     icon: const Icon(Icons.add_circle),
-                    label: const Text('Add New Vehicle'),
+                    label: const Text('Add Your Vehicle'),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: theme.colorScheme.secondary,
                       foregroundColor: Colors.white,
