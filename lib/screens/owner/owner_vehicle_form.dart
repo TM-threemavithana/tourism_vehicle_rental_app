@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../../services/cloudinary_service.dart';
@@ -7,6 +8,9 @@ import 'sections/collection_point_section.dart';
 import 'sections/rental_conditions_section.dart';
 import 'sections/driver_details_section.dart';
 import 'sections/pricing_section.dart';
+import 'sections/extras_section.dart';
+import 'sections/insurance_section.dart';
+import 'sections/vehicle_images_section.dart';
 
 class OwnerVehicleForm extends StatefulWidget {
   const OwnerVehicleForm({super.key});
@@ -26,6 +30,9 @@ class _OwnerVehicleFormState extends State<OwnerVehicleForm> {
   late RentalConditions _rentalConditions;
   late DriverDetails _driverDetails;
   late VehiclePricing _pricing;
+  late VehicleExtras _vehicleExtras;
+  late VehicleInsurance _vehicleInsurance; // Add to your state variables
+  late VehicleImages _vehicleImages;
 
   @override
   void initState() {
@@ -36,6 +43,9 @@ class _OwnerVehicleFormState extends State<OwnerVehicleForm> {
     _rentalConditions = RentalConditions();
     _driverDetails = DriverDetails();
     _pricing = VehiclePricing();
+    _vehicleExtras = VehicleExtras();
+    _vehicleInsurance = VehicleInsurance();
+    _vehicleImages = VehicleImages(); // Add this line
   }
 
   Future<void> _submitForm() async {
@@ -50,9 +60,63 @@ class _OwnerVehicleFormState extends State<OwnerVehicleForm> {
       return;
     }
 
+    // Check if at least one image is selected
+    if (_vehicleImages.imageUrls.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please add at least one vehicle image')),
+      );
+      return;
+    }
+
+    // Check if all required images are uploaded
+    bool allRequiredImagesUploaded = true;
+    for (int i = 0; i < 7; i++) {
+      if (!_vehicleImages.imageUrls.asMap().containsKey(i) ||
+          _vehicleImages.imageUrls[i].isEmpty) {
+        allRequiredImagesUploaded = false;
+        break;
+      }
+    }
+
+    if (!allRequiredImagesUploaded) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content: Text('Please upload all required vehicle images')),
+      );
+      return;
+    }
+
     setState(() => _isLoading = true);
 
     try {
+      // Upload all images to your storage service (Cloudinary or Firebase Storage)
+      // This part depends on your implementation, but typically:
+      List<String> uploadedImageUrls = [];
+      String primaryImageUrl = '';
+
+      for (String localPath in _vehicleImages.imageUrls) {
+        // Upload image and get URL
+        // For example:
+        final response = await _cloudinaryService.uploadImage(
+          File(localPath),
+          FirebaseAuth.instance.currentUser?.uid ?? 'unknown',
+        );
+
+        if (response != null) {
+          uploadedImageUrls.add(response.secureUrl);
+
+          // Set primary image URL
+          if (localPath == _vehicleImages.primaryImageUrl) {
+            primaryImageUrl = response.secureUrl;
+          }
+        }
+      }
+
+      // If primary image not set but we have images, use the first one
+      if (primaryImageUrl.isEmpty && uploadedImageUrls.isNotEmpty) {
+        primaryImageUrl = uploadedImageUrls[0];
+      }
+
       // First create the pricing map with the correct types
       Map<String, dynamic> pricingMap = {
         'vehicleValue': _pricing.vehicleValue,
@@ -122,6 +186,18 @@ class _OwnerVehicleFormState extends State<OwnerVehicleForm> {
 
         // Pricing - use the structured pricing map we created above
         'pricing': pricingMap,
+
+        // Add the extras section
+        'extras': _vehicleExtras.toMap(),
+
+        // Add the insurance section
+        'insurance': _vehicleInsurance.toMap(),
+
+        // Images section
+        'images': {
+          'imageUrls': uploadedImageUrls,
+          'primaryImageUrl': primaryImageUrl,
+        },
 
         // Status and ownership
         'status': 'available',
@@ -239,6 +315,41 @@ class _OwnerVehicleFormState extends State<OwnerVehicleForm> {
                         });
                       },
                       rentMode: _rentalConditions.rentMode,
+                    ),
+                    const SizedBox(height: 24),
+
+                    // Extras Section - Add this new section
+                    ExtrasSection(
+                      extras: _vehicleExtras,
+                      onExtrasChanged: (updatedExtras) {
+                        setState(() {
+                          _vehicleExtras = updatedExtras;
+                        });
+                      },
+                      vehicleDetails: _vehicleDetails,
+                    ),
+                    const SizedBox(height: 24),
+
+                    // Insurance Section - Add this new section
+                    InsuranceSection(
+                      insurance: _vehicleInsurance,
+                      onInsuranceChanged: (updatedInsurance) {
+                        setState(() {
+                          _vehicleInsurance = updatedInsurance;
+                        });
+                      },
+                      rentMode: _rentalConditions.rentMode,
+                    ),
+                    const SizedBox(height: 24),
+
+                    // Vehicle Images Section - Add this new section
+                    VehicleImagesSection(
+                      vehicleImages: _vehicleImages,
+                      onImagesChanged: (updatedImages) {
+                        setState(() {
+                          _vehicleImages = updatedImages;
+                        });
+                      },
                     ),
                     const SizedBox(height: 24),
 

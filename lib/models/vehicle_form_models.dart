@@ -1,4 +1,3 @@
-
 // Vehicle data model
 class VehicleFormData {
   String? vehicleType;
@@ -357,4 +356,77 @@ class VehiclePricing {
               'Weekly': false,
               'Monthly': false,
             };
+}
+
+// Add this class to your vehicle_form_models.dart file
+class VehicleExtras {
+  Map<String, bool> features;
+
+  VehicleExtras({
+    Map<String, bool>? features,
+  }) : features = features ??
+            {
+              'Alloys': false,
+              'Spoiler': false,
+              'Rear Wiper': false,
+              'Rear Defroster': false,
+              'Power Steering': false,
+              'USB': false,
+              'AWD': false,
+              'Tyre Repair Kit': false,
+              'Power Shutters': false,
+              'Power Mirrors': false,
+              'Power Locks': false,
+              'Navigation': false,
+              'Multi Functional Steering': false,
+              'Keyless Entry': false,
+              'DVD': false,
+              'Cruise Control': false,
+              'Airbag Passenger': false,
+              'Airbag Driver': false,
+            };
+
+  // Convert to a map for storing in Firebase
+  Map<String, bool> toMap() {
+    return features;
+  }
+}
+
+// Add this class to your vehicle_form_models.dart file
+class VehicleInsurance {
+  bool hasInsurance;
+  String securityDeposit;
+
+  VehicleInsurance({
+    this.hasInsurance = false,
+    this.securityDeposit = '',
+  });
+
+  // Convert to a map for storing in Firebase
+  Map<String, dynamic> toMap() {
+    return {
+      'hasInsurance': hasInsurance,
+      'securityDeposit': securityDeposit,
+    };
+  }
+}
+
+// Add this class to your vehicle_form_models.dart file after VehicleInsurance class
+class VehicleImages {
+  List<String> imageUrls;
+  String? primaryImageUrl;
+
+  VehicleImages({
+    List<String>? imageUrls,
+    this.primaryImageUrl,
+  }) : imageUrls = imageUrls ?? [];
+
+  // Convert to a map for storing in Firebase
+  Map<String, dynamic> toMap() {
+    return {
+      'imageUrls': imageUrls,
+      'primaryImageUrl':
+          primaryImageUrl ?? (imageUrls.isNotEmpty ? imageUrls[0] : null),
+    };
+  }
 }

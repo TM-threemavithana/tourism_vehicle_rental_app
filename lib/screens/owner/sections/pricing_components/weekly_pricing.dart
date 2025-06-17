@@ -8,11 +8,11 @@ class WeeklyPricingComponent extends StatefulWidget {
   final String? rentMode;
 
   const WeeklyPricingComponent({
-    Key? key,
+    super.key,
     required this.weeklyPricing,
     required this.onPricingChanged,
     this.rentMode,
-  }) : super(key: key);
+  });
 
   @override
   _WeeklyPricingComponentState createState() => _WeeklyPricingComponentState();

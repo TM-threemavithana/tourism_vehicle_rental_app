@@ -13,11 +13,11 @@ class PricingSection extends StatefulWidget {
   final String? rentMode;
 
   const PricingSection({
-    Key? key,
+    super.key,
     required this.pricing,
     required this.onPricingChanged,
     required this.rentMode,
-  }) : super(key: key);
+  });
 
   @override
   _PricingSectionState createState() => _PricingSectionState();

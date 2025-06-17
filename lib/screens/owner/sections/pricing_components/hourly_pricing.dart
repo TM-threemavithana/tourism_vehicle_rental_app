@@ -8,11 +8,11 @@ class HourlyPricingComponent extends StatefulWidget {
   final String? rentMode; // Add this parameter
 
   const HourlyPricingComponent({
-    Key? key,
+    super.key,
     required this.hourlyPricing,
     required this.onPricingChanged,
     this.rentMode, // Include rent mode
-  }) : super(key: key);
+  });
 
   @override
   _HourlyPricingComponentState createState() => _HourlyPricingComponentState();

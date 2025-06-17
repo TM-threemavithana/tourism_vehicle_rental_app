@@ -4,7 +4,6 @@ import '../../services/auth_service.dart';
 import '../auth/auth_wrapper.dart';
 import '../../widgets/side_menu.dart';
 import '../profile_screen.dart';
-import '../home_screen.dart';
 import '../owner/owner_dashboard_screen.dart' show OwnerDashboardScreen;
 
 class RenterDashboardScreen extends StatefulWidget {

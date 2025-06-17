@@ -8,11 +8,11 @@ class MonthlyPricingComponent extends StatefulWidget {
   final String? rentMode;
 
   const MonthlyPricingComponent({
-    Key? key,
+    super.key,
     required this.monthlyPricing,
     required this.onPricingChanged,
     this.rentMode,
-  }) : super(key: key);
+  });
 
   @override
   _MonthlyPricingComponentState createState() =>
