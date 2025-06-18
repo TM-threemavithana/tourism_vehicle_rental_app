@@ -8,6 +8,7 @@ import '../auth/auth_wrapper.dart';
 import '../../widgets/side_menu.dart';
 import '../profile_screen.dart';
 import 'add_vehicle_screen.dart';
+import 'vehicle_detail_screen.dart'; // Import the vehicle detail screen
 
 class OwnerDashboardScreen extends StatefulWidget {
   const OwnerDashboardScreen({super.key});
@@ -740,6 +741,15 @@ class _OwnerDashboardScreenState extends State<OwnerDashboardScreen>
     );
   }
 
+  void _navigateToVehicleDetails(Map<String, dynamic> vehicle) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => VehicleDetailScreen(vehicle: vehicle),
+      ),
+    );
+  }
+
   Widget _buildStatCard({
     required IconData icon,
     required String title,
@@ -1051,122 +1061,272 @@ class _OwnerDashboardScreenState extends State<OwnerDashboardScreen>
   }
 
   Widget _buildVehicleCard(Map<String, dynamic> vehicle) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      decoration: BoxDecoration(
-        color: isDarkMode ? Colors.grey[850] : Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.04),
-            blurRadius: 4,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        children: [
-          // Vehicle image
-          ClipRRect(
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
-            child: Image.network(
-              vehicle['images']?['primaryImageUrl'] ?? 'https://via.placeholder.com/400x200?text=No+Image',
-              height: 150,
-              width: double.infinity,
-              fit: BoxFit.cover,
-              errorBuilder: (context, error, stackTrace) {
-                return Container(
-                  height: 150,
-                  color: Colors.grey[300],
-                  child: const Icon(Icons.car_rental, size: 50, color: Colors.grey),
-                );
-              },
+    return GestureDetector(
+      onTap: () => _navigateToVehicleDetails(vehicle),
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 20),
+        decoration: BoxDecoration(
+          color: isDarkMode ? Colors.grey[850] : Colors.white,
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.06),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
             ),
-          ),
-          
-          // Vehicle details
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+          ],
+        ),
+        child: Column(
+          children: [
+            // Vehicle image with overlay gradient and status badge
+            Stack(
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Expanded(
-                      child: Text(
-                        '${vehicle['make'] ?? 'Unknown'} ${vehicle['model'] ?? 'Model'}',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: isDarkMode ? Colors.white : Colors.black87,
-                        ),
-                        overflow: TextOverflow.ellipsis,
-                      ),
+                // Vehicle Image
+                ClipRRect(
+                  borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+                  child: AspectRatio(
+                    aspectRatio: 16 / 9,
+                    child: Image.network(
+                      vehicle['images']?['primaryImageUrl'] ?? 'https://via.placeholder.com/400x200?text=No+Image',
+                      width: double.infinity,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Container(
+                          color: Colors.grey[300],
+                          child: const Icon(Icons.car_rental, size: 50, color: Colors.grey),
+                        );
+                      },
                     ),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 4,
-                      ),
-                      decoration: BoxDecoration(
-                        color: _getStatusColor(vehicle['status'] as String?).withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Text(
-                        vehicle['status'] as String? ?? 'Unknown',
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w500,
-                          color: _getStatusColor(vehicle['status'] as String?),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  'Year ${vehicle['year'] ?? 'N/A'} · ${vehicle['vehicleNo'] ?? 'No Reg Number'}',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: isDarkMode ? Colors.white70 : Colors.grey[700],
                   ),
                 ),
-                const SizedBox(height: 12),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Row(
+                
+                // Gradient overlay at the bottom
+                Positioned(
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  height: 60,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.bottomCenter,
+                        end: Alignment.topCenter,
+                        colors: [
+                          Colors.black.withOpacity(0.7),
+                          Colors.transparent,
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                
+                // Vehicle type icon badge
+                Positioned(
+                  top: 16,
+                  left: 16,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.primary.withOpacity(0.8),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Row(
                       children: [
                         Icon(
-                          Icons.location_on_outlined,
-                          size: 14,
-                          color: isDarkMode ? Colors.white60 : Colors.grey,
+                          _getVehicleTypeIcon(vehicle['type']),
+                          color: Colors.white,
+                          size: 16,
                         ),
                         const SizedBox(width: 4),
                         Text(
-                          vehicle['collectionPoint']?['district'] ?? 'Location not set',
-                          style: TextStyle(
-                            fontSize: 13,
-                            color: isDarkMode ? Colors.white60 : Colors.grey[600],
+                          vehicle['type'] ?? 'Vehicle',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
                       ],
                     ),
-                    
-                    // Show pricing if available
-                    if (vehicle['pricing']?['daily']?['baseRate'] != null)
-                      Text(
-                        'LKR ${vehicle['pricing']['daily']['baseRate'].toString()}',
+                  ),
+                ),
+                
+                // Status badge
+                Positioned(
+                  top: 16,
+                  right: 16,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: _getStatusColor(vehicle['status'] as String?),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Text(
+                      vehicle['status'] as String? ?? 'Unknown',
+                      style: const TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ),
+                
+                // Price badge at bottom
+                if (vehicle['pricing']?['daily']?['baseRate'] != null)
+                  Positioned(
+                    bottom: 12,
+                    right: 16,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(12),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.1),
+                            blurRadius: 4,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: Text(
+                        'LKR ${vehicle['pricing']['daily']['baseRate']}',
                         style: TextStyle(
-                          fontSize: 15,
+                          fontSize: 14,
                           fontWeight: FontWeight.bold,
                           color: Theme.of(context).colorScheme.primary,
                         ),
                       ),
-                  ],
-                ),
+                    ),
+                  ),
               ],
+            ),
+            
+            // Vehicle details
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Make and Model
+                  Text(
+                    '${vehicle['make'] ?? 'Unknown'} ${vehicle['model'] ?? 'Model'}',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: isDarkMode ? Colors.white : Colors.black87,
+                    ),
+                  ),
+                  
+                  const SizedBox(height: 8),
+                  
+                  // Vehicle details row
+                  Row(
+                    children: [
+                      _buildVehicleDetailTag(
+                        icon: Icons.calendar_today_outlined, 
+                        text: vehicle['year']?.toString() ?? 'N/A',
+                        isDark: isDarkMode,
+                      ),
+                      _buildVehicleDetailTag(
+                        icon: Icons.speed, 
+                        text: '${vehicle['engineCapacity'] ?? 'N/A'} cc',
+                        isDark: isDarkMode,
+                      ),
+                      _buildVehicleDetailTag(
+                        icon: Icons.settings, 
+                        text: vehicle['transmission'] ?? 'N/A',
+                        isDark: isDarkMode,
+                      ),
+                      _buildVehicleDetailTag(
+                        icon: Icons.local_gas_station, 
+                        text: vehicle['fuelType'] ?? 'N/A',
+                        isDark: isDarkMode,
+                      ),
+                    ],
+                  ),
+                  
+                  const SizedBox(height: 16),
+                  
+                  // Location and view details button
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      // Location
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.location_on_outlined,
+                            size: 16,
+                            color: isDarkMode ? Colors.white70 : Colors.grey[600],
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            vehicle['collectionPoint']?['district'] ?? 'Location not set',
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: isDarkMode ? Colors.white70 : Colors.grey[600],
+                            ),
+                          ),
+                        ],
+                      ),
+                      
+                      // View details button
+                      TextButton(
+                        onPressed: () => _navigateToVehicleDetails(vehicle),
+                        child: Row(
+                          children: [
+                            Text(
+                              'View Details',
+                              style: TextStyle(
+                                color: Theme.of(context).colorScheme.primary,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            const SizedBox(width: 4),
+                            Icon(
+                              Icons.arrow_forward,
+                              size: 16,
+                              color: Theme.of(context).colorScheme.primary,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // Helper widget for vehicle specifications
+  Widget _buildVehicleDetailTag({
+    required IconData icon,
+    required String text,
+    required bool isDark,
+  }) {
+    return Expanded(
+      child: Row(
+        children: [
+          Icon(
+            icon,
+            size: 14,
+            color: isDark ? Colors.white60 : Colors.grey[600],
+          ),
+          const SizedBox(width: 4),
+          Flexible(
+            child: Text(
+              text,
+              style: TextStyle(
+                fontSize: 12,
+                color: isDark ? Colors.white60 : Colors.grey[700],
+              ),
+              overflow: TextOverflow.ellipsis,
             ),
           ),
         ],
@@ -1174,6 +1334,27 @@ class _OwnerDashboardScreenState extends State<OwnerDashboardScreen>
     );
   }
 
+  // Helper method to get vehicle type icon
+  IconData _getVehicleTypeIcon(String? type) {
+    switch (type?.toLowerCase()) {
+      case 'car':
+        return Icons.directions_car;
+      case 'van':
+        return Icons.airport_shuttle;
+      case 'suv':
+        return Icons.time_to_leave;
+      case 'bus':
+        return Icons.directions_bus;
+      case 'truck':
+        return Icons.local_shipping;
+      case 'motorcycle':
+        return Icons.motorcycle;
+      default:
+        return Icons.directions_car;
+    }
+  }
+
+  // Add this method to your _OwnerDashboardScreenState class
   Color _getStatusColor(String? status) {
     switch (status?.toLowerCase()) {
       case 'available':
