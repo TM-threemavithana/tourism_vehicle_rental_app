@@ -3,6 +3,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
 import 'Refine_search.dart';
 import '../utils/app_colors.dart'; // Add import for app colors
+import 'Filter_results.dart'; // Import the new filter results screen
+import 'filter_results_drawer.dart';
 
 class VehicleSearchResultsScreen extends StatefulWidget {
   final Set<String> selectedVehicleTypes;
@@ -158,7 +160,7 @@ class _VehicleSearchResultsScreenState
       backgroundColor:
           isDarkMode ? AppColors.neutralDark : AppColors.neutralBackground,
 
-      // Add the drawer with RefineSearch
+      // Regular drawer for refine search
       drawer: RefineSearch(
         selectedVehicleTypes: widget.selectedVehicleTypes,
         location: widget.location,
@@ -169,6 +171,20 @@ class _VehicleSearchResultsScreenState
         flexibleDates: widget.flexibleDates,
         onApplyFilters: _applyFilters,
       ),
+
+      // End drawer for filter results with automatic button removed
+      endDrawer: FilterResultsDrawer(
+        selectedVehicleTypes: widget.selectedVehicleTypes,
+        initialResults: _searchResults,
+        onFiltersApplied: (filteredResults) {
+          setState(() {
+            _searchResults = filteredResults;
+          });
+        },
+      ),
+
+      // Set this to false to hide the automatic endDrawer button
+      endDrawerEnableOpenDragGesture: false,
 
       appBar: AppBar(
         backgroundColor: AppColors.primary,
@@ -185,6 +201,12 @@ class _VehicleSearchResultsScreenState
             fontSize: 18,
           ),
         ),
+        // Remove automatic drawer buttons
+        automaticallyImplyLeading: false,
+        // Make sure there are no actions that would add a button
+        actions: [
+          // Any actions you want to keep, but not the endDrawer button
+        ],
       ),
       body: Column(
         children: [
@@ -195,48 +217,40 @@ class _VehicleSearchResultsScreenState
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Row(
-                  children: [
-                    GestureDetector(
-                      onTap: () {
-                        _scaffoldKey.currentState?.openDrawer();
-                      },
-                      child: Row(
-                        children: [
-                          const Icon(Icons.tune, color: Colors.white, size: 20),
-                          const SizedBox(width: 8),
-                          const Text(
-                            'Refine Search',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-                Row(
-                  children: [
-                    GestureDetector(
-                      onTap: () {
-                        _scaffoldKey.currentState?.openDrawer();
-                      },
-                      child: const Text(
-                        'Filter Result',
+                // Left side - Refine Search button remains unchanged
+                GestureDetector(
+                  onTap: () {
+                    _scaffoldKey.currentState?.openDrawer();
+                  },
+                  child: Row(
+                    children: const [
+                      Icon(Icons.tune, color: Colors.white, size: 20),
+                      SizedBox(width: 8),
+                      Text(
+                        'Refine Search',
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
                         ),
                       ),
+                    ],
+                  ),
+                ),
+
+                // Right side - Filter Result text only (without icon)
+                GestureDetector(
+                  onTap: () {
+                    _scaffoldKey.currentState?.openEndDrawer();
+                  },
+                  child: const Text(
+                    'Filter Result',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
                     ),
-                    const SizedBox(width: 8),
-                    const Icon(Icons.filter_alt,
-                        color: AppColors.sandBeige, size: 20),
-                  ],
+                  ),
                 ),
               ],
             ),
@@ -379,7 +393,8 @@ class _VehicleSearchResultsScreenState
                       ),
                     ),
                     child: Text(
-                      'Rs. ${vehicle['pricing']?['daily']?['baseRate'] ?? 'N/A'}.00 / Day',
+                      // Show actual daily price from pricing data
+                      'Rs. ${vehicle['pricing']?['daily']?['vehicleOnly']?['price'] ?? 'N/A'}.00 / Day',
                       textAlign: TextAlign.center,
                       style: const TextStyle(
                         color: Colors.black,
@@ -401,7 +416,8 @@ class _VehicleSearchResultsScreenState
                       color: AppColors.neutralDark,
                     ),
                     child: Text(
-                      '${vehicle['kmLimit'] ?? '200'} KM / Day',
+                      // Show actual mileage limit from pricing data
+                      '${vehicle['pricing']?['daily']?['vehicleOnly']?['mileageLimit'] ?? 'N/A'} KM / Day',
                       textAlign: TextAlign.center,
                       style: const TextStyle(
                         color: Colors.white,
@@ -442,7 +458,7 @@ class _VehicleSearchResultsScreenState
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
-                          '${vehicle['make']} ${vehicle['model']}',
+                          '${vehicle['make'] ?? 'Unknown'} ${vehicle['model'] ?? ''}',
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
@@ -456,14 +472,18 @@ class _VehicleSearchResultsScreenState
 
                   const SizedBox(height: 4),
 
-                  // Rating
+                  // Rating - use real data when available
                   Row(
                     children: [
                       Row(
                         children: List.generate(
                           5,
                           (index) => Icon(
-                            Icons.star_border,
+                            // Show filled stars based on actual rating if available
+                            (vehicle['rating'] != null &&
+                                    index < (vehicle['rating'] as num).floor())
+                                ? Icons.star
+                                : Icons.star_border,
                             size: 14,
                             color: AppColors.warning,
                           ),
@@ -471,7 +491,8 @@ class _VehicleSearchResultsScreenState
                       ),
                       const SizedBox(width: 4),
                       Text(
-                        '0 (0)',
+                        // Show actual rating and reviews count
+                        '${vehicle['rating'] ?? 0} (${vehicle['reviewsCount'] ?? 0})',
                         style: TextStyle(
                           fontSize: 12,
                           color: isDarkMode ? Colors.grey[400] : Colors.grey,
@@ -492,7 +513,8 @@ class _VehicleSearchResultsScreenState
                       ),
                       const SizedBox(width: 4),
                       Text(
-                        '${vehicle['collectionPoint']?['city'] ?? 'Colombo'} ${vehicle['collectionPoint']?['district'] ?? '10'}',
+                        // Show actual collection point city and district
+                        '${vehicle['collectionPoint']?['city'] ?? ''} ${vehicle['collectionPoint']?['district'] ?? ''}',
                         style: TextStyle(
                           fontSize: 12,
                           color: isDarkMode ? Colors.grey[400] : Colors.grey,
@@ -503,7 +525,7 @@ class _VehicleSearchResultsScreenState
 
                   const SizedBox(height: 4),
 
-                  // Driver info
+                  // Driver info - show based on rental conditions
                   Row(
                     children: [
                       Icon(
@@ -513,9 +535,9 @@ class _VehicleSearchResultsScreenState
                       ),
                       const SizedBox(width: 4),
                       Text(
-                        vehicle['hasDriver'] == true
-                            ? 'With Driver'
-                            : 'Vehicle Only',
+                        // Show actual rent mode
+                        vehicle['rentalConditions']?['rentMode'] ??
+                            'Vehicle Only',
                         style: TextStyle(
                           fontSize: 12,
                           color: isDarkMode ? Colors.grey[400] : Colors.grey,
@@ -526,11 +548,14 @@ class _VehicleSearchResultsScreenState
 
                   const SizedBox(height: 8),
 
-                  // Availability
-                  const Align(
+                  // Availability status
+                  Align(
                     alignment: Alignment.centerRight,
                     child: Text(
-                      'Available',
+                      // Show actual status
+                      vehicle['status'] == 'available'
+                          ? 'Available'
+                          : 'Not Available',
                       style: TextStyle(
                         fontSize: 12,
                         color: AppColors.success,
@@ -573,35 +598,6 @@ class _VehicleSearchResultsScreenState
 
     // Join the pluralized types with commas
     return '${pluralizedTypes.join(", ")} in ${widget.location.isEmpty ? "All Locations" : widget.location}';
-  }
-
-  void _showFilterScreen() {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      barrierColor: Colors.black54,
-      elevation: 10,
-      enableDrag: false,
-      backgroundColor: Colors.transparent,
-      builder: (BuildContext context) {
-        return FractionallySizedBox(
-          alignment: Alignment.centerLeft,
-          widthFactor: 0.85, // Takes 85% of screen width
-          heightFactor: 1,
-          child: RefineSearch(
-            // Change this from FilterScreen to RefineSearch
-            selectedVehicleTypes: widget.selectedVehicleTypes,
-            location: widget.location,
-            pickupDate: widget.pickupDate,
-            pickupTime: widget.pickupTime,
-            returnDate: widget.returnDate,
-            returnTime: widget.returnTime,
-            flexibleDates: widget.flexibleDates,
-            onApplyFilters: _applyFilters,
-          ),
-        );
-      },
-    );
   }
 
   // Update the _applyFilters method
@@ -651,8 +647,7 @@ class _VehicleSearchResultsScreenState
       padding: const EdgeInsets.all(16),
       itemCount: _searchResults.length,
       itemBuilder: (context, index) {
-        final vehicle = _searchResults[index];
-        return _buildVehicleCard(vehicle);
+        return _buildVehicleCard(_searchResults[index]);
       },
     );
   }

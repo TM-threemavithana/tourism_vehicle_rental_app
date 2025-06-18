@@ -7,18 +7,20 @@ import 'package:cached_network_image/cached_network_image.dart';
 class VehicleDetailScreen extends StatefulWidget {
   final Map<String, dynamic> vehicle;
 
-  const VehicleDetailScreen({Key? key, required this.vehicle}) : super(key: key);
+  const VehicleDetailScreen({Key? key, required this.vehicle})
+      : super(key: key);
 
   @override
   _VehicleDetailScreenState createState() => _VehicleDetailScreenState();
 }
 
-class _VehicleDetailScreenState extends State<VehicleDetailScreen> with SingleTickerProviderStateMixin {
+class _VehicleDetailScreenState extends State<VehicleDetailScreen>
+    with SingleTickerProviderStateMixin {
   late TabController _tabController;
   int _currentImageIndex = 0;
   List<String> _imageUrls = [];
   Map<String, dynamic> _vehicleDetails = {};
-  
+
   bool get isDarkMode => Theme.of(context).brightness == Brightness.dark;
 
   @override
@@ -26,19 +28,22 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen> with SingleTi
     super.initState();
     _tabController = TabController(length: 4, vsync: this);
     _vehicleDetails = widget.vehicle;
-    
+
+    // Add this debug call
+    _debugPrintVehicleData();
+
     // Extract all images
     _extractImages();
   }
-  
+
   void _extractImages() {
     List<String> images = [];
-    
+
     // Add primary image first
     if (_vehicleDetails['images']?['primaryImageUrl'] != null) {
       images.add(_vehicleDetails['images']['primaryImageUrl']);
     }
-    
+
     // Add all other images
     if (_vehicleDetails['images']?['imageUrls'] is List) {
       for (String url in _vehicleDetails['images']['imageUrls']) {
@@ -47,7 +52,7 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen> with SingleTi
         }
       }
     }
-    
+
     setState(() {
       _imageUrls = images;
     });
@@ -62,7 +67,7 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen> with SingleTi
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     return Scaffold(
       body: CustomScrollView(
         slivers: [
@@ -74,83 +79,48 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen> with SingleTi
             flexibleSpace: FlexibleSpaceBar(
               background: Stack(
                 children: [
-                  // Image Carousel
-                  Container(
-                    height: 300,
-                    width: double.infinity,
-                    color: Colors.grey[300],
-                    child: _imageUrls.isNotEmpty 
-                      ? Image.network(
-                          _imageUrls[0],
-                          fit: BoxFit.cover,
-                        )
-                      : const Icon(Icons.car_rental, size: 80, color: Colors.grey),
-                  ),
-                  
-                  // Gradient overlay for better text visibility
-                  Positioned(
-                    bottom: 0,
-                    left: 0,
-                    right: 0,
-                    height: 100,
-                    child: Container(
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.bottomCenter,
-                          end: Alignment.topCenter,
-                          colors: [
-                            Colors.black.withOpacity(0.8),
-                            Colors.transparent,
-                          ],
-                        ),
-                      ),
+                  // Image carousel
+                  CarouselSlider(
+                    options: CarouselOptions(
+                      height: 300,
+                      viewportFraction: 1.0,
+                      enlargeCenterPage: false,
+                      onPageChanged: (index, reason) {
+                        setState(() {
+                          _currentImageIndex = index;
+                        });
+                      },
                     ),
+                    items: _imageUrls.isNotEmpty
+                        ? _imageUrls
+                            .map((url) => _buildCarouselItem(url))
+                            .toList()
+                        : [_buildPlaceholderImage()],
                   ),
-                  
-                  // Image page indicator
+
+                  // Dots indicator
                   if (_imageUrls.length > 1)
                     Positioned(
                       bottom: 20,
-                      right: 0,
                       left: 0,
+                      right: 0,
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: _imageUrls.asMap().entries.map((entry) {
                           return Container(
-                            width: 8,
-                            height: 8,
-                            margin: const EdgeInsets.symmetric(horizontal: 4),
+                            width: 8.0,
+                            height: 8.0,
+                            margin: const EdgeInsets.symmetric(horizontal: 4.0),
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
                               color: _currentImageIndex == entry.key
-                                ? Colors.white
-                                : Colors.white.withOpacity(0.4),
+                                  ? theme.colorScheme.primary
+                                  : Colors.white.withOpacity(0.5),
                             ),
                           );
                         }).toList(),
                       ),
                     ),
-                  
-                  // Status badge
-                  Positioned(
-                    top: 50,
-                    right: 16,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                      decoration: BoxDecoration(
-                        color: _getStatusColor(_vehicleDetails['status']),
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Text(
-                        _vehicleDetails['status'] ?? 'Unknown',
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 14,
-                        ),
-                      ),
-                    ),
-                  ),
                 ],
               ),
             ),
@@ -196,7 +166,7 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen> with SingleTi
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Vehicle Title and Price
+                // Vehicle title and status
                 Padding(
                   padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
                   child: Row(
@@ -208,29 +178,32 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen> with SingleTi
                           children: [
                             Text(
                               '${_vehicleDetails['make'] ?? ''} ${_vehicleDetails['model'] ?? ''}',
-                              style: TextStyle(
+                              style: const TextStyle(
                                 fontSize: 24,
                                 fontWeight: FontWeight.bold,
-                                color: isDarkMode ? Colors.white : Colors.black,
                               ),
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              '${_vehicleDetails['category'] ?? 'Vehicle'} · ${_vehicleDetails['year'] ?? ''} · ${_vehicleDetails['color'] ?? ''}',
+                              '${_vehicleDetails['category'] ?? 'Vehicle'} - ${_vehicleDetails['year'] ?? ''}',
                               style: TextStyle(
-                                fontSize: 14,
-                                color: isDarkMode ? Colors.white70 : Colors.grey[700],
+                                fontSize: 16,
+                                color: isDarkMode
+                                    ? Colors.white70
+                                    : Colors.grey[700],
                               ),
                             ),
                           ],
                         ),
                       ),
-                      if (_vehicleDetails['pricing']?['daily']?['baseRate'] != null)
+                      if (_vehicleDetails['pricing']?['daily']?['vehicleOnly']
+                              ?['price'] !=
+                          null)
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
                             Text(
-                              'LKR ${_vehicleDetails['pricing']['daily']['baseRate']}',
+                              'LKR ${_vehicleDetails['pricing']['daily']['vehicleOnly']['price']}',
                               style: TextStyle(
                                 fontSize: 22,
                                 fontWeight: FontWeight.bold,
@@ -249,10 +222,32 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen> with SingleTi
                     ],
                   ),
                 ),
-                
+
+                // Status chip
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Chip(
+                    backgroundColor: _getStatusColor(_vehicleDetails['status'])
+                        .withOpacity(0.2),
+                    label: Text(
+                      _vehicleDetails['status'] != null
+                          ? _vehicleDetails['status']
+                              .toString()
+                              .replaceAll('_', ' ')
+                              .toUpperCase()
+                          : 'UNKNOWN',
+                      style: TextStyle(
+                        color: _getStatusColor(_vehicleDetails['status']),
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+
                 // Vehicle Registration Details
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   child: Text(
                     'Vehicle No: ${_vehicleDetails['vehicleNo'] ?? 'N/A'}',
                     style: TextStyle(
@@ -262,24 +257,21 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen> with SingleTi
                     ),
                   ),
                 ),
-                
+
                 // Location
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
                   child: Row(
                     children: [
-                      Icon(
-                        Icons.location_on_outlined,
-                        size: 16,
-                        color: isDarkMode ? Colors.white60 : Colors.grey[700],
-                      ),
-                      const SizedBox(width: 8),
+                      Icon(Icons.location_on,
+                          size: 18, color: theme.colorScheme.primary),
+                      const SizedBox(width: 4),
                       Expanded(
                         child: Text(
-                          '${_vehicleDetails['collectionPoint']?['city'] ?? ''}, ${_vehicleDetails['collectionPoint']?['district'] ?? 'Location not set'}',
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: isDarkMode ? Colors.white60 : Colors.grey[700],
+                          '${_vehicleDetails['collectionPoint']?['city'] ?? 'N/A'}, ${_vehicleDetails['collectionPoint']?['district'] ?? 'N/A'}',
+                          style: const TextStyle(
+                            fontSize: 16,
                           ),
                         ),
                       ),
@@ -287,41 +279,39 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen> with SingleTi
                   ),
                 ),
 
-                // Tab Bar
-                Container(
-                  decoration: BoxDecoration(
-                    color: isDarkMode ? Colors.grey[850] : Colors.white,
-                    border: Border(
-                      bottom: BorderSide(
-                        color: isDarkMode ? Colors.grey[800]! : Colors.grey[300]!,
-                        width: 1,
-                      ),
-                    ),
-                  ),
-                  child: TabBar(
-                    controller: _tabController,
-                    labelColor: theme.colorScheme.primary,
-                    unselectedLabelColor: isDarkMode ? Colors.white60 : Colors.grey[700],
-                    indicatorColor: theme.colorScheme.primary,
-                    tabs: const [
-                      Tab(text: 'Specifications'),
-                      Tab(text: 'Features'),
-                      Tab(text: 'Rental'),
-                      Tab(text: 'Insurance'),
-                    ],
-                  ),
-                ),
+                const Divider(height: 32),
 
-                // Tab content
-                SizedBox(
-                  height: 500, // You can adjust or make this dynamic
-                  child: TabBarView(
-                    controller: _tabController,
+                // Tabs for more details
+                DefaultTabController(
+                  length: 4,
+                  child: Column(
                     children: [
-                      _buildSpecificationsTab(),
-                      _buildFeaturesTab(),
-                      _buildRentalDetailsTab(),
-                      _buildInsuranceTab(),
+                      TabBar(
+                        controller: _tabController,
+                        labelColor: theme.colorScheme.primary,
+                        unselectedLabelColor:
+                            isDarkMode ? Colors.white70 : Colors.grey[700],
+                        indicatorColor: theme.colorScheme.primary,
+                        tabs: const [
+                          Tab(text: 'Specs'),
+                          Tab(text: 'Features'),
+                          Tab(text: 'Rental'),
+                          Tab(text: 'Insurance'),
+                        ],
+                      ),
+                      SizedBox(
+                        height: MediaQuery.of(context).size.height *
+                            0.6, // Use a percentage of screen height
+                        child: TabBarView(
+                          controller: _tabController,
+                          children: [
+                            _buildSpecificationsTab(),
+                            _buildFeaturesTab(),
+                            _buildRentalDetailsTab(),
+                            _buildInsuranceTab(),
+                          ],
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -348,7 +338,7 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen> with SingleTi
       ),
     );
   }
-  
+
   Widget _buildPlaceholderImage() {
     return Container(
       color: Colors.grey[300],
@@ -382,79 +372,151 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen> with SingleTi
     );
   }
 
+  Widget _buildSectionHeader(String title) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Text(
+        title,
+        style: TextStyle(
+          fontSize: 18,
+          fontWeight: FontWeight.bold,
+          color: Theme.of(context).colorScheme.primary,
+        ),
+      ),
+    );
+  }
+
+  // Add this helper method for subsection headers
+  Widget _buildSubSectionHeader(String title) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 8, bottom: 12),
+      child: Text(
+        title,
+        style: TextStyle(
+          fontSize: 16,
+          fontWeight: FontWeight.w600,
+          color: Theme.of(context).colorScheme.secondary,
+        ),
+      ),
+    );
+  }
+
   Widget _buildSpecificationsTab() {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Vehicle Specifications',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 16),
+          // Basic Information Section
+          _buildSectionHeader('Basic Information'),
+          _buildSpecificationRow(
+              'Vehicle Type', _vehicleDetails['type'] ?? 'N/A'),
           _buildSpecificationRow('Make', _vehicleDetails['make'] ?? 'N/A'),
           _buildSpecificationRow('Model', _vehicleDetails['model'] ?? 'N/A'),
-          _buildSpecificationRow('Category', _vehicleDetails['category'] ?? 'N/A'),
-          _buildSpecificationRow('Year', _vehicleDetails['year']?.toString() ?? 'N/A'),
+          _buildSpecificationRow(
+              'Category', _vehicleDetails['category'] ?? 'N/A'),
+          _buildSpecificationRow('Grade', _vehicleDetails['grade'] ?? 'N/A'),
+          _buildSpecificationRow(
+              'Year', _vehicleDetails['year']?.toString() ?? 'N/A'),
           _buildSpecificationRow('Color', _vehicleDetails['color'] ?? 'N/A'),
-          _buildSpecificationRow('Transmission', _vehicleDetails['transmission'] ?? 'N/A'),
-          _buildSpecificationRow('Fuel Type', _vehicleDetails['fuelType'] ?? 'N/A'),
-          _buildSpecificationRow('Engine Capacity', '${_vehicleDetails['engineCapacity'] ?? 'N/A'} cc'),
-          _buildSpecificationRow('Seating Capacity', _vehicleDetails['seatingCapacity']?.toString() ?? 'N/A'),
-          _buildSpecificationRow('Doors', _vehicleDetails['doors']?.toString() ?? 'N/A'),
-          _buildSpecificationRow('Vehicle Number', _vehicleDetails['vehicleNo'] ?? 'N/A'),
-          _buildSpecificationRow('Chassis Number', _vehicleDetails['chassisNo'] ?? 'N/A'),
-          _buildSpecificationRow('Engine Number', _vehicleDetails['engineNo'] ?? 'N/A'),
+          const Divider(height: 24),
+
+          // Technical Specifications Section
+          _buildSectionHeader('Technical Specifications'),
+          _buildSpecificationRow(
+              'Transmission', _vehicleDetails['transmission'] ?? 'N/A'),
+          _buildSpecificationRow(
+              'Fuel Type', _vehicleDetails['fuelType'] ?? 'N/A'),
+          _buildSpecificationRow('Engine Capacity',
+              '${_vehicleDetails['engineCapacity'] ?? 'N/A'} cc'),
+          _buildSpecificationRow('Seating Capacity',
+              _vehicleDetails['seatingCapacity']?.toString() ?? 'N/A'),
+          _buildSpecificationRow(
+              'Doors', _vehicleDetails['doors']?.toString() ?? 'N/A'),
+          const Divider(height: 24),
+
+          // Registration Information Section
+          _buildSectionHeader('Registration Information'),
+          _buildSpecificationRow(
+              'Vehicle Number', _vehicleDetails['vehicleNo'] ?? 'N/A'),
+          _buildSpecificationRow(
+              'Chassis Number', _vehicleDetails['chassisNo'] ?? 'N/A'),
+          _buildSpecificationRow(
+              'Engine Number', _vehicleDetails['engineNo'] ?? 'N/A'),
+          const Divider(height: 24),
+
+          // Collection Point Section
+          _buildSectionHeader('Collection Point'),
+          _buildSpecificationRow('District',
+              _vehicleDetails['collectionPoint']?['district'] ?? 'N/A'),
+          _buildSpecificationRow(
+              'City', _vehicleDetails['collectionPoint']?['city'] ?? 'N/A'),
+          _buildSpecificationRow('Address',
+              _vehicleDetails['collectionPoint']?['address'] ?? 'N/A'),
         ],
       ),
     );
   }
 
   Widget _buildFeaturesTab() {
-    final features = _vehicleDetails['extras']?['features'] as Map<String, dynamic>?;
-    final featuresList = features?.entries.where((e) => e.value == true).map((e) => e.key).toList() ?? [];
-    
+    // Check if extras exists and if it has a features property that is a Map
+    final Map<String, dynamic>? features =
+        _vehicleDetails['extras']?['features'] as Map<String, dynamic>?;
+
+    // Get a list of all features that are set to true
+    final List<String> featuresList = [];
+
+    if (features != null) {
+      features.forEach((key, value) {
+        if (value == true) {
+          featuresList.add(key);
+        }
+      });
+    }
+
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Vehicle Features & Extras',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
+          _buildSectionHeader('Vehicle Features & Extras'),
           const SizedBox(height: 16),
           if (featuresList.isEmpty)
-            const Center(
+            Center(
               child: Padding(
-                padding: EdgeInsets.symmetric(vertical: 32),
-                child: Text('No features specified'),
+                padding: const EdgeInsets.symmetric(vertical: 32),
+                child: Column(
+                  children: const [
+                    Icon(Icons.info_outline, size: 48, color: Colors.grey),
+                    SizedBox(height: 12),
+                    Text(
+                      'No features specified for this vehicle',
+                      style: TextStyle(color: Colors.grey),
+                    ),
+                  ],
+                ),
               ),
             )
           else
             Wrap(
               spacing: 10,
               runSpacing: 10,
-              children: featuresList.map((feature) => Chip(
-                backgroundColor: Theme.of(context).colorScheme.primary.withOpacity(0.1),
-                labelStyle: TextStyle(
-                  color: Theme.of(context).colorScheme.primary,
-                  fontWeight: FontWeight.w500,
-                ),
-                label: Text(feature),
-                avatar: Icon(
-                  _getFeatureIcon(feature),
-                  color: Theme.of(context).colorScheme.primary,
-                  size: 18,
-                ),
-              )).toList(),
+              children: featuresList.map((feature) {
+                return Chip(
+                  backgroundColor:
+                      Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                  labelStyle: TextStyle(
+                    color: Theme.of(context).colorScheme.primary,
+                    fontWeight: FontWeight.w500,
+                  ),
+                  label: Text(feature),
+                  avatar: Icon(
+                    _getFeatureIcon(feature),
+                    color: Theme.of(context).colorScheme.primary,
+                    size: 18,
+                  ),
+                );
+              }).toList(),
             ),
         ],
       ),
@@ -464,83 +526,167 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen> with SingleTi
   Widget _buildRentalDetailsTab() {
     final rentalConditions = _vehicleDetails['rentalConditions'];
     final pricing = _vehicleDetails['pricing'];
-    
+
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Rental Information',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 16),
-          
-          // Rental Conditions
-          const Text(
-            'Rental Conditions',
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          const SizedBox(height: 8),
-          _buildSpecificationRow('Rent Mode', rentalConditions?['rentMode'] ?? 'N/A'),
-          
-          // Available Periods
-          const SizedBox(height: 16),
-          const Text(
-            'Available Rental Periods',
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          const SizedBox(height: 8),
-          if (pricing?['rentalPeriods'] != null) ...[
-            for (var period in ['hourly', 'daily', 'weekly', 'monthly'])
-              if (pricing['rentalPeriods'][period] == true)
-                _buildSpecificationRow(
-                  '${period.substring(0, 1).toUpperCase()}${period.substring(1)}', 
-                  'Available'
-                ),
+          _buildSectionHeader('Rental Information'),
+
+          // Vehicle Value display
+          if (pricing != null && pricing['vehicleValue'] != null) ...[
+            _buildSpecificationRow(
+                'Vehicle Value', 'LKR ${pricing['vehicleValue']}'),
+            const Divider(height: 24),
           ],
-          
-          // Pricing Details
-          const SizedBox(height: 16),
-          const Text(
-            'Pricing',
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
+
+          // Rental Conditions section
+          if (rentalConditions != null) ...[
+            _buildSubSectionHeader('Rental Conditions'),
+            if (rentalConditions['rentMode'] != null)
+              _buildSpecificationRow('Rent Mode', rentalConditions['rentMode']),
+            if (rentalConditions['minRentalPeriod'] != null)
+              _buildSpecificationRow('Minimum Rental Period',
+                  '${rentalConditions['minRentalPeriod']['value']} ${rentalConditions['minRentalPeriod']['unit']}'),
+            if (rentalConditions['maxRentalPeriod'] != null)
+              _buildSpecificationRow('Maximum Rental Period',
+                  '${rentalConditions['maxRentalPeriod']['value']} ${rentalConditions['maxRentalPeriod']['unit']}'),
+            if (rentalConditions['advanceRentalPeriod'] != null)
+              _buildSpecificationRow('Advance Booking Period',
+                  '${rentalConditions['advanceRentalPeriod']['value']} ${rentalConditions['advanceRentalPeriod']['unit']}'),
+            const Divider(height: 24),
+          ],
+
+          // Available Rental Periods section
+          if (pricing != null && pricing['rentalPeriods'] != null) ...[
+            _buildSubSectionHeader('Available Rental Periods'),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                for (var period in ['hourly', 'daily', 'weekly', 'monthly'])
+                  if (pricing['rentalPeriods'][period] == true)
+                    _buildSpecificationRow(period.capitalize(), 'Available'),
+              ],
             ),
-          ),
-          const SizedBox(height: 8),
-          if (pricing?['hourly']?['baseRate'] != null)
-            _buildSpecificationRow('Hourly Rate', 'LKR ${pricing['hourly']['baseRate']}'),
-          if (pricing?['daily']?['baseRate'] != null)
-            _buildSpecificationRow('Daily Rate', 'LKR ${pricing['daily']['baseRate']}'),
-          if (pricing?['weekly']?['baseRate'] != null)
-            _buildSpecificationRow('Weekly Rate', 'LKR ${pricing['weekly']['baseRate']}'),
-          if (pricing?['monthly']?['baseRate'] != null)
-            _buildSpecificationRow('Monthly Rate', 'LKR ${pricing['monthly']['baseRate']}'),
-          
-          // Driver Details if applicable
-          if (_vehicleDetails['driverDetails'] != null) ...[
-            const SizedBox(height: 16),
-            const Text(
-              'Driver Details',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
+            const Divider(height: 24),
+          ],
+
+          // Pricing Details section
+          _buildSubSectionHeader('Pricing'),
+
+          // Debug info - helps identify structure issues
+          if (pricing == null)
+            Text("No pricing information available",
+                style: TextStyle(color: Colors.red)),
+
+          // Hourly pricing section
+          if (pricing != null && pricing['hourly'] != null) ...[
+            const Text('Hourly Rates',
+                style: TextStyle(fontWeight: FontWeight.bold)),
             const SizedBox(height: 8),
-            _buildSpecificationRow('Driver Name', _vehicleDetails['driverDetails']['name'] ?? 'N/A'),
-            _buildSpecificationRow('License No.', _vehicleDetails['driverDetails']['licenseNo'] ?? 'N/A'),
+            if (pricing['hourly']['vehicleOnly'] != null) ...[
+              _buildSpecificationRow('Vehicle Only Price',
+                  'LKR ${pricing['hourly']['vehicleOnly']['price']}'),
+              _buildSpecificationRow('Mileage Limit',
+                  '${pricing['hourly']['vehicleOnly']['mileageLimit']} km'),
+              _buildSpecificationRow('Extra Mileage Charge',
+                  'LKR ${pricing['hourly']['vehicleOnly']['extraMileageCharge']}/km'),
+            ],
+            if (pricing['hourly']['withDriver'] != null) ...[
+              const SizedBox(height: 8),
+              _buildSpecificationRow('With Driver Price',
+                  'LKR ${pricing['hourly']['withDriver']['price']}'),
+              _buildSpecificationRow('Mileage Limit',
+                  '${pricing['hourly']['withDriver']['mileageLimit']} km'),
+              _buildSpecificationRow('Extra Mileage Charge',
+                  'LKR ${pricing['hourly']['withDriver']['extraMileageCharge']}/km'),
+            ],
+            const Divider(height: 24),
+          ],
+
+          // Daily pricing section
+          if (pricing != null && pricing['daily'] != null) ...[
+            const Text('Daily Rates',
+                style: TextStyle(fontWeight: FontWeight.bold)),
+            const SizedBox(height: 8),
+            if (pricing['daily']['vehicleOnly'] != null) ...[
+              _buildSpecificationRow('Vehicle Only Price',
+                  'LKR ${pricing['daily']['vehicleOnly']['price']}'),
+              _buildSpecificationRow('Mileage Limit',
+                  '${pricing['daily']['vehicleOnly']['mileageLimit']} km'),
+              _buildSpecificationRow('Extra Mileage Charge',
+                  'LKR ${pricing['daily']['vehicleOnly']['extraMileageCharge']}/km'),
+            ],
+            if (pricing['daily']['withDriver'] != null) ...[
+              const SizedBox(height: 8),
+              _buildSpecificationRow('With Driver Price',
+                  'LKR ${pricing['daily']['withDriver']['price']}'),
+              _buildSpecificationRow('Mileage Limit',
+                  '${pricing['daily']['withDriver']['mileageLimit']} km'),
+              _buildSpecificationRow('Extra Mileage Charge',
+                  'LKR ${pricing['daily']['withDriver']['extraMileageCharge']}/km'),
+            ],
+            const Divider(height: 24),
+          ],
+
+          // Weekly pricing section
+          if (pricing != null && pricing['weekly'] != null) ...[
+            const Text('Weekly Rates',
+                style: TextStyle(fontWeight: FontWeight.bold)),
+            const SizedBox(height: 8),
+            if (pricing['weekly']['vehicleOnly'] != null) ...[
+              _buildSpecificationRow('Vehicle Only Price',
+                  'LKR ${pricing['weekly']['vehicleOnly']['price']}'),
+              _buildSpecificationRow('Mileage Limit',
+                  '${pricing['weekly']['vehicleOnly']['mileageLimit']} km'),
+              _buildSpecificationRow('Extra Mileage Charge',
+                  'LKR ${pricing['weekly']['vehicleOnly']['extraMileageCharge']}/km'),
+            ],
+            if (pricing['weekly']['withDriver'] != null) ...[
+              const SizedBox(height: 8),
+              _buildSpecificationRow('With Driver Price',
+                  'LKR ${pricing['weekly']['withDriver']['price']}'),
+              _buildSpecificationRow('Mileage Limit',
+                  '${pricing['weekly']['withDriver']['mileageLimit']} km'),
+              _buildSpecificationRow('Extra Mileage Charge',
+                  'LKR ${pricing['weekly']['withDriver']['extraMileageCharge']}/km'),
+            ],
+            const Divider(height: 24),
+          ],
+
+          // Monthly pricing section
+          if (pricing != null && pricing['monthly'] != null) ...[
+            const Text('Monthly Rates',
+                style: TextStyle(fontWeight: FontWeight.bold)),
+            const SizedBox(height: 8),
+            if (pricing['monthly']['vehicleOnly'] != null) ...[
+              _buildSpecificationRow('Vehicle Only Price',
+                  'LKR ${pricing['monthly']['vehicleOnly']['price']}'),
+              _buildSpecificationRow('Mileage Limit',
+                  '${pricing['monthly']['vehicleOnly']['mileageLimit']} km'),
+              _buildSpecificationRow('Extra Mileage Charge',
+                  'LKR ${pricing['monthly']['vehicleOnly']['extraMileageCharge']}/km'),
+            ],
+            if (pricing['monthly']['withDriver'] != null) ...[
+              const SizedBox(height: 8),
+              _buildSpecificationRow('With Driver Price',
+                  'LKR ${pricing['monthly']['withDriver']['price']}'),
+              _buildSpecificationRow('Mileage Limit',
+                  '${pricing['monthly']['withDriver']['mileageLimit']} km'),
+              _buildSpecificationRow('Extra Mileage Charge',
+                  'LKR ${pricing['monthly']['withDriver']['extraMileageCharge']}/km'),
+            ],
+            const Divider(height: 24),
+          ],
+
+          // Driver Details section
+          if (_vehicleDetails['driverDetails'] != null) ...[
+            _buildSubSectionHeader('Driver Details'),
+            _buildSpecificationRow('Driver Name',
+                _vehicleDetails['driverDetails']['name'] ?? 'N/A'),
+            _buildSpecificationRow('License No.',
+                _vehicleDetails['driverDetails']['licenseNo'] ?? 'N/A'),
           ],
         ],
       ),
@@ -549,41 +695,86 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen> with SingleTi
 
   Widget _buildInsuranceTab() {
     final insurance = _vehicleDetails['insurance'];
-    
+    final hasInsurance = insurance?['hasInsurance'] == true;
+    final securityDeposit = insurance?['securityDeposit'];
+
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Insurance Details',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 16),
-          
-          if (insurance == null || insurance.isEmpty)
-            const Center(
+          _buildSectionHeader('Insurance Details'),
+          if (!hasInsurance && securityDeposit == null)
+            Center(
               child: Padding(
-                padding: EdgeInsets.symmetric(vertical: 32),
-                child: Text('No insurance details available'),
+                padding: const EdgeInsets.symmetric(vertical: 32),
+                child: Column(
+                  children: const [
+                    Icon(Icons.error_outline, size: 48, color: Colors.grey),
+                    SizedBox(height: 12),
+                    Text(
+                      'No insurance details available',
+                      style: TextStyle(color: Colors.grey),
+                    ),
+                  ],
+                ),
               ),
             )
-          else ...[
-            _buildSpecificationRow('Insurance Provider', insurance['provider'] ?? 'N/A'),
-            _buildSpecificationRow('Policy Number', insurance['policyNumber'] ?? 'N/A'),
-            _buildSpecificationRow('Expiry Date', insurance['expiryDate'] != null
-              ? DateFormat('MMM dd, yyyy').format(DateTime.parse(insurance['expiryDate']))
-              : 'N/A'),
-            _buildSpecificationRow('Coverage Type', insurance['coverageType'] ?? 'N/A'),
-          ],
+          else
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildSpecificationRow('Insurance Status',
+                    hasInsurance ? 'Insured' : 'Not Insured'),
+                if (hasInsurance) ...[
+                  if (insurance?['provider'] != null)
+                    _buildSpecificationRow(
+                        'Insurance Provider', insurance['provider']),
+                  if (insurance?['policyNumber'] != null)
+                    _buildSpecificationRow(
+                        'Policy Number', insurance['policyNumber']),
+                  if (insurance?['expiryDate'] != null)
+                    _buildSpecificationRow(
+                        'Expiry Date',
+                        DateFormat('MMM dd, yyyy')
+                            .format(DateTime.parse(insurance['expiryDate']))),
+                  if (insurance?['coverageType'] != null)
+                    _buildSpecificationRow(
+                        'Coverage Type', insurance['coverageType']),
+                ],
+                if (securityDeposit != null) ...[
+                  const Divider(height: 24),
+                  _buildSpecificationRow(
+                      'Security Deposit', 'LKR $securityDeposit'),
+
+                  // Information about security deposit
+                  Padding(
+                    padding: const EdgeInsets.only(top: 16),
+                    child: Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Colors.amber.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: Colors.amber),
+                      ),
+                      child: const Text(
+                        'Security deposit is refundable at the end of the rental period, subject to vehicle condition assessment.',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontStyle: FontStyle.italic,
+                          color: Colors.amber,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ],
+            ),
         ],
       ),
     );
   }
-  
+
   // Method to get feature icon
   IconData _getFeatureIcon(String feature) {
     switch (feature.toLowerCase()) {
@@ -631,15 +822,14 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen> with SingleTi
       const SnackBar(content: Text('Edit vehicle functionality coming soon!')),
     );
   }
-  
+
   void _showDeleteDialog() {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Delete Vehicle?'),
         content: const Text(
-          'Are you sure you want to delete this vehicle? This action cannot be undone.'
-        ),
+            'Are you sure you want to delete this vehicle? This action cannot be undone.'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
@@ -659,7 +849,7 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen> with SingleTi
       ),
     );
   }
-  
+
   Future<void> _deleteVehicle() async {
     try {
       // Get the document ID for this vehicle
@@ -667,7 +857,7 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen> with SingleTi
           .collection('vehicles')
           .where('vehicleNo', isEqualTo: _vehicleDetails['vehicleNo'])
           .get();
-          
+
       if (vehiclesSnapshot.docs.isNotEmpty) {
         await vehiclesSnapshot.docs.first.reference.delete();
         ScaffoldMessenger.of(context).showSnackBar(
@@ -684,6 +874,27 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen> with SingleTi
     }
   }
 
+  // Add this method for debugging
+  void _debugPrintVehicleData() {
+    print("==== VEHICLE DATA DEBUG ====");
+    print("Vehicle ID: ${_vehicleDetails['id']}");
+
+    // Print extras
+    print("EXTRAS: ${_vehicleDetails['extras']}");
+    if (_vehicleDetails['extras'] != null) {
+      print("Features: ${_vehicleDetails['extras']['features']}");
+    }
+
+    // Print pricing
+    print("PRICING: ${_vehicleDetails['pricing']}");
+    if (_vehicleDetails['pricing'] != null) {
+      print("Rental Periods: ${_vehicleDetails['pricing']['rentalPeriods']}");
+      print("Daily Pricing: ${_vehicleDetails['pricing']['daily']}");
+    }
+
+    print("==== END DEBUG ====");
+  }
+
   // Helper method for status color
   Color _getStatusColor(String? status) {
     switch (status?.toLowerCase()) {
@@ -698,5 +909,12 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen> with SingleTi
       default:
         return Colors.grey;
     }
+  }
+}
+
+// Add this extension method for string capitalization
+extension StringExtension on String {
+  String capitalize() {
+    return "${this[0].toUpperCase()}${this.substring(1)}";
   }
 }
