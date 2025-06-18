@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
-import 'Refine_search.dart'; // Make sure this import is present
+import 'Refine_search.dart';
+import '../utils/app_colors.dart'; // Add import for app colors
 
 class VehicleSearchResultsScreen extends StatefulWidget {
   final Set<String> selectedVehicleTypes;
@@ -149,9 +150,13 @@ class _VehicleSearchResultsScreenState
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
-      key: _scaffoldKey, // Add the scaffold key
-      backgroundColor: Colors.grey[100],
+      key: _scaffoldKey,
+      backgroundColor:
+          isDarkMode ? AppColors.neutralDark : AppColors.neutralBackground,
 
       // Add the drawer with RefineSearch
       drawer: RefineSearch(
@@ -166,16 +171,16 @@ class _VehicleSearchResultsScreenState
       ),
 
       appBar: AppBar(
-        backgroundColor: Colors.amber,
+        backgroundColor: AppColors.primary,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
           _buildSearchTitle(),
           style: const TextStyle(
-            color: Colors.black,
+            color: Colors.white,
             fontWeight: FontWeight.bold,
             fontSize: 18,
           ),
@@ -185,7 +190,7 @@ class _VehicleSearchResultsScreenState
         children: [
           // Filter Section
           Container(
-            color: Colors.grey[800],
+            color: isDarkMode ? AppColors.neutralDark : AppColors.secondary,
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -194,7 +199,6 @@ class _VehicleSearchResultsScreenState
                   children: [
                     GestureDetector(
                       onTap: () {
-                        // Open the drawer when icon or text is tapped
                         _scaffoldKey.currentState?.openDrawer();
                       },
                       child: Row(
@@ -218,7 +222,6 @@ class _VehicleSearchResultsScreenState
                   children: [
                     GestureDetector(
                       onTap: () {
-                        // Also open drawer for Filter Result text
                         _scaffoldKey.currentState?.openDrawer();
                       },
                       child: const Text(
@@ -231,7 +234,8 @@ class _VehicleSearchResultsScreenState
                       ),
                     ),
                     const SizedBox(width: 8),
-                    const Icon(Icons.filter_alt, color: Colors.amber, size: 20),
+                    const Icon(Icons.filter_alt,
+                        color: AppColors.sandBeige, size: 20),
                   ],
                 ),
               ],
@@ -241,11 +245,14 @@ class _VehicleSearchResultsScreenState
           // Results List
           Expanded(
             child: _isLoading
-                ? const Center(child: CircularProgressIndicator())
+                ? Center(
+                    child: CircularProgressIndicator(
+                    color: AppColors.primary,
+                  ))
                 : _errorMessage != null
                     ? Center(
                         child: Text(_errorMessage!,
-                            style: const TextStyle(color: Colors.red)))
+                            style: TextStyle(color: AppColors.error)))
                     : _searchResults.isEmpty
                         ? _buildNoResultsView()
                         : _buildResultsListView(),
@@ -255,27 +262,47 @@ class _VehicleSearchResultsScreenState
     );
   }
 
+  // Update _buildNoResultsView to use app theme colors
   Widget _buildNoResultsView() {
+    final theme = Theme.of(context);
+    final isDarkMode = theme.brightness == Brightness.dark;
+
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.search_off, size: 80, color: Colors.grey[400]),
+          Icon(Icons.search_off,
+              size: 80,
+              color: isDarkMode
+                  ? AppColors.neutralMedium
+                  : AppColors.neutralLight),
           const SizedBox(height: 16),
-          const Text(
+          Text(
             'No vehicles found',
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: isDarkMode ? Colors.white : AppColors.neutralDark,
+            ),
           ),
           const SizedBox(height: 8),
           Text(
             'Try changing your search criteria',
-            style: TextStyle(fontSize: 16, color: Colors.grey[600]),
+            style: TextStyle(
+                fontSize: 16,
+                color: isDarkMode
+                    ? AppColors.neutralLight
+                    : AppColors.neutralMedium),
           ),
           const SizedBox(height: 24),
           ElevatedButton(
             onPressed: () {
               Navigator.pop(context);
             },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.primary,
+              foregroundColor: Colors.white,
+            ),
             child: const Text('Back to Search'),
           )
         ],
@@ -283,26 +310,19 @@ class _VehicleSearchResultsScreenState
     );
   }
 
-  Widget _buildResultsListView() {
-    return ListView.builder(
-      padding: const EdgeInsets.all(8),
-      itemCount: _searchResults.length,
-      itemBuilder: (context, index) {
-        final vehicle = _searchResults[index];
-        return _buildVehicleCard(vehicle);
-      },
-    );
-  }
-
+  // Update _buildVehicleCard to use app theme colors
   Widget _buildVehicleCard(Map<String, dynamic> vehicle) {
+    final theme = Theme.of(context);
+    final isDarkMode = theme.brightness == Brightness.dark;
+
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 4),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isDarkMode ? AppColors.neutralDark : Colors.white,
         borderRadius: BorderRadius.circular(8),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.2),
+            color: Colors.black.withOpacity(0.2),
             spreadRadius: 1,
             blurRadius: 3,
             offset: const Offset(0, 1),
@@ -315,8 +335,8 @@ class _VehicleSearchResultsScreenState
           Container(
             width: 120,
             height: 120,
-            decoration: BoxDecoration(
-              borderRadius: const BorderRadius.only(
+            decoration: const BoxDecoration(
+              borderRadius: BorderRadius.only(
                 topLeft: Radius.circular(8),
                 bottomLeft: Radius.circular(8),
               ),
@@ -337,9 +357,10 @@ class _VehicleSearchResultsScreenState
                     errorBuilder: (_, __, ___) => Container(
                       width: 120,
                       height: 120,
-                      color: Colors.grey[300],
-                      child: const Icon(Icons.car_rental,
-                          size: 40, color: Colors.grey),
+                      color: isDarkMode ? Colors.grey[800] : Colors.grey[300],
+                      child: Icon(Icons.car_rental,
+                          size: 40,
+                          color: isDarkMode ? Colors.grey[700] : Colors.grey),
                     ),
                   ),
                 ),
@@ -351,9 +372,9 @@ class _VehicleSearchResultsScreenState
                   right: 0,
                   child: Container(
                     padding: const EdgeInsets.symmetric(vertical: 4),
-                    decoration: const BoxDecoration(
-                      color: Colors.amber,
-                      borderRadius: BorderRadius.only(
+                    decoration: BoxDecoration(
+                      color: AppColors.secondary,
+                      borderRadius: const BorderRadius.only(
                         bottomLeft: Radius.circular(8),
                       ),
                     ),
@@ -377,7 +398,7 @@ class _VehicleSearchResultsScreenState
                   child: Container(
                     padding: const EdgeInsets.symmetric(vertical: 2),
                     decoration: BoxDecoration(
-                      color: Colors.grey[800],
+                      color: AppColors.neutralDark,
                     ),
                     child: Text(
                       '${vehicle['kmLimit'] ?? '200'} KM / Day',
@@ -404,12 +425,12 @@ class _VehicleSearchResultsScreenState
                   // Brand Logo and Vehicle Name
                   Row(
                     children: [
-                      // Brand logo placeholder (you can add actual brand logos)
+                      // Brand logo placeholder
                       Container(
                         width: 24,
                         height: 24,
                         decoration: BoxDecoration(
-                          color: Colors.red,
+                          color: AppColors.primary,
                           borderRadius: BorderRadius.circular(4),
                         ),
                         child: const Icon(
@@ -422,10 +443,10 @@ class _VehicleSearchResultsScreenState
                       Expanded(
                         child: Text(
                           '${vehicle['make']} ${vehicle['model']}',
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
-                            color: Colors.black,
+                            color: isDarkMode ? Colors.white : Colors.black,
                           ),
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -440,19 +461,20 @@ class _VehicleSearchResultsScreenState
                     children: [
                       Row(
                         children: List.generate(
-                            5,
-                            (index) => Icon(
-                                  Icons.star_border,
-                                  size: 14,
-                                  color: Colors.amber[700],
-                                )),
+                          5,
+                          (index) => Icon(
+                            Icons.star_border,
+                            size: 14,
+                            color: AppColors.warning,
+                          ),
+                        ),
                       ),
                       const SizedBox(width: 4),
-                      const Text(
+                      Text(
                         '0 (0)',
                         style: TextStyle(
                           fontSize: 12,
-                          color: Colors.grey,
+                          color: isDarkMode ? Colors.grey[400] : Colors.grey,
                         ),
                       ),
                     ],
@@ -463,17 +485,17 @@ class _VehicleSearchResultsScreenState
                   // Location
                   Row(
                     children: [
-                      const Icon(
+                      Icon(
                         Icons.location_on,
                         size: 14,
-                        color: Colors.grey,
+                        color: isDarkMode ? Colors.grey[400] : Colors.grey,
                       ),
                       const SizedBox(width: 4),
                       Text(
                         '${vehicle['collectionPoint']?['city'] ?? 'Colombo'} ${vehicle['collectionPoint']?['district'] ?? '10'}',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 12,
-                          color: Colors.grey,
+                          color: isDarkMode ? Colors.grey[400] : Colors.grey,
                         ),
                       ),
                     ],
@@ -484,19 +506,19 @@ class _VehicleSearchResultsScreenState
                   // Driver info
                   Row(
                     children: [
-                      const Icon(
+                      Icon(
                         Icons.person,
                         size: 14,
-                        color: Colors.grey,
+                        color: isDarkMode ? Colors.grey[400] : Colors.grey,
                       ),
                       const SizedBox(width: 4),
                       Text(
                         vehicle['hasDriver'] == true
                             ? 'With Driver'
                             : 'Vehicle Only',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 12,
-                          color: Colors.grey,
+                          color: isDarkMode ? Colors.grey[400] : Colors.grey,
                         ),
                       ),
                     ],
@@ -511,7 +533,7 @@ class _VehicleSearchResultsScreenState
                       'Available',
                       style: TextStyle(
                         fontSize: 12,
-                        color: Colors.green,
+                        color: AppColors.success,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -619,6 +641,19 @@ class _VehicleSearchResultsScreenState
           model: model,
         ),
       ),
+    );
+  }
+
+  // Add this method to the _VehicleSearchResultsScreenState class
+
+  Widget _buildResultsListView() {
+    return ListView.builder(
+      padding: const EdgeInsets.all(16),
+      itemCount: _searchResults.length,
+      itemBuilder: (context, index) {
+        final vehicle = _searchResults[index];
+        return _buildVehicleCard(vehicle);
+      },
     );
   }
 }
