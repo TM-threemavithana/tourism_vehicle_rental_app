@@ -10,7 +10,7 @@
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
 
     <application
-        android:label="tourism_vehicle_rental_app"
+        android:label="Wayz.lk"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher"
         android:largeHeap="true"

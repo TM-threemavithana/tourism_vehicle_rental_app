@@ -9,10 +9,10 @@ class VehicleImagesSection extends StatefulWidget {
   final Function(VehicleImages) onImagesChanged;
 
   const VehicleImagesSection({
-    Key? key,
+    super.key,
     required this.vehicleImages,
     required this.onImagesChanged,
-  }) : super(key: key);
+  });
 
   @override
   _VehicleImagesSectionState createState() => _VehicleImagesSectionState();
@@ -22,8 +22,8 @@ class _VehicleImagesSectionState extends State<VehicleImagesSection> {
   final ImagePicker _picker = ImagePicker();
 
   // Reduced to 6 required images (removed vehicle reg)
-  List<File?> _requiredImages = List.filled(6, null);
-  List<File?> _optionalImages = List.filled(4, null);
+  final List<File?> _requiredImages = List.filled(6, null);
+  final List<File?> _optionalImages = List.filled(4, null);
 
   // Updated labels (changed "Interior" to "Additional", removed "Vehicle Reg")
   final List<String> _requiredLabels = [

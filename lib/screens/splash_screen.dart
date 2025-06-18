@@ -380,7 +380,7 @@ class _SplashScreenState extends State<SplashScreen>
               child: Column(
                 children: [
                   const Text(
-                    '© 2025 WayZ.lk | Sri Lanka',
+                    '© 2025 Wayz.lk | Sri Lanka', // Updated from 'WayZ.lk' to 'Wayz.lk'
                     style: TextStyle(
                       color: Colors.white60,
                       fontSize: 12,

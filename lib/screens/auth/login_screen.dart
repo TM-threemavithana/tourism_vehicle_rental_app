@@ -186,7 +186,7 @@ class _LoginScreenState extends State<LoginScreen>
                             ),
                             const SizedBox(height: 16),
                             const Text(
-                              'WayZ.lk',
+                              'Wayz.lk', // Updated from 'WayZ.lk' to 'Wayz.lk'
                               style: TextStyle(
                                 color: Colors.white,
                                 fontSize: 32,

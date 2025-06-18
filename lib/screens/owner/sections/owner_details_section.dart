@@ -7,10 +7,10 @@ class OwnerDetailsSection extends StatefulWidget {
   final Function(OwnerDetails) onOwnerDetailsChanged;
 
   const OwnerDetailsSection({
-    Key? key,
+    super.key,
     required this.ownerDetails,
     required this.onOwnerDetailsChanged,
-  }) : super(key: key);
+  });
 
   @override
   _OwnerDetailsSectionState createState() => _OwnerDetailsSectionState();

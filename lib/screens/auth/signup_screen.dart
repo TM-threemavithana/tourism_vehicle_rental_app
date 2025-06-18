@@ -192,7 +192,7 @@ class _SignupScreenState extends State<SignupScreen>
                             ),
                             const SizedBox(height: 8),
                             Text(
-                              'Join WayZ for amazing adventures',
+                              'Join Wayz.lk for amazing adventures',
                               style: TextStyle(
                                 color: Colors.white.withOpacity(0.9),
                                 fontSize: 16,
