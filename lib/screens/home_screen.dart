@@ -4,6 +4,7 @@ import 'auth/auth_wrapper.dart';
 import '../widgets/side_menu.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'profile_screen.dart'; // Import the ProfileScreen
+import 'vehicle_search_results_screen.dart'; // Import the VehicleSearchResultsScreen
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -15,10 +16,14 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
-  final List<String> _vehicleTypes = ['Bike','Three-Wheeler' ,'Car']; // Updated to match image
+  final List<String> _vehicleTypes = [
+    'Bike',
+    'Three-Wheeler',
+    'Car'
+  ]; // Updated to match image
   final AuthService _authService = AuthService();
   final Set<String> _selectedVehicles = <String>{};
-  final TextEditingController _locationController = TextEditingController();
+  late TextEditingController _locationController;
   DateTime _pickupDate = DateTime(2025, 6, 14); // Match image date
   TimeOfDay _pickupTime = const TimeOfDay(hour: 17, minute: 0); // 05:00 pm
   DateTime _returnDate = DateTime(2025, 6, 21); // Match image date
@@ -28,14 +33,40 @@ class _HomeScreenState extends State<HomeScreen>
   bool _isMenuOpen = false;
   String _currentTab = 'Search';
 
+  // Add popular Sri Lankan coastal destinations
+  final List<String> _popularLocations = [
+    'Colombo',
+    'Galle',
+    'Hikkaduwa',
+    'Bentota',
+    'Mirissa',
+    'Unawatuna',
+    'Negombo',
+    'Trincomalee',
+    'Arugam Bay',
+    'Batticaloa',
+    'Pasikuda',
+    'Kalpitiya',
+    'Tangalle'
+  ];
+
   @override
   void initState() {
     super.initState();
+
+    // Initialize with an empty string instead of "Location"
+    _locationController = TextEditingController(text: '');
+
+    // Always use current date for pickup
+    _pickupDate = DateTime.now();
+
+    // Set return date to 7 days after pickup date
+    _returnDate = _pickupDate.add(const Duration(days: 7));
+
     _controller = AnimationController(
       duration: const Duration(seconds: 15),
       vsync: this,
     )..repeat();
-    _locationController.text = 'Location';
   }
 
   @override
@@ -81,15 +112,32 @@ class _HomeScreenState extends State<HomeScreen>
     final DateTime? picked = await showDatePicker(
       context: context,
       initialDate: isPickup ? _pickupDate : _returnDate,
-      firstDate: DateTime.now(),
+      firstDate: isPickup ? DateTime.now() : _pickupDate,
       lastDate: DateTime.now().add(const Duration(days: 365)),
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: ColorScheme.light(
+              primary: Theme.of(context).colorScheme.primary,
+              onPrimary: Colors.white,
+            ),
+          ),
+          child: child!,
+        );
+      },
     );
+
     if (picked != null) {
       setState(() {
         if (isPickup) {
           _pickupDate = picked;
+          // Always set return date to 7 days after pickup
+          _returnDate = picked.add(const Duration(days: 7));
         } else {
-          _returnDate = picked;
+          // For return date selection, ensure it's at least 1 day after pickup
+          if (picked.isAfter(_pickupDate)) {
+            _returnDate = picked;
+          }
         }
       });
     }
@@ -284,8 +332,9 @@ class _HomeScreenState extends State<HomeScreen>
                                       ? const Color(0xFFFFA500)
                                       : Colors.white.withOpacity(0.1),
                                   border: Border.all(
-                                    color:
-                                        isSelected ? Colors.white : Colors.white38,
+                                    color: isSelected
+                                        ? Colors.white
+                                        : Colors.white38,
                                     width: 2,
                                   ),
                                   borderRadius: BorderRadius.circular(8),
@@ -321,11 +370,97 @@ class _HomeScreenState extends State<HomeScreen>
                     ],
                   ),
                   // Location field
-                  SizedBox(
-                    height: screenHeight * 0.06,
-                    child: _buildInputField(
-                      controller: _locationController,
-                      hintText: 'Location',
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8.0),
+                    child: Container(
+                      height: screenHeight * 0.06,
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.2),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Autocomplete<String>(
+                        optionsBuilder: (TextEditingValue textEditingValue) {
+                          if (textEditingValue.text == '') {
+                            return _popularLocations;
+                          }
+                          return _popularLocations.where((location) => location
+                              .toLowerCase()
+                              .contains(textEditingValue.text.toLowerCase()));
+                        },
+                        onSelected: (String selection) {
+                          setState(() {
+                            _locationController.text = selection;
+                          });
+                        },
+                        fieldViewBuilder:
+                            (context, controller, focusNode, onFieldSubmitted) {
+                          // Initialize the controller with the current value
+                          controller.text = _locationController.text;
+
+                          // Add listener to update our controller when this one changes
+                          controller.addListener(() {
+                            if (_locationController.text != controller.text) {
+                              _locationController.text = controller.text;
+                            }
+                          });
+
+                          return Padding(
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 8.0),
+                            child: TextField(
+                              controller: controller,
+                              focusNode: focusNode,
+                              style: const TextStyle(color: Colors.white),
+                              textAlign: TextAlign.center,
+                              decoration: InputDecoration(
+                                hintText: 'Location',
+                                hintStyle: TextStyle(color: Colors.white70),
+                                border: InputBorder.none,
+                                suffixIcon: Icon(Icons.arrow_drop_down,
+                                    color: Colors.white),
+                                contentPadding:
+                                    EdgeInsets.symmetric(vertical: 12.0),
+                              ),
+                              // Enable direct text input
+                              onSubmitted: (value) {
+                                // Update the controller when the user submits text manually
+                                setState(() {
+                                  _locationController.text = value;
+                                });
+                              },
+                            ),
+                          );
+                        },
+                        optionsViewBuilder: (context, onSelected, options) {
+                          return Align(
+                            alignment: Alignment.topLeft,
+                            child: Material(
+                              elevation: 4.0,
+                              child: ConstrainedBox(
+                                constraints: BoxConstraints(
+                                  maxHeight: 200,
+                                  maxWidth: screenWidth * 0.9,
+                                ),
+                                child: ListView.builder(
+                                  padding: EdgeInsets.zero,
+                                  shrinkWrap: true,
+                                  itemCount: options.length,
+                                  itemBuilder:
+                                      (BuildContext context, int index) {
+                                    final option = options.elementAt(index);
+                                    return ListTile(
+                                      title: Text(option),
+                                      onTap: () {
+                                        onSelected(option);
+                                      },
+                                    );
+                                  },
+                                ),
+                              ),
+                            ),
+                          );
+                        },
+                      ),
                     ),
                   ),
                   // Date and time section
@@ -420,18 +555,21 @@ class _HomeScreenState extends State<HomeScreen>
                                   color: _flexibleDates
                                       ? const Color(0xFFFFA500)
                                       : Colors.transparent,
-                                  border: Border.all(color: Colors.white, width: 1.5),
+                                  border: Border.all(
+                                      color: Colors.white, width: 1.5),
                                   borderRadius: BorderRadius.circular(4),
                                 ),
                                 child: _flexibleDates
-                                    ? const Icon(Icons.check, color: Colors.black, size: 12)
+                                    ? const Icon(Icons.check,
+                                        color: Colors.black, size: 12)
                                     : null,
                               ),
                             ),
                             const SizedBox(width: 6),
                             const Text(
                               'My dates are flexible',
-                              style: TextStyle(color: Colors.white, fontSize: 13),
+                              style:
+                                  TextStyle(color: Colors.white, fontSize: 13),
                             ),
                           ],
                         ),
@@ -452,18 +590,21 @@ class _HomeScreenState extends State<HomeScreen>
                                   color: _showNearbyVehicles
                                       ? const Color(0xFFA0522D)
                                       : Colors.transparent,
-                                  border: Border.all(color: Colors.white, width: 1.5),
+                                  border: Border.all(
+                                      color: Colors.white, width: 1.5),
                                   borderRadius: BorderRadius.circular(4),
                                 ),
                                 child: _showNearbyVehicles
-                                    ? const Icon(Icons.check, color: Colors.white, size: 12)
+                                    ? const Icon(Icons.check,
+                                        color: Colors.white, size: 12)
                                     : null,
                               ),
                             ),
                             const SizedBox(width: 6),
                             const Text(
                               'Show Nearby Vehicles',
-                              style: TextStyle(color: Colors.white, fontSize: 13),
+                              style:
+                                  TextStyle(color: Colors.white, fontSize: 13),
                             ),
                           ],
                         ),
@@ -477,7 +618,21 @@ class _HomeScreenState extends State<HomeScreen>
                     child: ElevatedButton(
                       onPressed: _selectedVehicles.isNotEmpty
                           ? () {
-                              print('Selected vehicles: $_selectedVehicles');
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      VehicleSearchResultsScreen(
+                                    selectedVehicleTypes: _selectedVehicles,
+                                    location: _locationController.text,
+                                    pickupDate: _pickupDate,
+                                    pickupTime: _pickupTime,
+                                    returnDate: _returnDate,
+                                    returnTime: _returnTime,
+                                    flexibleDates: _flexibleDates,
+                                  ),
+                                ),
+                              );
                             }
                           : null,
                       style: ElevatedButton.styleFrom(
@@ -551,7 +706,6 @@ class _HomeScreenState extends State<HomeScreen>
           ],
         ],
       ),
-     
     );
   }
 
@@ -570,7 +724,8 @@ class _HomeScreenState extends State<HomeScreen>
           hintText: hintText,
           hintStyle: TextStyle(color: Colors.grey[600], fontSize: 14),
           border: InputBorder.none,
-          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          contentPadding:
+              const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         ),
       ),
     );
@@ -603,7 +758,7 @@ class _HomeScreenState extends State<HomeScreen>
         return Icons.directions_car_filled;
       case 'Car':
         return Icons.directions_car;
-      
+
       default:
         return Icons.directions_car;
     }
