@@ -317,55 +317,70 @@ class _HomeScreenState extends State<HomeScreen>
                           ),
                         ),
                       ),
-                      SizedBox(
-                        height: screenHeight * 0.12,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: _vehicleTypes.map((type) {
-                            final isSelected = _selectedVehicles.contains(type);
-                            return GestureDetector(
-                              onTap: () => _toggleVehicleSelection(type),
-                              child: Container(
-                                width: screenWidth * 0.22,
-                                decoration: BoxDecoration(
+                      Wrap(
+                        spacing: 10.0,
+                        runSpacing: 8.0,
+                        children: _vehicleTypes.map((type) {
+                          final isSelected = _selectedVehicles.contains(type);
+                          return GestureDetector(
+                            onTap: () => _toggleVehicleSelection(type),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 12.0, vertical: 8.0),
+                              decoration: BoxDecoration(
+                                color: isSelected
+                                    ? const Color(0xFFFFA500)
+                                    : Colors.white.withOpacity(0.1),
+                                borderRadius: BorderRadius.circular(8),
+                                border: Border.all(
                                   color: isSelected
-                                      ? const Color(0xFFFFA500)
-                                      : Colors.white.withOpacity(0.1),
-                                  border: Border.all(
-                                    color: isSelected
-                                        ? Colors.white
-                                        : Colors.white38,
-                                    width: 2,
-                                  ),
-                                  borderRadius: BorderRadius.circular(8),
+                                      ? Colors.white
+                                      : Colors.white38,
+                                  width: 1.5,
                                 ),
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Icon(
-                                      _getVehicleIcon(type),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Container(
+                                    width: 18,
+                                    height: 18,
+                                    decoration: BoxDecoration(
                                       color: isSelected
                                           ? Colors.black
-                                          : Colors.white,
-                                      size: 20,
-                                    ),
-                                    const SizedBox(height: 4),
-                                    Text(
-                                      type,
-                                      style: TextStyle(
+                                          : Colors.transparent,
+                                      border: Border.all(
                                         color: isSelected
                                             ? Colors.black
                                             : Colors.white,
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 12,
+                                        width: 1.5,
                                       ),
+                                      borderRadius: BorderRadius.circular(4),
                                     ),
-                                  ],
-                                ),
+                                    child: isSelected
+                                        ? const Icon(
+                                            Icons.check,
+                                            color: Colors.white,
+                                            size: 14,
+                                          )
+                                        : null,
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    type,
+                                    style: TextStyle(
+                                      color: isSelected
+                                          ? Colors.black
+                                          : Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 14,
+                                    ),
+                                  ),
+                                ],
                               ),
-                            );
-                          }).toList(),
-                        ),
+                            ),
+                          );
+                        }).toList(),
                       ),
                     ],
                   ),
@@ -630,6 +645,8 @@ class _HomeScreenState extends State<HomeScreen>
                                     returnDate: _returnDate,
                                     returnTime: _returnTime,
                                     flexibleDates: _flexibleDates,
+                                    make: null, // No make filter initially
+                                    model: null, // No model filter initially
                                   ),
                                 ),
                               );

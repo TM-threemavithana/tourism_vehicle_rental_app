@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
+import 'Refine_search.dart'; // Make sure this import is present
 
 class VehicleSearchResultsScreen extends StatefulWidget {
   final Set<String> selectedVehicleTypes;
@@ -10,6 +11,8 @@ class VehicleSearchResultsScreen extends StatefulWidget {
   final DateTime returnDate;
   final TimeOfDay returnTime;
   final bool flexibleDates;
+  final String? make;
+  final String? model;
 
   const VehicleSearchResultsScreen({
     Key? key,
@@ -20,6 +23,8 @@ class VehicleSearchResultsScreen extends StatefulWidget {
     required this.returnDate,
     required this.returnTime,
     required this.flexibleDates,
+    this.make,
+    this.model,
   }) : super(key: key);
 
   @override
@@ -33,10 +38,29 @@ class _VehicleSearchResultsScreenState
   List<Map<String, dynamic>> _searchResults = [];
   String? _errorMessage;
 
+  // Add a scaffold key to control the drawer
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+
   @override
   void initState() {
     super.initState();
     _performSearch();
+  }
+
+  // You might also want to add this to ensure the search is refreshed when parameters change
+  @override
+  void didUpdateWidget(VehicleSearchResultsScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    // Check if any search parameters have changed
+    if (oldWidget.selectedVehicleTypes != widget.selectedVehicleTypes ||
+        oldWidget.location != widget.location ||
+        oldWidget.pickupDate != widget.pickupDate ||
+        oldWidget.returnDate != widget.returnDate ||
+        oldWidget.make != widget.make ||
+        oldWidget.model != widget.model) {
+      _performSearch(); // Reload the search results
+    }
   }
 
   Future<void> _performSearch() async {
@@ -64,14 +88,20 @@ class _VehicleSearchResultsScreenState
 
         // Check district/city location match
         bool locationMatches = false;
-        if (widget.location.isNotEmpty && widget.location != 'Location') {
+        if (widget.location.isNotEmpty) {
           final collectionPoint =
               data['collectionPoint'] as Map<String, dynamic>?;
           if (collectionPoint != null) {
             final district = collectionPoint['district'] as String?;
             final city = collectionPoint['city'] as String?;
 
-            if ((district?.toLowerCase() == widget.location.toLowerCase()) ||
+            if ((district
+                        ?.toLowerCase()
+                        .contains(widget.location.toLowerCase()) ==
+                    true) ||
+                (city?.toLowerCase().contains(widget.location.toLowerCase()) ==
+                    true) ||
+                (district?.toLowerCase() == widget.location.toLowerCase()) ||
                 (city?.toLowerCase() == widget.location.toLowerCase())) {
               locationMatches = true;
             }
@@ -81,8 +111,26 @@ class _VehicleSearchResultsScreenState
           locationMatches = true;
         }
 
-        // Only add if location matches
-        if (locationMatches) {
+        // Check make match if specified
+        bool makeMatches = true;
+        if (widget.make != null && widget.make!.isNotEmpty) {
+          makeMatches = (data['make'] as String?)?.toLowerCase() ==
+              widget.make!.toLowerCase();
+        }
+
+        // Check model match if specified
+        bool modelMatches = true;
+        if (widget.model != null && widget.model!.isNotEmpty) {
+          modelMatches = (data['model'] as String?)?.toLowerCase() ==
+              widget.model!.toLowerCase();
+        }
+
+        // Check date availability (you could add more sophisticated date checking here)
+        bool dateMatches = true;
+        // Add more detailed date matching logic if needed
+
+        // Only add if all criteria match
+        if (locationMatches && makeMatches && modelMatches && dateMatches) {
           results.add({...data, 'id': doc.id});
         }
       }
@@ -102,7 +150,21 @@ class _VehicleSearchResultsScreenState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey, // Add the scaffold key
       backgroundColor: Colors.grey[100],
+
+      // Add the drawer with RefineSearch
+      drawer: RefineSearch(
+        selectedVehicleTypes: widget.selectedVehicleTypes,
+        location: widget.location,
+        pickupDate: widget.pickupDate,
+        pickupTime: widget.pickupTime,
+        returnDate: widget.returnDate,
+        returnTime: widget.returnTime,
+        flexibleDates: widget.flexibleDates,
+        onApplyFilters: _applyFilters,
+      ),
+
       appBar: AppBar(
         backgroundColor: Colors.amber,
         elevation: 0,
@@ -130,26 +192,42 @@ class _VehicleSearchResultsScreenState
               children: [
                 Row(
                   children: [
-                    const Icon(Icons.tune, color: Colors.white, size: 20),
-                    const SizedBox(width: 8),
-                    const Text(
-                      'Refine Search',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
+                    GestureDetector(
+                      onTap: () {
+                        // Open the drawer when icon or text is tapped
+                        _scaffoldKey.currentState?.openDrawer();
+                      },
+                      child: Row(
+                        children: [
+                          const Icon(Icons.tune, color: Colors.white, size: 20),
+                          const SizedBox(width: 8),
+                          const Text(
+                            'Refine Search',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ],
                 ),
                 Row(
                   children: [
-                    const Text(
-                      'Filter Result',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
+                    GestureDetector(
+                      onTap: () {
+                        // Also open drawer for Filter Result text
+                        _scaffoldKey.currentState?.openDrawer();
+                      },
+                      child: const Text(
+                        'Filter Result',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
                     ),
                     const SizedBox(width: 8),
@@ -459,12 +537,12 @@ class _VehicleSearchResultsScreenState
       switch (type.toLowerCase()) {
         case 'car':
           return 'Cars';
-       
+
         case 'bike':
           return 'Bikes';
         case 'three-wheeler':
           return 'Three-Wheelers';
-        
+
         default:
           // For any other type, just add 's' at the end
           return '${type}s';
@@ -473,5 +551,74 @@ class _VehicleSearchResultsScreenState
 
     // Join the pluralized types with commas
     return '${pluralizedTypes.join(", ")} in ${widget.location.isEmpty ? "All Locations" : widget.location}';
+  }
+
+  void _showFilterScreen() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      barrierColor: Colors.black54,
+      elevation: 10,
+      enableDrag: false,
+      backgroundColor: Colors.transparent,
+      builder: (BuildContext context) {
+        return FractionallySizedBox(
+          alignment: Alignment.centerLeft,
+          widthFactor: 0.85, // Takes 85% of screen width
+          heightFactor: 1,
+          child: RefineSearch(
+            // Change this from FilterScreen to RefineSearch
+            selectedVehicleTypes: widget.selectedVehicleTypes,
+            location: widget.location,
+            pickupDate: widget.pickupDate,
+            pickupTime: widget.pickupTime,
+            returnDate: widget.returnDate,
+            returnTime: widget.returnTime,
+            flexibleDates: widget.flexibleDates,
+            onApplyFilters: _applyFilters,
+          ),
+        );
+      },
+    );
+  }
+
+  // Update the _applyFilters method
+
+  void _applyFilters(
+    Set<String> selectedVehicleTypes,
+    String location,
+    DateTime pickupDate,
+    TimeOfDay pickupTime,
+    DateTime returnDate,
+    TimeOfDay returnTime,
+    bool flexibleDates,
+    String? make,
+    String? model,
+  ) {
+    // First close the drawer
+    Navigator.pop(context);
+
+    // Then update the state to show loading
+    setState(() {
+      _isLoading = true;
+    });
+
+    // Update the search results with new parameters
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (context) => VehicleSearchResultsScreen(
+          selectedVehicleTypes: selectedVehicleTypes,
+          location: location,
+          pickupDate: pickupDate,
+          pickupTime: pickupTime,
+          returnDate: returnDate,
+          returnTime: returnTime,
+          flexibleDates: flexibleDates,
+          make: make,
+          model: model,
+        ),
+      ),
+    );
   }
 }
