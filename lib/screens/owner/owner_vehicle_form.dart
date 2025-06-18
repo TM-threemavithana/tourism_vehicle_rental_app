@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../services/cloudinary_service.dart';
 import '../../models/vehicle_form_models.dart';
 import 'sections/vehicle_details_section.dart';
@@ -266,13 +267,32 @@ class _OwnerVehicleFormState extends State<OwnerVehicleForm> {
         };
       }
 
-      // TODO: Save vehicle data to Firebase/Firestore
-      // For now, just show a success message
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Vehicle added successfully!')),
-        );
-        Navigator.pop(context);
+      // Save vehicle data to Firebase/Firestore
+      try {
+        // Get the current user ID
+        final userId = FirebaseAuth.instance.currentUser?.uid;
+        if (userId == null) {
+          throw Exception('User not logged in');
+        }
+
+        // Create a reference to the vehicles collection
+        final vehiclesRef = FirebaseFirestore.instance.collection('vehicles');
+
+        // Add the vehicle document
+        await vehiclesRef.add(vehicleData);
+
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Vehicle added successfully!')),
+          );
+          Navigator.pop(context, true); // Return true to indicate success
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Error saving vehicle: $e')),
+          );
+        }
       }
     } catch (e) {
       if (mounted) {
