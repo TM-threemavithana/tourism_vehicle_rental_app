@@ -8,11 +8,11 @@ class FilterResultsDrawer extends StatefulWidget {
   final Function(List<Map<String, dynamic>>) onFiltersApplied;
 
   const FilterResultsDrawer({
-    Key? key,
+    super.key,
     required this.selectedVehicleTypes,
     required this.initialResults,
     required this.onFiltersApplied,
-  }) : super(key: key);
+  });
 
   @override
   _FilterResultsDrawerState createState() => _FilterResultsDrawerState();

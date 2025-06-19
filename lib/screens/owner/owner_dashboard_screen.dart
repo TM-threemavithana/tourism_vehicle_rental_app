@@ -202,7 +202,7 @@ class _OwnerDashboardScreenState extends State<OwnerDashboardScreen>
       }
       
       final avgRating = ratingCount > 0 
-          ? (totalRating / ratingCount).toStringAsFixed(1) + '/5'
+          ? '${(totalRating / ratingCount).toStringAsFixed(1)}/5'
           : 'No ratings';
       
       if (mounted) {

@@ -18,7 +18,7 @@ class FilterResultsScreen extends StatefulWidget {
   final List<Map<String, dynamic>>? initialResults;
 
   const FilterResultsScreen({
-    Key? key,
+    super.key,
     required this.selectedVehicleTypes,
     required this.location,
     required this.pickupDate,
@@ -30,7 +30,7 @@ class FilterResultsScreen extends StatefulWidget {
     this.model,
     this.sortBy,
     this.initialResults,
-  }) : super(key: key);
+  });
 
   @override
   _FilterResultsScreenState createState() => _FilterResultsScreenState();

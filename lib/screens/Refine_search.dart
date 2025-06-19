@@ -14,7 +14,7 @@ class RefineSearch extends StatefulWidget {
       bool, String?, String?) onApplyFilters;
 
   const RefineSearch({
-    Key? key,
+    super.key,
     required this.selectedVehicleTypes,
     required this.location,
     required this.pickupDate,
@@ -23,7 +23,7 @@ class RefineSearch extends StatefulWidget {
     required this.returnTime,
     required this.flexibleDates,
     required this.onApplyFilters,
-  }) : super(key: key);
+  });
 
   @override
   _RefineSearchState createState() => _RefineSearchState();

@@ -7,8 +7,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 class VehicleDetailScreen extends StatefulWidget {
   final Map<String, dynamic> vehicle;
 
-  const VehicleDetailScreen({Key? key, required this.vehicle})
-      : super(key: key);
+  const VehicleDetailScreen({super.key, required this.vehicle});
 
   @override
   _VehicleDetailScreenState createState() => _VehicleDetailScreenState();
@@ -915,6 +914,6 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
 // Add this extension method for string capitalization
 extension StringExtension on String {
   String capitalize() {
-    return "${this[0].toUpperCase()}${this.substring(1)}";
+    return "${this[0].toUpperCase()}${substring(1)}";
   }
 }

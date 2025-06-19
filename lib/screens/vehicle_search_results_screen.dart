@@ -18,7 +18,7 @@ class VehicleSearchResultsScreen extends StatefulWidget {
   final String? model;
 
   const VehicleSearchResultsScreen({
-    Key? key,
+    super.key,
     required this.selectedVehicleTypes,
     required this.location,
     required this.pickupDate,
@@ -28,7 +28,7 @@ class VehicleSearchResultsScreen extends StatefulWidget {
     required this.flexibleDates,
     this.make,
     this.model,
-  }) : super(key: key);
+  });
 
   @override
   _VehicleSearchResultsScreenState createState() =>
