@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:intl/intl.dart';
 import 'Refine_search.dart';
 import '../utils/app_colors.dart';
 import 'filter_results.dart';

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../utils/app_colors.dart';
-import '../utils/form_data_constants.dart';
 
 class FilterResultsDrawer extends StatefulWidget {
   final Set<String> selectedVehicleTypes;
