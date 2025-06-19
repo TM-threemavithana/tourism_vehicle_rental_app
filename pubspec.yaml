@@ -81,6 +81,9 @@ flutter:
   uses-material-design: true
   
   assets:
+    - assets/
+    - assets/car logo/
+    - assets/images/
     - assets/images/splash_background.png
     - assets/images/logo.png
     - assets/images/image1.jpg  # Onboarding slide 1

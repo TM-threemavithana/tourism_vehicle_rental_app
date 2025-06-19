@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
 import 'Refine_search.dart';
-import '../utils/app_colors.dart'; // Add import for app colors
-import 'filter_results.dart'; // Update this import to the renamed file
+import '../utils/app_colors.dart';
+import 'filter_results.dart';
+import 'vehicle_detail_page.dart';
 
 class VehicleSearchResultsScreen extends StatefulWidget {
   final Set<String> selectedVehicleTypes;
@@ -30,21 +31,19 @@ class VehicleSearchResultsScreen extends StatefulWidget {
   });
 
   @override
-  _VehicleSearchResultsScreenState createState() =>
+  State<VehicleSearchResultsScreen> createState() =>
       _VehicleSearchResultsScreenState();
 }
 
 class _VehicleSearchResultsScreenState
     extends State<VehicleSearchResultsScreen> {
-  // Existing variables
   bool _isLoading = true;
   List<Map<String, dynamic>> _searchResults = [];
   String? _errorMessage;
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
-  
-  String _selectedSortOption = ''; // Was 'price_low_to_high' before
-  RangeValues _priceRange = RangeValues(0, 50000);
+  String _selectedSortOption = '';
+  RangeValues _priceRange = const RangeValues(0, 50000);
   Set<String> _selectedFeatures = {};
   Set<String> _selectedFuelTypes = {};
   Set<String> _selectedTransmissionTypes = {};
@@ -60,42 +59,33 @@ class _VehicleSearchResultsScreenState
   void didUpdateWidget(VehicleSearchResultsScreen oldWidget) {
     super.didUpdateWidget(oldWidget);
 
-    // Check if any search parameters have changed
     if (oldWidget.selectedVehicleTypes != widget.selectedVehicleTypes ||
         oldWidget.location != widget.location ||
         oldWidget.pickupDate != widget.pickupDate ||
         oldWidget.returnDate != widget.returnDate ||
         oldWidget.make != widget.make ||
         oldWidget.model != widget.model) {
-      _performSearch(); // Reload the search results
+      _performSearch();
     }
   }
 
-  // Keep the search logic the same
   Future<void> _performSearch() async {
     try {
-      // Create a query to filter vehicles
       Query query = FirebaseFirestore.instance.collection('vehicles');
 
-      // Filter by vehicle type if specific types selected
       if (widget.selectedVehicleTypes.isNotEmpty) {
         query =
             query.where('type', whereIn: widget.selectedVehicleTypes.toList());
       }
 
-      // Filter by status to only show available vehicles
       query = query.where('status', isEqualTo: 'available');
 
-      // Execute the query
       final QuerySnapshot snapshot = await query.get();
-
-      // Process the results
       List<Map<String, dynamic>> results = [];
 
       for (var doc in snapshot.docs) {
         final data = doc.data() as Map<String, dynamic>;
 
-        // Check district/city location match
         bool locationMatches = false;
         if (widget.location.isNotEmpty) {
           final collectionPoint =
@@ -116,29 +106,23 @@ class _VehicleSearchResultsScreenState
             }
           }
         } else {
-          // If no location specified, consider it a match
           locationMatches = true;
         }
 
-        // Check make match if specified
         bool makeMatches = true;
         if (widget.make != null && widget.make!.isNotEmpty) {
           makeMatches = (data['make'] as String?)?.toLowerCase() ==
               widget.make!.toLowerCase();
         }
 
-        // Check model match if specified
         bool modelMatches = true;
         if (widget.model != null && widget.model!.isNotEmpty) {
           modelMatches = (data['model'] as String?)?.toLowerCase() ==
               widget.model!.toLowerCase();
         }
 
-        // Check date availability (you could add more sophisticated date checking here)
         bool dateMatches = true;
-        // Add more detailed date matching logic if needed
 
-        // Only add if all criteria match
         if (locationMatches && makeMatches && modelMatches && dateMatches) {
           results.add({...data, 'id': doc.id});
         }
@@ -156,9 +140,7 @@ class _VehicleSearchResultsScreenState
     }
   }
 
-  // In _VehicleSearchResultsScreenState class, replace _showFilterResultsDrawer method with this:
   void _showFilterResultsDrawer() {
-    // Open the filter drawer from the right side
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -171,10 +153,8 @@ class _VehicleSearchResultsScreenState
         child: SizedBox(
           height: MediaQuery.of(context).size.height,
           child: FilterResultsDrawer(
-            // Make sure this class is in filter_results.dart
             selectedVehicleTypes: widget.selectedVehicleTypes,
             initialResults: _searchResults,
-            // Pass the current filter state
             initialSortOption: _selectedSortOption,
             initialPriceRange: _priceRange,
             initialFeatures: _selectedFeatures,
@@ -184,10 +164,7 @@ class _VehicleSearchResultsScreenState
             onFiltersApplied: (filteredResults, sortOption, priceRange,
                 features, fuelTypes, transmissionTypes, rentModes) {
               setState(() {
-                // Save results
                 _searchResults = filteredResults;
-
-                // Save filter state for next time
                 _selectedSortOption = sortOption;
                 _priceRange = priceRange;
                 _selectedFeatures = features;
@@ -195,7 +172,6 @@ class _VehicleSearchResultsScreenState
                 _selectedTransmissionTypes = transmissionTypes;
                 _selectedRentModes = rentModes;
 
-                // Show appropriate message if no results match filters
                 if (_searchResults.isEmpty) {
                   _errorMessage = "No vehicles match your filter criteria";
                 } else {
@@ -211,15 +187,12 @@ class _VehicleSearchResultsScreenState
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
       key: _scaffoldKey,
       backgroundColor:
           isDarkMode ? AppColors.neutralDark : AppColors.neutralBackground,
-
-      // Keep only refine search drawer
       drawer: RefineSearch(
         selectedVehicleTypes: widget.selectedVehicleTypes,
         location: widget.location,
@@ -230,7 +203,6 @@ class _VehicleSearchResultsScreenState
         flexibleDates: widget.flexibleDates,
         onApplyFilters: _applyFilters,
       ),
-
       appBar: AppBar(
         backgroundColor: AppColors.primary,
         elevation: 0,
@@ -246,19 +218,15 @@ class _VehicleSearchResultsScreenState
             fontSize: 18,
           ),
         ),
-        // Remove automatic drawer buttons
         automaticallyImplyLeading: false,
       ),
       body: Column(
         children: [
-          // Modify to remove the Filter Results button
           Container(
             color: isDarkMode ? AppColors.neutralDark : AppColors.secondary,
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             child: Row(
-              // Only keep the refine search button
               children: [
-                // Refine Search button
                 Expanded(
                   child: GestureDetector(
                     onTap: () {
@@ -280,15 +248,11 @@ class _VehicleSearchResultsScreenState
                     ),
                   ),
                 ),
-
-                // Add vertical divider between buttons
                 Container(
                   height: 24,
                   width: 1,
                   color: Colors.white.withOpacity(0.3),
                 ),
-
-                // Filter Results button
                 Expanded(
                   child: GestureDetector(
                     onTap: _showFilterResultsDrawer,
@@ -312,18 +276,20 @@ class _VehicleSearchResultsScreenState
               ],
             ),
           ),
-
-          // Results List - keep as is
           Expanded(
             child: _isLoading
                 ? Center(
                     child: CircularProgressIndicator(
-                    color: AppColors.primary,
-                  ))
+                      color: AppColors.primary,
+                    ),
+                  )
                 : _errorMessage != null
                     ? Center(
-                        child: Text(_errorMessage!,
-                            style: TextStyle(color: AppColors.error)))
+                        child: Text(
+                          _errorMessage!,
+                          style: TextStyle(color: AppColors.error),
+                        ),
+                      )
                     : _searchResults.isEmpty
                         ? _buildNoResultsView()
                         : _buildResultsListView(),
@@ -333,20 +299,19 @@ class _VehicleSearchResultsScreenState
     );
   }
 
-  // Update _buildNoResultsView to use app theme colors
   Widget _buildNoResultsView() {
-    final theme = Theme.of(context);
-    final isDarkMode = theme.brightness == Brightness.dark;
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.search_off,
-              size: 80,
-              color: isDarkMode
-                  ? AppColors.neutralMedium
-                  : AppColors.neutralLight),
+          Icon(
+            Icons.search_off,
+            size: 80,
+            color:
+                isDarkMode ? AppColors.neutralMedium : AppColors.neutralLight,
+          ),
           const SizedBox(height: 16),
           Text(
             'No vehicles found',
@@ -381,283 +346,237 @@ class _VehicleSearchResultsScreenState
     );
   }
 
-  // Update _buildVehicleCard to use app theme colors
   Widget _buildVehicleCard(Map<String, dynamic> vehicle) {
-    final theme = Theme.of(context);
-    final isDarkMode = theme.brightness == Brightness.dark;
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
-    return Container(
-      margin: const EdgeInsets.symmetric(vertical: 4),
-      decoration: BoxDecoration(
-        color: isDarkMode ? AppColors.neutralDark : Colors.white,
-        borderRadius: BorderRadius.circular(8),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.2),
-            spreadRadius: 1,
-            blurRadius: 3,
-            offset: const Offset(0, 1),
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => VehicleDetailPage(vehicle: vehicle),
           ),
-        ],
-      ),
-      child: Row(
-        children: [
-          // Vehicle Image
-          Container(
-            width: 120,
-            height: 120,
-            decoration: const BoxDecoration(
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(8),
-                bottomLeft: Radius.circular(8),
-              ),
+        );
+      },
+      child: Container(
+        margin: const EdgeInsets.symmetric(vertical: 4),
+        decoration: BoxDecoration(
+          color: isDarkMode ? AppColors.neutralDark : Colors.white,
+          borderRadius: BorderRadius.circular(8),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.2),
+              spreadRadius: 1,
+              blurRadius: 3,
+              offset: const Offset(0, 1),
             ),
-            child: Stack(
-              children: [
-                ClipRRect(
-                  borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(8),
-                    bottomLeft: Radius.circular(8),
-                  ),
-                  child: Image.network(
-                    vehicle['images']?['primaryImageUrl'] ??
-                        'https://via.placeholder.com/120x120?text=No+Image',
-                    width: 120,
-                    height: 120,
-                    fit: BoxFit.cover,
-                    errorBuilder: (_, __, ___) => Container(
+          ],
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 120,
+              height: 120,
+              decoration: const BoxDecoration(
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(8),
+                  bottomLeft: Radius.circular(8),
+                ),
+              ),
+              child: Stack(
+                children: [
+                  ClipRRect(
+                    borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(8),
+                      bottomLeft: Radius.circular(8),
+                    ),
+                    child: Image.network(
+                      vehicle['images']?['primaryImageUrl'] ??
+                          'https://via.placeholder.com/120x120?text=No+Image',
                       width: 120,
                       height: 120,
-                      color: isDarkMode ? Colors.grey[800] : Colors.grey[300],
-                      child: Icon(Icons.car_rental,
+                      fit: BoxFit.cover,
+                      errorBuilder: (_, __, ___) => Container(
+                        width: 120,
+                        height: 120,
+                        color: isDarkMode ? Colors.grey[800] : Colors.grey[300],
+                        child: Icon(
+                          Icons.car_rental,
                           size: 40,
-                          color: isDarkMode ? Colors.grey[700] : Colors.grey),
-                    ),
-                  ),
-                ),
-
-                // Price Badge
-                Positioned(
-                  bottom: 0,
-                  left: 0,
-                  right: 0,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(vertical: 4),
-                    decoration: BoxDecoration(
-                      color: AppColors.secondary,
-                      borderRadius: const BorderRadius.only(
-                        bottomLeft: Radius.circular(8),
-                      ),
-                    ),
-                    child: Text(
-                      // Show actual daily price from pricing data
-                      'Rs. ${vehicle['pricing']?['daily']?['vehicleOnly']?['price'] ?? 'N/A'}.00 / Day',
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(
-                        color: Colors.black,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 12,
+                          color: isDarkMode ? Colors.grey[700] : Colors.grey,
+                        ),
                       ),
                     ),
                   ),
-                ),
-
-                // KM Badge
-                Positioned(
-                  bottom: 24,
-                  left: 0,
-                  right: 0,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(vertical: 2),
-                    decoration: BoxDecoration(
-                      color: AppColors.neutralDark,
-                    ),
-                    child: Text(
-                      // Show actual mileage limit from pricing data
-                      '${vehicle['pricing']?['daily']?['vehicleOnly']?['mileageLimit'] ?? 'N/A'} KM / Day',
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 11,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-          // Vehicle Details
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.all(12),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Brand Logo and Vehicle Name
-                  Row(
-                    children: [
-                      // Brand logo placeholder
-                      Container(
-                        width: 24,
-                        height: 24,
-                        decoration: BoxDecoration(
-                          color: AppColors.primary,
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                        child: const Icon(
-                          Icons.directions_car,
-                          color: Colors.white,
-                          size: 16,
+                  Positioned(
+                    bottom: 0,
+                    left: 0,
+                    right: 0,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(vertical: 4),
+                      decoration: BoxDecoration(
+                        color: AppColors.secondary,
+                        borderRadius: const BorderRadius.only(
+                          bottomLeft: Radius.circular(8),
                         ),
                       ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Text(
-                          '${vehicle['make'] ?? 'Unknown'} ${vehicle['model'] ?? ''}',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: isDarkMode ? Colors.white : Colors.black,
-                          ),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                    ],
-                  ),
-
-                  const SizedBox(height: 4),
-
-                  // Rating - use real data when available
-                  Row(
-                    children: [
-                      Row(
-                        children: List.generate(
-                          5,
-                          (index) => Icon(
-                            // Show filled stars based on actual rating if available
-                            (vehicle['rating'] != null &&
-                                    index < (vehicle['rating'] as num).floor())
-                                ? Icons.star
-                                : Icons.star_border,
-                            size: 14,
-                            color: AppColors.warning,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 4),
-                      Text(
-                        // Show actual rating and reviews count
-                        '${vehicle['rating'] ?? 0} (${vehicle['reviewsCount'] ?? 0})',
-                        style: TextStyle(
+                      child: Text(
+                        'Rs. ${vehicle['pricing']?['daily']?['vehicleOnly']?['price'] ?? 'N/A'}.00 / Day',
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          color: Colors.black,
+                          fontWeight: FontWeight.bold,
                           fontSize: 12,
-                          color: isDarkMode ? Colors.grey[400] : Colors.grey,
                         ),
-                      ),
-                    ],
-                  ),
-
-                  const SizedBox(height: 8),
-
-                  // Location
-                  Row(
-                    children: [
-                      Icon(
-                        Icons.location_on,
-                        size: 14,
-                        color: isDarkMode ? Colors.grey[400] : Colors.grey,
-                      ),
-                      const SizedBox(width: 4),
-                      Text(
-                        // Show actual collection point city and district
-                        '${vehicle['collectionPoint']?['city'] ?? ''} ${vehicle['collectionPoint']?['district'] ?? ''}',
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: isDarkMode ? Colors.grey[400] : Colors.grey,
-                        ),
-                      ),
-                    ],
-                  ),
-
-                  const SizedBox(height: 4),
-
-                  // Driver info - show based on rental conditions
-                  Row(
-                    children: [
-                      Icon(
-                        Icons.person,
-                        size: 14,
-                        color: isDarkMode ? Colors.grey[400] : Colors.grey,
-                      ),
-                      const SizedBox(width: 4),
-                      Text(
-                        // Show actual rent mode
-                        vehicle['rentalConditions']?['rentMode'] ??
-                            'Vehicle Only',
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: isDarkMode ? Colors.grey[400] : Colors.grey,
-                        ),
-                      ),
-                    ],
-                  ),
-
-                  const SizedBox(height: 8),
-
-                  // Availability status
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: Text(
-                      // Show actual status
-                      vehicle['status'] == 'available'
-                          ? 'Available'
-                          : 'Not Available',
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: AppColors.success,
-                        fontWeight: FontWeight.w500,
                       ),
                     ),
                   ),
                 ],
               ),
             ),
-          ),
-        ],
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Container(
+                          width: 24,
+                          height: 24,
+                          decoration: BoxDecoration(
+                            color: AppColors.primary,
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: const Icon(
+                            Icons.directions_car,
+                            color: Colors.white,
+                            size: 16,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            '${vehicle['make'] ?? 'Unknown'} ${vehicle['model'] ?? ''}',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: isDarkMode ? Colors.white : Colors.black,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 4),
+                    Row(
+                      children: [
+                        Row(
+                          children: List.generate(
+                            5,
+                            (index) => Icon(
+                              (vehicle['rating'] != null &&
+                                      index <
+                                          (vehicle['rating'] as num).floor())
+                                  ? Icons.star
+                                  : Icons.star_border,
+                              size: 14,
+                              color: AppColors.warning,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          '${vehicle['rating'] ?? 0} (${vehicle['reviewsCount'] ?? 0})',
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: isDarkMode ? Colors.grey[400] : Colors.grey,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.location_on,
+                          size: 14,
+                          color: isDarkMode ? Colors.grey[400] : Colors.grey,
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          '${vehicle['collectionPoint']?['city'] ?? ''} ${vehicle['collectionPoint']?['district'] ?? ''}',
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: isDarkMode ? Colors.grey[400] : Colors.grey,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 4),
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.person,
+                          size: 14,
+                          color: isDarkMode ? Colors.grey[400] : Colors.grey,
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          vehicle['rentalConditions']?['rentMode'] ??
+                              'Vehicle Only',
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: isDarkMode ? Colors.grey[400] : Colors.grey,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: Text(
+                        vehicle['status'] == 'available'
+                            ? 'Available'
+                            : 'Not Available',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: AppColors.success,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
 
-  // Add this helper method to the class to handle pluralization
   String _buildSearchTitle() {
     if (widget.selectedVehicleTypes.isEmpty) {
       return 'All Vehicles in ${widget.location.isEmpty ? "All Locations" : widget.location}';
     }
 
-    // Generate properly pluralized vehicle type names
     List<String> pluralizedTypes = widget.selectedVehicleTypes.map((type) {
-      // Add pluralization rules for different vehicle types
       switch (type.toLowerCase()) {
         case 'car':
           return 'Cars';
-
         case 'bike':
           return 'Bikes';
         case 'three-wheeler':
           return 'Three-Wheelers';
-
         default:
-          // For any other type, just add 's' at the end
           return '${type}s';
       }
     }).toList();
 
-    // Join the pluralized types with commas
     return '${pluralizedTypes.join(", ")} in ${widget.location.isEmpty ? "All Locations" : widget.location}';
   }
-
-  // Update the _applyFilters method
 
   void _applyFilters(
     Set<String> selectedVehicleTypes,
@@ -670,15 +589,12 @@ class _VehicleSearchResultsScreenState
     String? make,
     String? model,
   ) {
-    // First close the drawer
     Navigator.pop(context);
 
-    // Then update the state to show loading
     setState(() {
       _isLoading = true;
     });
 
-    // Update the search results with new parameters
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
@@ -696,8 +612,6 @@ class _VehicleSearchResultsScreenState
       ),
     );
   }
-
-  // Add this method to the _VehicleSearchResultsScreenState class
 
   Widget _buildResultsListView() {
     return ListView.builder(
