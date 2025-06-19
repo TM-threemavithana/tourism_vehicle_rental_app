@@ -235,7 +235,9 @@ class _OwnerVehicleFormState extends State<OwnerVehicleForm> {
         'pricing': pricingMap,
 
         // Add the extras section
-        'extras': _vehicleExtras.toMap(),
+        'extras': {
+          'features': _vehicleExtras.toMap(),
+        },
 
         // Add the insurance section
         'insurance': _vehicleInsurance.toMap(),
