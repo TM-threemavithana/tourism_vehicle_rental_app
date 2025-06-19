@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../utils/form_data_constants.dart';
+import '../utils/app_colors.dart';
 
 class RefineSearch extends StatefulWidget {
   final Set<String> selectedVehicleTypes;
@@ -197,51 +198,83 @@ class _RefineSearchState extends State<RefineSearch> {
   @override
   Widget build(BuildContext context) {
     final Size screenSize = MediaQuery.of(context).size;
-
-    // Set drawer width to 80% of screen width
     final double drawerWidth = screenSize.width * 0.8;
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
     return Drawer(
       width: drawerWidth,
       child: Container(
-        color: Colors.white,
+        decoration: BoxDecoration(
+          color: isDarkMode ? AppColors.neutralDark : Colors.white,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 8.0,
+            ),
+          ],
+        ),
         child: SafeArea(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Header with title
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: const Text(
-                  'Refine Search',
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
-                  ),
+              // Header with title and decorative element
+              Container(
+                padding: const EdgeInsets.fromLTRB(16, 24, 16, 16),
+                decoration: BoxDecoration(
+                  color: isDarkMode ? Colors.black : AppColors.primary,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.1),
+                      blurRadius: 4.0,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text(
+                          'Refine Search',
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.close, color: Colors.white),
+                          padding: EdgeInsets.zero,
+                          constraints: const BoxConstraints(),
+                          onPressed: () => Navigator.pop(context),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Container(
+                      height: 2,
+                      width: 40,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                    ),
+                  ],
                 ),
               ),
 
-              const Divider(),
-
-              // Scrollable content area
+              // Scrollable content area with enhanced styling
               Expanded(
                 child: ListView(
                   padding: const EdgeInsets.symmetric(horizontal: 16.0),
                   children: [
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 20),
 
-                    // Vehicle type selection
-                    Text(
-                      'Vehicle Type',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black87,
-                      ),
-                    ),
+                    // Vehicle type section with enhanced styling
+                    _buildSectionHeader('Vehicle Type', isDarkMode),
                     const SizedBox(height: 12),
-
                     Wrap(
                       spacing: 10.0,
                       runSpacing: 8.0,
@@ -249,23 +282,35 @@ class _RefineSearchState extends State<RefineSearch> {
                         final isSelected = _selectedVehicles.contains(type);
                         return GestureDetector(
                           onTap: () => _toggleVehicleSelection(type),
-                          child: Container(
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 200),
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 12.0, vertical: 8.0),
                             decoration: BoxDecoration(
                               color: isSelected
-                                  ? Theme.of(context)
-                                      .colorScheme
-                                      .primary
-                                      .withOpacity(0.1)
-                                  : Colors.grey[100],
+                                  ? AppColors.primary.withOpacity(0.1)
+                                  : isDarkMode
+                                      ? AppColors.neutralDark.withOpacity(0.7)
+                                      : Colors.grey[100],
                               borderRadius: BorderRadius.circular(8),
                               border: Border.all(
                                 color: isSelected
-                                    ? Theme.of(context).colorScheme.primary
-                                    : Colors.grey[300]!,
+                                    ? AppColors.primary
+                                    : isDarkMode
+                                        ? Colors.grey[700]!
+                                        : Colors.grey[300]!,
                                 width: 1.5,
                               ),
+                              boxShadow: isSelected
+                                  ? [
+                                      BoxShadow(
+                                        color:
+                                            AppColors.primary.withOpacity(0.2),
+                                        blurRadius: 4.0,
+                                        offset: const Offset(0, 2),
+                                      )
+                                    ]
+                                  : null,
                             ),
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
@@ -275,14 +320,14 @@ class _RefineSearchState extends State<RefineSearch> {
                                   height: 18,
                                   decoration: BoxDecoration(
                                     color: isSelected
-                                        ? Theme.of(context).colorScheme.primary
+                                        ? AppColors.primary
                                         : Colors.transparent,
                                     border: Border.all(
                                       color: isSelected
-                                          ? Theme.of(context)
-                                              .colorScheme
-                                              .primary
-                                          : Colors.grey[400]!,
+                                          ? AppColors.primary
+                                          : isDarkMode
+                                              ? Colors.grey[400]!
+                                              : Colors.grey[400]!,
                                       width: 1.5,
                                     ),
                                     borderRadius: BorderRadius.circular(4),
@@ -300,9 +345,13 @@ class _RefineSearchState extends State<RefineSearch> {
                                   type,
                                   style: TextStyle(
                                     color: isSelected
-                                        ? Theme.of(context).colorScheme.primary
-                                        : Colors.black87,
-                                    fontWeight: FontWeight.bold,
+                                        ? AppColors.primary
+                                        : isDarkMode
+                                            ? Colors.white
+                                            : Colors.black87,
+                                    fontWeight: isSelected
+                                        ? FontWeight.bold
+                                        : FontWeight.w500,
                                     fontSize: 14,
                                   ),
                                 ),
@@ -315,354 +364,93 @@ class _RefineSearchState extends State<RefineSearch> {
 
                     const SizedBox(height: 24),
 
-                    // Vehicle Make/Brand selection (when a vehicle type is selected)
+                    // Make/Brand section with enhanced styling
                     if (_selectedVehicleType != null) ...[
-                      Text(
-                        'Make/Brand',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black87,
-                        ),
-                      ),
+                      _buildSectionHeader('Make/Brand', isDarkMode),
                       const SizedBox(height: 8),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12.0),
-                        decoration: BoxDecoration(
-                          color: Colors.grey[100],
-                          borderRadius: BorderRadius.circular(8),
-                          border: Border.all(color: Colors.grey[300]!),
-                        ),
-                        child: DropdownButtonHideUnderline(
-                          child: DropdownButton<String>(
-                            isExpanded: true,
-                            value: _selectedMake,
-                            hint: Text('Select make/brand'),
-                            items: VehicleFormConstants
-                                    .makesMap[_selectedVehicleType]
-                                    ?.map((make) => DropdownMenuItem<String>(
-                                        value: make, child: Text(make)))
-                                    .toList() ??
-                                [],
-                            onChanged: _selectMake,
-                          ),
-                        ),
+                      _buildDropdownField(
+                        value: _selectedMake,
+                        hint: 'Select make/brand',
+                        items: VehicleFormConstants
+                                .makesMap[_selectedVehicleType]
+                                ?.map((make) => DropdownMenuItem<String>(
+                                    value: make, child: Text(make)))
+                                .toList() ??
+                            [],
+                        onChanged: _selectMake,
+                        isDarkMode: isDarkMode,
                       ),
                       const SizedBox(height: 16),
                     ],
 
-                    // Vehicle Model selection (when a make is selected)
+                    // Model section with enhanced styling
                     if (_selectedVehicleType != null &&
                         _selectedMake != null) ...[
-                      Text(
-                        'Model',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black87,
-                        ),
-                      ),
+                      _buildSectionHeader('Model', isDarkMode),
                       const SizedBox(height: 8),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12.0),
-                        decoration: BoxDecoration(
-                          color: Colors.grey[100],
-                          borderRadius: BorderRadius.circular(8),
-                          border: Border.all(color: Colors.grey[300]!),
-                        ),
-                        child: DropdownButtonHideUnderline(
-                          child: DropdownButton<String>(
-                            isExpanded: true,
-                            value: _selectedModel,
-                            hint: Text('Select model'),
-                            items: VehicleFormConstants
-                                    .modelsMap[_selectedVehicleType]
-                                        ?[_selectedMake]
-                                    ?.map((model) => DropdownMenuItem<String>(
-                                        value: model, child: Text(model)))
-                                    .toList() ??
-                                [],
-                            onChanged: _selectModel,
-                          ),
-                        ),
+                      _buildDropdownField(
+                        value: _selectedModel,
+                        hint: 'Select model',
+                        items: VehicleFormConstants
+                                .modelsMap[_selectedVehicleType]?[_selectedMake]
+                                ?.map((model) => DropdownMenuItem<String>(
+                                    value: model, child: Text(model)))
+                                .toList() ??
+                            [],
+                        onChanged: _selectModel,
+                        isDarkMode: isDarkMode,
                       ),
                       const SizedBox(height: 16),
                     ],
 
-                    // Location search field
-                    Text(
-                      'Location',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black87,
-                      ),
-                    ),
+                    // Location section with enhanced styling
+                    _buildSectionHeader('Location', isDarkMode),
                     const SizedBox(height: 8),
-
-                    Autocomplete<String>(
-                      optionsBuilder: (TextEditingValue textEditingValue) {
-                        if (textEditingValue.text == '') {
-                          return _popularLocations;
-                        }
-                        return _popularLocations.where((location) => location
-                            .toLowerCase()
-                            .contains(textEditingValue.text.toLowerCase()));
-                      },
-                      onSelected: (String selection) {
-                        setState(() {
-                          _locationController.text = selection;
-                        });
-                      },
-                      fieldViewBuilder:
-                          (context, controller, focusNode, onFieldSubmitted) {
-                        controller.text = _locationController.text;
-
-                        controller.addListener(() {
-                          if (_locationController.text != controller.text) {
-                            _locationController.text = controller.text;
-                          }
-                        });
-
-                        return Container(
-                          decoration: BoxDecoration(
-                            color: Colors.grey[100],
-                            borderRadius: BorderRadius.circular(8),
-                            border: Border.all(color: Colors.grey[300]!),
-                          ),
-                          child: TextField(
-                            controller: controller,
-                            focusNode: focusNode,
-                            textAlign: TextAlign.center,
-                            decoration: InputDecoration(
-                              hintText: 'Select or type destination',
-                              hintStyle: TextStyle(color: Colors.grey[500]),
-                              border: InputBorder.none,
-                              contentPadding: const EdgeInsets.symmetric(
-                                  vertical: 12.0, horizontal: 16.0),
-                              suffixIcon:
-                                  Icon(Icons.search, color: Colors.grey[600]),
-                            ),
-                          ),
-                        );
-                      },
-                      optionsViewBuilder: (context, onSelected, options) {
-                        return Align(
-                          alignment: Alignment.topLeft,
-                          child: Material(
-                            elevation: 4.0,
-                            child: ConstrainedBox(
-                              constraints: BoxConstraints(
-                                maxHeight: 200,
-                                maxWidth: drawerWidth - 32,
-                              ),
-                              child: ListView.builder(
-                                padding: EdgeInsets.zero,
-                                shrinkWrap: true,
-                                itemCount: options.length,
-                                itemBuilder: (BuildContext context, int index) {
-                                  final option = options.elementAt(index);
-                                  return ListTile(
-                                    title: Text(option),
-                                    onTap: () {
-                                      onSelected(option);
-                                    },
-                                  );
-                                },
-                              ),
-                            ),
-                          ),
-                        );
-                      },
+                    _buildAutocompleteField(
+                      drawerWidth: drawerWidth,
+                      isDarkMode: isDarkMode,
                     ),
 
                     const SizedBox(height: 24),
 
-                    // Date section
-                    Text(
-                      'Dates',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black87,
-                      ),
-                    ),
+                    // Dates section with enhanced styling
+                    _buildSectionHeader('Dates', isDarkMode),
                     const SizedBox(height: 12),
 
-                    // Pickup date & time
-                    Row(
-                      children: [
-                        const Text(
-                          'Pick up:',
-                          style: TextStyle(
-                            color: Colors.black87,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: Row(
-                            children: [
-                              Expanded(
-                                child: GestureDetector(
-                                  onTap: () => _selectDate(context, true),
-                                  child: Container(
-                                    height: 40,
-                                    decoration: BoxDecoration(
-                                      color: Colors.grey[100],
-                                      borderRadius: BorderRadius.circular(8),
-                                      border:
-                                          Border.all(color: Colors.grey[300]!),
-                                    ),
-                                    child: Center(
-                                      child: Text(
-                                        _formatDate(_pickupDate),
-                                        style: TextStyle(
-                                          color: Colors.black87,
-                                          fontSize: 14,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(width: 8),
-                              Expanded(
-                                child: GestureDetector(
-                                  onTap: () => _selectTime(context, true),
-                                  child: Container(
-                                    height: 40,
-                                    decoration: BoxDecoration(
-                                      color: Colors.grey[100],
-                                      borderRadius: BorderRadius.circular(8),
-                                      border:
-                                          Border.all(color: Colors.grey[300]!),
-                                    ),
-                                    child: Center(
-                                      child: Text(
-                                        _formatTime(_pickupTime),
-                                        style: TextStyle(
-                                          color: Colors.black87,
-                                          fontSize: 14,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
+                    // Pickup date & time with enhanced styling
+                    _buildDateTimeRow(
+                      label: 'Pick up:',
+                      date: _pickupDate,
+                      time: _pickupTime,
+                      onDateTap: () => _selectDate(context, true),
+                      onTimeTap: () => _selectTime(context, true),
+                      isDarkMode: isDarkMode,
                     ),
 
                     const SizedBox(height: 12),
 
-                    // Return date & time
-                    Row(
-                      children: [
-                        const Text(
-                          'Return:  ',
-                          style: TextStyle(
-                            color: Colors.black87,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: Row(
-                            children: [
-                              Expanded(
-                                child: GestureDetector(
-                                  onTap: () => _selectDate(context, false),
-                                  child: Container(
-                                    height: 40,
-                                    decoration: BoxDecoration(
-                                      color: Colors.grey[100],
-                                      borderRadius: BorderRadius.circular(8),
-                                      border:
-                                          Border.all(color: Colors.grey[300]!),
-                                    ),
-                                    child: Center(
-                                      child: Text(
-                                        _formatDate(_returnDate),
-                                        style: TextStyle(
-                                          color: Colors.black87,
-                                          fontSize: 14,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(width: 8),
-                              Expanded(
-                                child: GestureDetector(
-                                  onTap: () => _selectTime(context, false),
-                                  child: Container(
-                                    height: 40,
-                                    decoration: BoxDecoration(
-                                      color: Colors.grey[100],
-                                      borderRadius: BorderRadius.circular(8),
-                                      border:
-                                          Border.all(color: Colors.grey[300]!),
-                                    ),
-                                    child: Center(
-                                      child: Text(
-                                        _formatTime(_returnTime),
-                                        style: TextStyle(
-                                          color: Colors.black87,
-                                          fontSize: 14,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
+                    // Return date & time with enhanced styling
+                    _buildDateTimeRow(
+                      label: 'Return:',
+                      date: _returnDate,
+                      time: _returnTime,
+                      onDateTap: () => _selectDate(context, false),
+                      onTimeTap: () => _selectTime(context, false),
+                      isDarkMode: isDarkMode,
                     ),
 
                     const SizedBox(height: 16),
 
-                    // Flexible dates option
-                    GestureDetector(
-                      onTap: () {
+                    // Flexible dates option with enhanced styling
+                    _buildCheckboxOption(
+                      label: 'My dates are flexible',
+                      isSelected: _flexibleDates,
+                      onToggle: () {
                         setState(() {
                           _flexibleDates = !_flexibleDates;
                         });
                       },
-                      child: Row(
-                        children: [
-                          Container(
-                            width: 18,
-                            height: 18,
-                            decoration: BoxDecoration(
-                              color: _flexibleDates
-                                  ? Theme.of(context).colorScheme.primary
-                                  : Colors.transparent,
-                              border: Border.all(
-                                  color: Theme.of(context).colorScheme.primary,
-                                  width: 1.5),
-                              borderRadius: BorderRadius.circular(4),
-                            ),
-                            child: _flexibleDates
-                                ? const Icon(Icons.check,
-                                    color: Colors.white, size: 12)
-                                : null,
-                          ),
-                          const SizedBox(width: 8),
-                          const Text(
-                            'My dates are flexible',
-                            style:
-                                TextStyle(color: Colors.black87, fontSize: 14),
-                          ),
-                        ],
-                      ),
+                      isDarkMode: isDarkMode,
                     ),
 
                     const SizedBox(height: 24),
@@ -670,17 +458,16 @@ class _RefineSearchState extends State<RefineSearch> {
                 ),
               ),
 
-              // Bottom action buttons
+              // Bottom action buttons with enhanced styling
               Container(
                 padding: const EdgeInsets.all(16.0),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: isDarkMode ? Colors.black : Colors.white,
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
+                      color: Colors.black.withOpacity(0.1),
                       offset: const Offset(0, -2),
-                      blurRadius: 5,
-                      spreadRadius: 0,
+                      blurRadius: 8,
                     ),
                   ],
                 ),
@@ -692,24 +479,27 @@ class _RefineSearchState extends State<RefineSearch> {
                       child: TextButton(
                         onPressed: () => Navigator.pop(context),
                         style: TextButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          foregroundColor: AppColors.primary,
+                          padding: const EdgeInsets.symmetric(vertical: 14),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8),
-                            side: BorderSide(color: Colors.grey[300]!),
+                            side: BorderSide(color: AppColors.primary),
                           ),
                         ),
-                        child: const Text('CLOSE'),
+                        child: const Text(
+                          'CLOSE',
+                          style: TextStyle(fontWeight: FontWeight.w600),
+                        ),
                       ),
                     ),
                     const SizedBox(width: 12),
+
                     // Search button
                     Expanded(
                       flex: 2,
                       child: ElevatedButton(
                         onPressed: _selectedVehicles.isNotEmpty
                             ? () {
-                                // Only call the callback - no additional Navigator.pop needed here
-                                // as we're handling it in the _applyFilters method
                                 widget.onApplyFilters(
                                   _selectedVehicles,
                                   _locationController.text,
@@ -724,10 +514,10 @@ class _RefineSearchState extends State<RefineSearch> {
                               }
                             : null,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor:
-                              Theme.of(context).colorScheme.primary,
+                          backgroundColor: AppColors.primary,
                           disabledBackgroundColor: Colors.grey.shade400,
-                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          elevation: 2,
+                          padding: const EdgeInsets.symmetric(vertical: 14),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8),
                           ),
@@ -749,6 +539,266 @@ class _RefineSearchState extends State<RefineSearch> {
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  // Helper methods to build UI components
+  Widget _buildSectionHeader(String title, bool isDarkMode) {
+    return Text(
+      title,
+      style: TextStyle(
+        fontSize: 16,
+        fontWeight: FontWeight.bold,
+        color: isDarkMode ? Colors.white : Colors.black87,
+      ),
+    );
+  }
+
+  Widget _buildDropdownField({
+    required String? value,
+    required String hint,
+    required List<DropdownMenuItem<String>> items,
+    required Function(String?) onChanged,
+    required bool isDarkMode,
+  }) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12.0),
+      decoration: BoxDecoration(
+        color: isDarkMode ? Colors.grey[800] : Colors.grey[100],
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(
+          color: isDarkMode ? Colors.grey[600]! : Colors.grey[300]!,
+        ),
+      ),
+      child: DropdownButtonHideUnderline(
+        child: DropdownButton<String>(
+          isExpanded: true,
+          value: value,
+          hint: Text(hint,
+              style: TextStyle(
+                  color: isDarkMode ? Colors.grey[400] : Colors.grey[600])),
+          items: items,
+          onChanged: onChanged,
+          icon: Icon(Icons.arrow_drop_down,
+              color: isDarkMode ? Colors.grey[400] : Colors.grey[600]),
+          dropdownColor: isDarkMode ? Colors.grey[800] : Colors.white,
+          style: TextStyle(
+            color: isDarkMode ? Colors.white : Colors.black87,
+            fontSize: 14,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildAutocompleteField({
+    required double drawerWidth,
+    required bool isDarkMode,
+  }) {
+    return Autocomplete<String>(
+      optionsBuilder: (TextEditingValue textEditingValue) {
+        if (textEditingValue.text == '') {
+          return _popularLocations;
+        }
+        return _popularLocations.where((location) => location
+            .toLowerCase()
+            .contains(textEditingValue.text.toLowerCase()));
+      },
+      onSelected: (String selection) {
+        setState(() {
+          _locationController.text = selection;
+        });
+      },
+      fieldViewBuilder: (context, controller, focusNode, onFieldSubmitted) {
+        controller.text = _locationController.text;
+
+        controller.addListener(() {
+          if (_locationController.text != controller.text) {
+            _locationController.text = controller.text;
+          }
+        });
+
+        return Container(
+          decoration: BoxDecoration(
+            color: isDarkMode ? Colors.grey[800] : Colors.grey[100],
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(
+              color: isDarkMode ? Colors.grey[600]! : Colors.grey[300]!,
+            ),
+          ),
+          child: TextField(
+            controller: controller,
+            focusNode: focusNode,
+            style: TextStyle(
+              color: isDarkMode ? Colors.white : Colors.black87,
+            ),
+            decoration: InputDecoration(
+              hintText: 'Select or type destination',
+              hintStyle: TextStyle(
+                  color: isDarkMode ? Colors.grey[400] : Colors.grey[500]),
+              border: InputBorder.none,
+              contentPadding:
+                  const EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0),
+              suffixIcon: Icon(Icons.search,
+                  color: isDarkMode ? Colors.grey[400] : Colors.grey[600]),
+            ),
+          ),
+        );
+      },
+      optionsViewBuilder: (context, onSelected, options) {
+        return Align(
+          alignment: Alignment.topLeft,
+          child: Material(
+            elevation: 4.0,
+            color: isDarkMode ? Colors.grey[800] : Colors.white,
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                maxHeight: 200,
+                maxWidth: drawerWidth - 32,
+              ),
+              child: ListView.builder(
+                padding: EdgeInsets.zero,
+                shrinkWrap: true,
+                itemCount: options.length,
+                itemBuilder: (BuildContext context, int index) {
+                  final option = options.elementAt(index);
+                  return ListTile(
+                    title: Text(
+                      option,
+                      style: TextStyle(
+                        color: isDarkMode ? Colors.white : Colors.black87,
+                      ),
+                    ),
+                    onTap: () {
+                      onSelected(option);
+                    },
+                    hoverColor:
+                        isDarkMode ? Colors.grey[700] : Colors.grey[100],
+                  );
+                },
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildDateTimeRow({
+    required String label,
+    required DateTime date,
+    required TimeOfDay time,
+    required VoidCallback onDateTap,
+    required VoidCallback onTimeTap,
+    required bool isDarkMode,
+  }) {
+    return Row(
+      children: [
+        Text(
+          label,
+          style: TextStyle(
+            color: isDarkMode ? Colors.white70 : Colors.black87,
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+        const SizedBox(width: 8),
+        Expanded(
+          child: Row(
+            children: [
+              Expanded(
+                child: GestureDetector(
+                  onTap: onDateTap,
+                  child: Container(
+                    height: 42,
+                    decoration: BoxDecoration(
+                      color: isDarkMode ? Colors.grey[800] : Colors.grey[100],
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(
+                        color:
+                            isDarkMode ? Colors.grey[600]! : Colors.grey[300]!,
+                      ),
+                    ),
+                    child: Center(
+                      child: Text(
+                        _formatDate(date),
+                        style: TextStyle(
+                          color: isDarkMode ? Colors.white : Colors.black87,
+                          fontSize: 14,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: GestureDetector(
+                  onTap: onTimeTap,
+                  child: Container(
+                    height: 42,
+                    decoration: BoxDecoration(
+                      color: isDarkMode ? Colors.grey[800] : Colors.grey[100],
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(
+                        color:
+                            isDarkMode ? Colors.grey[600]! : Colors.grey[300]!,
+                      ),
+                    ),
+                    child: Center(
+                      child: Text(
+                        _formatTime(time),
+                        style: TextStyle(
+                          color: isDarkMode ? Colors.white : Colors.black87,
+                          fontSize: 14,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildCheckboxOption({
+    required String label,
+    required bool isSelected,
+    required VoidCallback onToggle,
+    required bool isDarkMode,
+  }) {
+    return GestureDetector(
+      onTap: onToggle,
+      child: Row(
+        children: [
+          AnimatedContainer(
+            duration: const Duration(milliseconds: 150),
+            width: 18,
+            height: 18,
+            decoration: BoxDecoration(
+              color: isSelected ? AppColors.primary : Colors.transparent,
+              border: Border.all(
+                  color: isSelected ? AppColors.primary : Colors.grey,
+                  width: 1.5),
+              borderRadius: BorderRadius.circular(4),
+            ),
+            child: isSelected
+                ? const Icon(Icons.check, color: Colors.white, size: 12)
+                : null,
+          ),
+          const SizedBox(width: 8),
+          Text(
+            label,
+            style: TextStyle(
+              color: isDarkMode ? Colors.white : Colors.black87,
+              fontSize: 14,
+            ),
+          ),
+        ],
       ),
     );
   }

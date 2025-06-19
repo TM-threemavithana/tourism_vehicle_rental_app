@@ -42,8 +42,8 @@ class _VehicleSearchResultsScreenState
   String? _errorMessage;
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
-  // Add these variables to save filter state
-  String _selectedSortOption = 'price_low_to_high';
+  
+  String _selectedSortOption = ''; // Was 'price_low_to_high' before
   RangeValues _priceRange = RangeValues(0, 50000);
   Set<String> _selectedFeatures = {};
   Set<String> _selectedFuelTypes = {};

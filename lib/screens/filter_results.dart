@@ -62,6 +62,7 @@ class _FilterResultsDrawerState extends State<FilterResultsDrawer> {
     super.initState();
 
     // Initialize filter state with saved values from the parent widget
+    // Don't set a default sort option - use the one passed from the parent or empty string
     _selectedSortOption = widget.initialSortOption;
     _selectedFeatures = Set.from(widget.initialFeatures);
     _selectedFuelTypes = Set.from(widget.initialFuelTypes);
@@ -108,7 +109,7 @@ class _FilterResultsDrawerState extends State<FilterResultsDrawer> {
     }
   }
 
-  // Update the _applyFilters method to properly handle your vehicle data structure
+  // Update the _applyFilters method to not set a default sort option
   void _applyFilters() {
     // Start with a fresh copy of the initial results
     List<Map<String, dynamic>> results = List.from(widget.initialResults);
@@ -225,11 +226,10 @@ class _FilterResultsDrawerState extends State<FilterResultsDrawer> {
       print("After features filter: ${results.length}");
     }
 
-    // Apply sort - make sure we have a default sorting option
-    if (_selectedSortOption.isEmpty) {
-      _selectedSortOption = 'price_low_to_high';
+    // Only apply sort if a sort option is explicitly selected
+    if (_selectedSortOption.isNotEmpty) {
+      _sortResults(results);
     }
-    _sortResults(results);
 
     // Update state with filtered results
     setState(() {
@@ -380,6 +380,7 @@ class _FilterResultsDrawerState extends State<FilterResultsDrawer> {
     });
   }
 
+  // Update the Widget build method for consistent colors
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -402,24 +403,49 @@ class _FilterResultsDrawerState extends State<FilterResultsDrawer> {
       ),
       child: Column(
         children: [
-          // Header
+          // Header - Keep consistent with Refine Search
           Container(
             padding: const EdgeInsets.fromLTRB(16, 32, 16, 16),
-            color: isDarkMode ? Colors.black : AppColors.primary,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text(
-                  'Filter Results',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                  ),
+            decoration: BoxDecoration(
+              color: isDarkMode ? Colors.black : AppColors.primary,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.1),
+                  blurRadius: 4.0,
+                  offset: const Offset(0, 2),
                 ),
-                IconButton(
-                  icon: const Icon(Icons.close, color: Colors.white),
-                  onPressed: () => Navigator.pop(context),
+              ],
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      'Filter Results',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.close, color: Colors.white),
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(),
+                      onPressed: () => Navigator.pop(context),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Container(
+                  height: 2,
+                  width: 40,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
                 ),
               ],
             ),
@@ -433,15 +459,8 @@ class _FilterResultsDrawerState extends State<FilterResultsDrawer> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // Sort options
-                  Text(
-                    'Sort By',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: isDarkMode ? Colors.white : Colors.black87,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
+                  _buildSectionHeader('Sort By', isDarkMode),
+                  const SizedBox(height: 12),
                   SingleChildScrollView(
                     scrollDirection: Axis.horizontal,
                     child: Row(
@@ -456,18 +475,11 @@ class _FilterResultsDrawerState extends State<FilterResultsDrawer> {
                     ),
                   ),
 
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 24),
 
-                  // Price range filter
-                  Text(
-                    'Price Range (LKR per day)',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: isDarkMode ? Colors.white : Colors.black87,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
+                  // Price range
+                  _buildSectionHeader('Price Range (LKR per day)', isDarkMode),
+                  const SizedBox(height: 12),
                   Row(
                     children: [
                       Text(
@@ -502,18 +514,11 @@ class _FilterResultsDrawerState extends State<FilterResultsDrawer> {
                     ],
                   ),
 
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 24),
 
                   // Rent mode section
-                  Text(
-                    'Rent Mode',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: isDarkMode ? Colors.white : Colors.black87,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
+                  _buildSectionHeader('Rent Mode', isDarkMode),
+                  const SizedBox(height: 12),
                   Wrap(
                     spacing: 8,
                     runSpacing: 8,
@@ -527,18 +532,11 @@ class _FilterResultsDrawerState extends State<FilterResultsDrawer> {
                     ],
                   ),
 
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 24),
 
                   // Fuel type section
-                  Text(
-                    'Fuel Type',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: isDarkMode ? Colors.white : Colors.black87,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
+                  _buildSectionHeader('Fuel Type', isDarkMode),
+                  const SizedBox(height: 12),
                   Wrap(
                     spacing: 8,
                     runSpacing: 8,
@@ -554,18 +552,11 @@ class _FilterResultsDrawerState extends State<FilterResultsDrawer> {
                     ],
                   ),
 
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 24),
 
                   // Transmission section
-                  Text(
-                    'Transmission',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: isDarkMode ? Colors.white : Colors.black87,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
+                  _buildSectionHeader('Transmission', isDarkMode),
+                  const SizedBox(height: 12),
                   Wrap(
                     spacing: 8,
                     runSpacing: 8,
@@ -577,18 +568,11 @@ class _FilterResultsDrawerState extends State<FilterResultsDrawer> {
                     ],
                   ),
 
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 24),
 
                   // Features section
-                  Text(
-                    'Features',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: isDarkMode ? Colors.white : Colors.black87,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
+                  _buildSectionHeader('Features', isDarkMode),
+                  const SizedBox(height: 12),
                   Wrap(
                     spacing: 8,
                     runSpacing: 8,
@@ -604,15 +588,14 @@ class _FilterResultsDrawerState extends State<FilterResultsDrawer> {
 
           // Bottom buttons
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            padding: const EdgeInsets.all(16.0),
             decoration: BoxDecoration(
               color: isDarkMode ? Colors.black : Colors.white,
               boxShadow: [
                 BoxShadow(
                   color: Colors.black.withOpacity(0.1),
-                  spreadRadius: 0,
-                  blurRadius: 5,
-                  offset: const Offset(0, -3),
+                  offset: const Offset(0, -2),
+                  blurRadius: 8,
                 ),
               ],
             ),
@@ -625,13 +608,16 @@ class _FilterResultsDrawerState extends State<FilterResultsDrawer> {
                     onPressed: () => Navigator.pop(context),
                     style: TextButton.styleFrom(
                       foregroundColor: AppColors.primary,
-                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      padding: const EdgeInsets.symmetric(vertical: 14),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
                         side: BorderSide(color: AppColors.primary),
                       ),
                     ),
-                    child: const Text('CLOSE'),
+                    child: const Text(
+                      'CLOSE',
+                      style: TextStyle(fontWeight: FontWeight.w600),
+                    ),
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -659,8 +645,8 @@ class _FilterResultsDrawerState extends State<FilterResultsDrawer> {
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.primary,
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      elevation: 2,
+                      padding: const EdgeInsets.symmetric(vertical: 14),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
                       ),
@@ -668,6 +654,7 @@ class _FilterResultsDrawerState extends State<FilterResultsDrawer> {
                     child: const Text(
                       'APPLY FILTERS',
                       style: TextStyle(
+                        color: Colors.white,
                         fontWeight: FontWeight.bold,
                         fontSize: 14,
                       ),
@@ -682,12 +669,27 @@ class _FilterResultsDrawerState extends State<FilterResultsDrawer> {
     );
   }
 
+  // Add helper method for section headers to match Refine Search
+  Widget _buildSectionHeader(String title, bool isDarkMode) {
+    return Text(
+      title,
+      style: TextStyle(
+        fontSize: 16,
+        fontWeight: FontWeight.bold,
+        color: isDarkMode ? Colors.white : Colors.black87,
+      ),
+    );
+  }
+
+  // Update sort option styling to match Refine Search
   Widget _buildSortOption(String value, String label) {
     final isSelected = _selectedSortOption == value;
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
     return GestureDetector(
       onTap: () => _changeSortOption(value),
-      child: Container(
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
         margin: const EdgeInsets.only(right: 8),
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         decoration: BoxDecoration(
@@ -696,11 +698,24 @@ class _FilterResultsDrawerState extends State<FilterResultsDrawer> {
             color: isSelected ? AppColors.primary : Colors.grey,
           ),
           borderRadius: BorderRadius.circular(16),
+          boxShadow: isSelected
+              ? [
+                  BoxShadow(
+                    color: AppColors.primary.withOpacity(0.2),
+                    blurRadius: 4.0,
+                    offset: const Offset(0, 2),
+                  ),
+                ]
+              : null,
         ),
         child: Text(
           label,
           style: TextStyle(
-            color: isSelected ? Colors.white : Colors.grey,
+            color: isSelected
+                ? Colors.white
+                : isDarkMode
+                    ? Colors.white70
+                    : Colors.grey,
             fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
           ),
         ),
@@ -708,15 +723,44 @@ class _FilterResultsDrawerState extends State<FilterResultsDrawer> {
     );
   }
 
+  // Update filter chip styling to match Refine Search
   Widget _buildFilterChip(
       String label, Set<String> selectedItems, Function(String) onToggle) {
     final isSelected = selectedItems.contains(label);
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return FilterChip(
       selected: isSelected,
-      label: Text(label),
+      label: Text(
+        label,
+        style: TextStyle(
+          color: isSelected
+              ? AppColors.primary
+              : isDarkMode
+                  ? Colors.white
+                  : Colors.black87,
+          fontWeight: isSelected ? FontWeight.w500 : FontWeight.normal,
+        ),
+      ),
       onSelected: (_) => onToggle(label),
-      selectedColor: AppColors.primary.withOpacity(0.2),
+      selectedColor: AppColors.primary.withOpacity(0.1),
       checkmarkColor: AppColors.primary,
+      backgroundColor: isDarkMode
+          ? AppColors.neutralDark.withOpacity(0.7)
+          : Colors.grey[100],
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(8),
+        side: BorderSide(
+          color: isSelected
+              ? AppColors.primary
+              : isDarkMode
+                  ? Colors.grey[700]!
+                  : Colors.grey[300]!,
+          width: 1.5,
+        ),
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 0),
+      visualDensity: VisualDensity.compact,
     );
   }
 }
