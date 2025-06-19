@@ -3,8 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
 import 'Refine_search.dart';
 import '../utils/app_colors.dart'; // Add import for app colors
-import 'Filter_results.dart'; // Import the new filter results screen
-import 'filter_results_drawer.dart';
+import 'filter_results.dart'; // Update this import to the renamed file
 
 class VehicleSearchResultsScreen extends StatefulWidget {
   final Set<String> selectedVehicleTypes;
@@ -37,12 +36,19 @@ class VehicleSearchResultsScreen extends StatefulWidget {
 
 class _VehicleSearchResultsScreenState
     extends State<VehicleSearchResultsScreen> {
+  // Existing variables
   bool _isLoading = true;
   List<Map<String, dynamic>> _searchResults = [];
   String? _errorMessage;
-
-  // Add a scaffold key to control the drawer
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+
+  // Add these variables to save filter state
+  String _selectedSortOption = 'price_low_to_high';
+  RangeValues _priceRange = RangeValues(0, 50000);
+  Set<String> _selectedFeatures = {};
+  Set<String> _selectedFuelTypes = {};
+  Set<String> _selectedTransmissionTypes = {};
+  Set<String> _selectedRentModes = {};
 
   @override
   void initState() {
@@ -50,7 +56,6 @@ class _VehicleSearchResultsScreenState
     _performSearch();
   }
 
-  // You might also want to add this to ensure the search is refreshed when parameters change
   @override
   void didUpdateWidget(VehicleSearchResultsScreen oldWidget) {
     super.didUpdateWidget(oldWidget);
@@ -66,6 +71,7 @@ class _VehicleSearchResultsScreenState
     }
   }
 
+  // Keep the search logic the same
   Future<void> _performSearch() async {
     try {
       // Create a query to filter vehicles
@@ -150,6 +156,59 @@ class _VehicleSearchResultsScreenState
     }
   }
 
+  // In _VehicleSearchResultsScreenState class, replace _showFilterResultsDrawer method with this:
+  void _showFilterResultsDrawer() {
+    // Open the filter drawer from the right side
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      enableDrag: false,
+      isDismissible: false,
+      barrierColor: Colors.transparent,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Align(
+        alignment: Alignment.centerRight,
+        child: SizedBox(
+          height: MediaQuery.of(context).size.height,
+          child: FilterResultsDrawer(
+            // Make sure this class is in filter_results.dart
+            selectedVehicleTypes: widget.selectedVehicleTypes,
+            initialResults: _searchResults,
+            // Pass the current filter state
+            initialSortOption: _selectedSortOption,
+            initialPriceRange: _priceRange,
+            initialFeatures: _selectedFeatures,
+            initialFuelTypes: _selectedFuelTypes,
+            initialTransmissionTypes: _selectedTransmissionTypes,
+            initialRentModes: _selectedRentModes,
+            onFiltersApplied: (filteredResults, sortOption, priceRange,
+                features, fuelTypes, transmissionTypes, rentModes) {
+              setState(() {
+                // Save results
+                _searchResults = filteredResults;
+
+                // Save filter state for next time
+                _selectedSortOption = sortOption;
+                _priceRange = priceRange;
+                _selectedFeatures = features;
+                _selectedFuelTypes = fuelTypes;
+                _selectedTransmissionTypes = transmissionTypes;
+                _selectedRentModes = rentModes;
+
+                // Show appropriate message if no results match filters
+                if (_searchResults.isEmpty) {
+                  _errorMessage = "No vehicles match your filter criteria";
+                } else {
+                  _errorMessage = null;
+                }
+              });
+            },
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -160,7 +219,7 @@ class _VehicleSearchResultsScreenState
       backgroundColor:
           isDarkMode ? AppColors.neutralDark : AppColors.neutralBackground,
 
-      // Regular drawer for refine search
+      // Keep only refine search drawer
       drawer: RefineSearch(
         selectedVehicleTypes: widget.selectedVehicleTypes,
         location: widget.location,
@@ -171,20 +230,6 @@ class _VehicleSearchResultsScreenState
         flexibleDates: widget.flexibleDates,
         onApplyFilters: _applyFilters,
       ),
-
-      // End drawer for filter results with automatic button removed
-      endDrawer: FilterResultsDrawer(
-        selectedVehicleTypes: widget.selectedVehicleTypes,
-        initialResults: _searchResults,
-        onFiltersApplied: (filteredResults) {
-          setState(() {
-            _searchResults = filteredResults;
-          });
-        },
-      ),
-
-      // Set this to false to hide the automatic endDrawer button
-      endDrawerEnableOpenDragGesture: false,
 
       appBar: AppBar(
         backgroundColor: AppColors.primary,
@@ -203,52 +248,64 @@ class _VehicleSearchResultsScreenState
         ),
         // Remove automatic drawer buttons
         automaticallyImplyLeading: false,
-        // Make sure there are no actions that would add a button
-        actions: [
-          // Any actions you want to keep, but not the endDrawer button
-        ],
       ),
       body: Column(
         children: [
-          // Filter Section
+          // Modify to remove the Filter Results button
           Container(
             color: isDarkMode ? AppColors.neutralDark : AppColors.secondary,
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              // Only keep the refine search button
               children: [
-                // Left side - Refine Search button remains unchanged
-                GestureDetector(
-                  onTap: () {
-                    _scaffoldKey.currentState?.openDrawer();
-                  },
-                  child: Row(
-                    children: const [
-                      Icon(Icons.tune, color: Colors.white, size: 20),
-                      SizedBox(width: 8),
-                      Text(
-                        'Refine Search',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
+                // Refine Search button
+                Expanded(
+                  child: GestureDetector(
+                    onTap: () {
+                      _scaffoldKey.currentState?.openDrawer();
+                    },
+                    child: Row(
+                      children: const [
+                        Icon(Icons.tune, color: Colors.white, size: 20),
+                        SizedBox(width: 8),
+                        Text(
+                          'Refine Search',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
 
-                // Right side - Filter Result text only (without icon)
-                GestureDetector(
-                  onTap: () {
-                    _scaffoldKey.currentState?.openEndDrawer();
-                  },
-                  child: const Text(
-                    'Filter Result',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
+                // Add vertical divider between buttons
+                Container(
+                  height: 24,
+                  width: 1,
+                  color: Colors.white.withOpacity(0.3),
+                ),
+
+                // Filter Results button
+                Expanded(
+                  child: GestureDetector(
+                    onTap: _showFilterResultsDrawer,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: const [
+                        Icon(Icons.filter_list, color: Colors.white, size: 20),
+                        SizedBox(width: 8),
+                        Text(
+                          'Filter Results',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
@@ -256,7 +313,7 @@ class _VehicleSearchResultsScreenState
             ),
           ),
 
-          // Results List
+          // Results List - keep as is
           Expanded(
             child: _isLoading
                 ? Center(

@@ -1,58 +1,50 @@
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import '../utils/app_colors.dart';
 import '../utils/form_data_constants.dart';
-import 'vehicle_search_results_screen.dart';
 
-class FilterResultsScreen extends StatefulWidget {
+class FilterResultsDrawer extends StatefulWidget {
   final Set<String> selectedVehicleTypes;
-  final String location;
-  final DateTime pickupDate;
-  final TimeOfDay pickupTime;
-  final DateTime returnDate;
-  final TimeOfDay returnTime;
-  final bool flexibleDates;
-  final String? make;
-  final String? model;
-  final String? sortBy;
-  final List<Map<String, dynamic>>? initialResults;
+  final List<Map<String, dynamic>> initialResults;
+  // Add new parameters to receive saved filter state
+  final String initialSortOption;
+  final RangeValues initialPriceRange;
+  final Set<String> initialFeatures;
+  final Set<String> initialFuelTypes;
+  final Set<String> initialTransmissionTypes;
+  final Set<String> initialRentModes;
+  // Update callback to return the selected filter state
+  final Function(List<Map<String, dynamic>>, String, RangeValues, Set<String>,
+      Set<String>, Set<String>, Set<String>) onFiltersApplied;
 
-  const FilterResultsScreen({
+  const FilterResultsDrawer({
     super.key,
     required this.selectedVehicleTypes,
-    required this.location,
-    required this.pickupDate,
-    required this.pickupTime,
-    required this.returnDate,
-    required this.returnTime,
-    required this.flexibleDates,
-    this.make,
-    this.model,
-    this.sortBy,
-    this.initialResults,
+    required this.initialResults,
+    // Initialize with defaults but allow passing saved values
+    this.initialSortOption = 'price_low_to_high',
+    this.initialPriceRange = const RangeValues(0, 50000),
+    this.initialFeatures = const {},
+    this.initialFuelTypes = const {},
+    this.initialTransmissionTypes = const {},
+    this.initialRentModes = const {},
+    required this.onFiltersApplied,
   });
 
   @override
-  _FilterResultsScreenState createState() => _FilterResultsScreenState();
+  _FilterResultsDrawerState createState() => _FilterResultsDrawerState();
 }
 
-class _FilterResultsScreenState extends State<FilterResultsScreen> {
-  bool _isLoading = true;
-  List<Map<String, dynamic>> _filteredResults = [];
-  String? _errorMessage;
+class _FilterResultsDrawerState extends State<FilterResultsDrawer> {
+  // Filter state variables - initialize from widget's passed values
+  late String _selectedSortOption;
+  late RangeValues _priceRange;
+  late Set<String> _selectedFeatures;
+  late Set<String> _selectedFuelTypes;
+  late Set<String> _selectedTransmissionTypes;
+  late Set<String> _selectedRentModes;
+  late List<Map<String, dynamic>> _filteredResults;
 
-  // Filter state variables
-  String _selectedSortOption = 'price_low_to_high';
-  RangeValues _priceRange = RangeValues(0, 50000);
-  Set<String> _selectedFeatures = {};
-  Set<String> _selectedFuelTypes = {};
-  Set<String> _selectedTransmissionTypes = {};
-  Set<String> _selectedRentModes = {};
-  String? _selectedVehicleType;
-  String? _selectedMake;
-  String? _selectedModel;
-
-  // Common features in vehicles
+  // Existing code
   final List<String> _commonFeatures = [
     'Air Conditioning',
     'Bluetooth',
@@ -68,36 +60,34 @@ class _FilterResultsScreenState extends State<FilterResultsScreen> {
   @override
   void initState() {
     super.initState();
-    _selectedSortOption = widget.sortBy ?? 'price_low_to_high';
 
-    // If a vehicle type is selected and there's only one, set it as the selected type
-    if (widget.selectedVehicleTypes.length == 1) {
-      _selectedVehicleType = widget.selectedVehicleTypes.first;
-    }
+    // Initialize filter state with saved values from the parent widget
+    _selectedSortOption = widget.initialSortOption;
+    _selectedFeatures = Set.from(widget.initialFeatures);
+    _selectedFuelTypes = Set.from(widget.initialFuelTypes);
+    _selectedTransmissionTypes = Set.from(widget.initialTransmissionTypes);
+    _selectedRentModes = Set.from(widget.initialRentModes);
+    _filteredResults = List.from(widget.initialResults);
 
-    // Set make and model if provided
-    _selectedMake = widget.make;
-    _selectedModel = widget.model;
-
-    // Load initial results or fetch new ones
-    if (widget.initialResults != null) {
-      _processInitialResults();
+    // Initialize price range with saved value, but ensure it's valid for current data
+    if (widget.initialPriceRange.start == 0 &&
+        widget.initialPriceRange.end == 50000 &&
+        widget.initialResults.isNotEmpty) {
+      // No saved price range, calculate from data
+      _setPriceRangeFromData();
     } else {
-      _fetchVehicles();
+      // Use saved price range
+      _priceRange = widget.initialPriceRange;
     }
   }
 
-  void _processInitialResults() {
-    setState(() {
-      _isLoading = true;
-    });
-
-    // Get min and max price from the results to set price range
-    if (widget.initialResults != null && widget.initialResults!.isNotEmpty) {
+  // Add helper method to set price range from data
+  void _setPriceRangeFromData() {
+    if (widget.initialResults.isNotEmpty) {
       double minPrice = double.infinity;
       double maxPrice = 0;
 
-      for (var vehicle in widget.initialResults!) {
+      for (var vehicle in widget.initialResults) {
         final price = vehicle['pricing']?['daily']?['vehicleOnly']?['price'];
         if (price != null && price is num) {
           if (price < minPrice) minPrice = price.toDouble();
@@ -105,216 +95,167 @@ class _FilterResultsScreenState extends State<FilterResultsScreen> {
         }
       }
 
-      // Add a margin to the max price
-      maxPrice = maxPrice + 5000;
-      if (maxPrice > 50000) maxPrice = 50000;
+      // Set the widest possible range based on data
       if (minPrice == double.infinity) minPrice = 0;
+      maxPrice = maxPrice > 0 ? maxPrice + 5000 : 50000;
+      if (maxPrice > 50000) maxPrice = 50000;
 
       setState(() {
         _priceRange = RangeValues(minPrice, maxPrice);
       });
+    } else {
+      _priceRange = RangeValues(0, 50000);
     }
-
-    // Apply initial filtering
-    _applyFilters();
   }
 
-  Future<void> _fetchVehicles() async {
-    setState(() {
-      _isLoading = true;
-    });
+  // Update the _applyFilters method to properly handle your vehicle data structure
+  void _applyFilters() {
+    // Start with a fresh copy of the initial results
+    List<Map<String, dynamic>> results = List.from(widget.initialResults);
+    print("Initial results count: ${results.length}");
 
-    try {
-      // Create a base query for vehicles
-      Query query = FirebaseFirestore.instance.collection('vehicles');
+    // Apply price range filter
+    results = results.where((vehicle) {
+      final price = vehicle['pricing']?['daily']?['vehicleOnly']?['price'];
+      if (price == null) return false;
 
-      // Apply vehicle type filter if specified
-      if (widget.selectedVehicleTypes.isNotEmpty) {
-        query =
-            query.where('type', whereIn: widget.selectedVehicleTypes.toList());
+      // Handle both num and String price values
+      double numPrice;
+      if (price is num) {
+        numPrice = price.toDouble();
+      } else if (price is String) {
+        numPrice = double.tryParse(price) ?? 0.0;
+      } else {
+        return false;
       }
 
-      // Only show available vehicles
-      query = query.where('status', isEqualTo: 'available');
+      return numPrice >= _priceRange.start && numPrice <= _priceRange.end;
+    }).toList();
+    print("After price filter: ${results.length}");
 
-      // Execute the query
-      final QuerySnapshot snapshot = await query.get();
+    // Apply rent mode filter
+    if (_selectedRentModes.isNotEmpty) {
+      results = results.where((vehicle) {
+        final rentMode = vehicle['rentalConditions']?['rentMode'];
+        if (rentMode == null) return false;
 
-      // Convert to list of maps
-      List<Map<String, dynamic>> results = [];
+        // Handle special cases in rental modes
+        String normalizedRentMode = rentMode.toString().trim();
 
-      for (var doc in snapshot.docs) {
-        final data = doc.data() as Map<String, dynamic>;
-        // Add the document ID to the data
-        results.add({...data, 'id': doc.id});
-      }
-
-      // Find price range for the filter
-      if (results.isNotEmpty) {
-        double minPrice = double.infinity;
-        double maxPrice = 0;
-
-        for (var vehicle in results) {
-          final price = vehicle['pricing']?['daily']?['vehicleOnly']?['price'];
-          if (price != null && price is num) {
-            if (price < minPrice) minPrice = price.toDouble();
-            if (price > maxPrice) maxPrice = price.toDouble();
-          }
+        // For "With or Without Driver" match either "With Driver" or "Vehicle Only"
+        if (normalizedRentMode == 'With or Without Driver') {
+          return _selectedRentModes
+              .any((mode) => mode == 'With Driver' || mode == 'Vehicle Only');
         }
 
-        // Add a margin to the max price
-        maxPrice = maxPrice + 5000;
-        if (maxPrice > 50000) maxPrice = 50000;
-        if (minPrice == double.infinity) minPrice = 0;
-
-        setState(() {
-          _priceRange = RangeValues(minPrice, maxPrice);
-        });
-      }
-
-      // Store the results and apply filtering
-      setState(() {
-        _filteredResults = results;
-        _isLoading = false;
-      });
-
-      // Apply initial filters
-      _applyFilters();
-    } catch (e) {
-      setState(() {
-        _errorMessage = 'Error loading vehicles: $e';
-        _isLoading = false;
-      });
-    }
-  }
-
-  void _applyFilters() {
-    setState(() {
-      _isLoading = true;
-    });
-
-    try {
-      // Start with all results
-      List<Map<String, dynamic>> results = widget.initialResults != null
-          ? List.from(widget.initialResults!)
-          : _filteredResults;
-
-      // Apply location filter
-      if (widget.location.isNotEmpty) {
-        results = results.where((vehicle) {
-          final collectionPoint =
-              vehicle['collectionPoint'] as Map<String, dynamic>?;
-          if (collectionPoint == null) return false;
-
-          final district = collectionPoint['district'] as String?;
-          final city = collectionPoint['city'] as String?;
-
-          return (district
-                      ?.toLowerCase()
-                      .contains(widget.location.toLowerCase()) ??
-                  false) ||
-              (city?.toLowerCase().contains(widget.location.toLowerCase()) ??
-                  false);
-        }).toList();
-      }
-
-      // Apply vehicle type filter
-      if (_selectedVehicleType != null) {
-        results = results
-            .where((vehicle) => vehicle['type'] == _selectedVehicleType)
-            .toList();
-      }
-
-      // Apply make filter
-      if (_selectedMake != null && _selectedMake!.isNotEmpty) {
-        results = results
-            .where((vehicle) => vehicle['make'] == _selectedMake)
-            .toList();
-      }
-
-      // Apply model filter
-      if (_selectedModel != null && _selectedModel!.isNotEmpty) {
-        results = results
-            .where((vehicle) => vehicle['model'] == _selectedModel)
-            .toList();
-      }
-
-      // Apply price range filter
-      results = results.where((vehicle) {
-        final price = vehicle['pricing']?['daily']?['vehicleOnly']?['price'];
-        if (price == null) return false;
-
-        return price >= _priceRange.start && price <= _priceRange.end;
-      }).toList();
-
-      // Apply rent mode filter
-      if (_selectedRentModes.isNotEmpty) {
-        results = results.where((vehicle) {
-          final rentMode = vehicle['rentalConditions']?['rentMode'];
-          return rentMode != null && _selectedRentModes.contains(rentMode);
-        }).toList();
-      }
-
-      // Apply fuel type filter
-      if (_selectedFuelTypes.isNotEmpty) {
-        results = results.where((vehicle) {
-          final fuelType = vehicle['fuelType'];
-          return fuelType != null && _selectedFuelTypes.contains(fuelType);
-        }).toList();
-      }
-
-      // Apply transmission filter
-      if (_selectedTransmissionTypes.isNotEmpty) {
-        results = results.where((vehicle) {
-          final transmission = vehicle['transmission'];
-          return transmission != null &&
-              _selectedTransmissionTypes.contains(transmission);
-        }).toList();
-      }
-
-      // Apply features filter
-      if (_selectedFeatures.isNotEmpty) {
-        results = results.where((vehicle) {
-          final features =
-              vehicle['extras']?['features'] as Map<String, dynamic>?;
-          if (features == null) return false;
-
-          // Check if all selected features are available in this vehicle
-          for (var feature in _selectedFeatures) {
-            if (features[feature] != true) return false;
-          }
+        // For "Vehicle Only" also match "Self Drive" if it's in the selected modes
+        if (normalizedRentMode == 'Vehicle Only' &&
+            _selectedRentModes.contains('Self Drive')) {
           return true;
-        }).toList();
-      }
+        }
 
-      // Apply sort
-      _sortResults(results);
+        // For "Self Drive" also match "Vehicle Only" if it's in the selected modes
+        if (normalizedRentMode == 'Self Drive' &&
+            _selectedRentModes.contains('Vehicle Only')) {
+          return true;
+        }
 
-      setState(() {
-        _filteredResults = results;
-        _isLoading = false;
-      });
-    } catch (e) {
-      setState(() {
-        _errorMessage = 'Error applying filters: $e';
-        _isLoading = false;
-      });
+        return _selectedRentModes.contains(normalizedRentMode);
+      }).toList();
+      print("After rentMode filter: ${results.length}");
     }
+
+    // Apply fuel type filter with case-insensitive comparison
+    if (_selectedFuelTypes.isNotEmpty) {
+      results = results.where((vehicle) {
+        final fuelType = vehicle['fuelType'];
+        if (fuelType == null) return false;
+
+        final normalizedFuelType = fuelType.toString().trim();
+
+        return _selectedFuelTypes.any(
+            (type) => type.toLowerCase() == normalizedFuelType.toLowerCase());
+      }).toList();
+      print("After fuelType filter: ${results.length}");
+    }
+
+    // Apply transmission filter with case-insensitive comparison
+    if (_selectedTransmissionTypes.isNotEmpty) {
+      results = results.where((vehicle) {
+        final transmission = vehicle['transmission'];
+        if (transmission == null) return false;
+
+        final normalizedTransmission = transmission.toString().trim();
+
+        return _selectedTransmissionTypes.any((type) =>
+            type.toLowerCase() == normalizedTransmission.toLowerCase());
+      }).toList();
+      print("After transmission filter: ${results.length}");
+    }
+
+    // Apply features filter - only include vehicles that have ALL selected features
+    if (_selectedFeatures.isNotEmpty) {
+      results = results.where((vehicle) {
+        final features =
+            vehicle['extras']?['features'] as Map<String, dynamic>?;
+        if (features == null) return false;
+
+        // Check if vehicle has all selected features
+        for (var feature in _selectedFeatures) {
+          bool featureFound = false;
+
+          // Check exact match first
+          if (features[feature] == true) {
+            featureFound = true;
+          } else {
+            // Try case-insensitive matches for feature keys
+            for (var key in features.keys) {
+              if (key.toString().toLowerCase() == feature.toLowerCase() &&
+                  features[key] == true) {
+                featureFound = true;
+                break;
+              }
+            }
+          }
+
+          if (!featureFound) return false;
+        }
+        return true;
+      }).toList();
+      print("After features filter: ${results.length}");
+    }
+
+    // Apply sort - make sure we have a default sorting option
+    if (_selectedSortOption.isEmpty) {
+      _selectedSortOption = 'price_low_to_high';
+    }
+    _sortResults(results);
+
+    // Update state with filtered results
+    setState(() {
+      _filteredResults = results;
+    });
+    print("Final filtered results: ${_filteredResults.length}");
   }
 
+  // Update the sort method to handle different data types
   void _sortResults(List<Map<String, dynamic>> results) {
     switch (_selectedSortOption) {
       case 'price_low_to_high':
         results.sort((a, b) {
-          final aPrice = a['pricing']?['daily']?['vehicleOnly']?['price'] ?? 0;
-          final bPrice = b['pricing']?['daily']?['vehicleOnly']?['price'] ?? 0;
+          final aPrice = _extractNumericPrice(
+              a['pricing']?['daily']?['vehicleOnly']?['price']);
+          final bPrice = _extractNumericPrice(
+              b['pricing']?['daily']?['vehicleOnly']?['price']);
           return aPrice.compareTo(bPrice);
         });
         break;
       case 'price_high_to_low':
         results.sort((a, b) {
-          final aPrice = a['pricing']?['daily']?['vehicleOnly']?['price'] ?? 0;
-          final bPrice = b['pricing']?['daily']?['vehicleOnly']?['price'] ?? 0;
+          final aPrice = _extractNumericPrice(
+              a['pricing']?['daily']?['vehicleOnly']?['price']);
+          final bPrice = _extractNumericPrice(
+              b['pricing']?['daily']?['vehicleOnly']?['price']);
           return bPrice.compareTo(aPrice);
         });
         break;
@@ -327,12 +268,31 @@ class _FilterResultsScreenState extends State<FilterResultsScreen> {
         break;
       case 'rating':
         results.sort((a, b) {
-          final aRating = a['rating'] ?? 0;
-          final bRating = b['rating'] ?? 0;
+          final aRating = _extractNumericRating(a['rating']);
+          final bRating = _extractNumericRating(b['rating']);
           return bRating.compareTo(aRating);
         });
         break;
     }
+  }
+
+  // Add helper methods to safely extract numeric values
+  double _extractNumericPrice(dynamic price) {
+    if (price == null) return 0.0;
+    if (price is num) return price.toDouble();
+    if (price is String) {
+      return double.tryParse(price.replaceAll(RegExp(r'[^0-9.]'), '')) ?? 0.0;
+    }
+    return 0.0;
+  }
+
+  double _extractNumericRating(dynamic rating) {
+    if (rating == null) return 0.0;
+    if (rating is num) return rating.toDouble();
+    if (rating is String) {
+      return double.tryParse(rating) ?? 0.0;
+    }
+    return 0.0;
   }
 
   void _toggleFeature(String feature) {
@@ -343,7 +303,6 @@ class _FilterResultsScreenState extends State<FilterResultsScreen> {
         _selectedFeatures.add(feature);
       }
     });
-    _applyFilters();
   }
 
   void _toggleFuelType(String fuelType) {
@@ -354,7 +313,6 @@ class _FilterResultsScreenState extends State<FilterResultsScreen> {
         _selectedFuelTypes.add(fuelType);
       }
     });
-    _applyFilters();
   }
 
   void _toggleTransmissionType(String transmissionType) {
@@ -365,7 +323,6 @@ class _FilterResultsScreenState extends State<FilterResultsScreen> {
         _selectedTransmissionTypes.add(transmissionType);
       }
     });
-    _applyFilters();
   }
 
   void _toggleRentMode(String rentMode) {
@@ -376,7 +333,6 @@ class _FilterResultsScreenState extends State<FilterResultsScreen> {
         _selectedRentModes.add(rentMode);
       }
     });
-    _applyFilters();
   }
 
   void _updatePriceRange(RangeValues values) {
@@ -385,15 +341,10 @@ class _FilterResultsScreenState extends State<FilterResultsScreen> {
     });
   }
 
-  void _applyPriceRangeFilter() {
-    _applyFilters();
-  }
-
   void _changeSortOption(String option) {
     setState(() {
       _selectedSortOption = option;
     });
-    _applyFilters();
   }
 
   void _resetFilters() {
@@ -402,264 +353,324 @@ class _FilterResultsScreenState extends State<FilterResultsScreen> {
       _selectedFuelTypes = {};
       _selectedTransmissionTypes = {};
       _selectedRentModes = {};
-      _selectedMake = widget.make;
-      _selectedModel = widget.model;
-    });
-    _applyFilters();
-  }
 
-  // Navigate to search results with the filtered data
-  void _showFilteredResults() {
-    Navigator.pop(context, _filteredResults);
+      // Reset price range to the initial range
+      if (widget.initialResults.isNotEmpty) {
+        double minPrice = double.infinity;
+        double maxPrice = 0;
+
+        for (var vehicle in widget.initialResults) {
+          final price = vehicle['pricing']?['daily']?['vehicleOnly']?['price'];
+          if (price != null && price is num) {
+            if (price < minPrice) minPrice = price.toDouble();
+            if (price > maxPrice) maxPrice = price.toDouble();
+          }
+        }
+
+        maxPrice = maxPrice + 5000;
+        if (maxPrice > 50000) maxPrice = 50000;
+        if (minPrice == double.infinity) minPrice = 0;
+
+        _priceRange = RangeValues(minPrice, maxPrice);
+      } else {
+        _priceRange = RangeValues(0, 50000);
+      }
+
+      _filteredResults = List.from(widget.initialResults);
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDarkMode = theme.brightness == Brightness.dark;
+    final screenSize = MediaQuery.of(context).size;
 
-    return Scaffold(
-      backgroundColor:
-          isDarkMode ? AppColors.neutralDark : AppColors.neutralBackground,
-      appBar: AppBar(
-        backgroundColor: AppColors.primary,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () => Navigator.pop(context),
-        ),
-        title: const Text(
-          'Filter Results',
-          style: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-            fontSize: 18,
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: _resetFilters,
-            child: Text(
-              'Reset',
-              style: TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
+    return Container(
+      width: screenSize.width * 0.85,
+      height: screenSize.height,
+      decoration: BoxDecoration(
+        color: isDarkMode ? AppColors.neutralDark : Colors.white,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.3),
+            spreadRadius: 1,
+            blurRadius: 10,
+            offset: const Offset(-5, 0),
           ),
         ],
       ),
-      body: Column(
+      child: Column(
         children: [
-          // Filter options section
+          // Header
+          Container(
+            padding: const EdgeInsets.fromLTRB(16, 32, 16, 16),
+            color: isDarkMode ? Colors.black : AppColors.primary,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text(
+                  'Filter Results',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.close, color: Colors.white),
+                  onPressed: () => Navigator.pop(context),
+                ),
+              ],
+            ),
+          ),
+
+          // Filters content
           Expanded(
             child: SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Sort options
-                    Text(
-                      'Sort By',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: isDarkMode ? Colors.white : Colors.black87,
-                      ),
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Sort options
+                  Text(
+                    'Sort By',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: isDarkMode ? Colors.white : Colors.black87,
                     ),
-                    const SizedBox(height: 8),
-                    SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      child: Row(
-                        children: [
-                          _buildSortOption(
-                              'price_low_to_high', 'Price: Low to High'),
-                          _buildSortOption(
-                              'price_high_to_low', 'Price: High to Low'),
-                          _buildSortOption('newest_first', 'Newest First'),
-                          _buildSortOption('rating', 'Highest Rated'),
-                        ],
-                      ),
-                    ),
-
-                    const SizedBox(height: 20),
-
-                    // Price range filter
-                    Text(
-                      'Price Range (LKR per day)',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: isDarkMode ? Colors.white : Colors.black87,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Row(
+                  ),
+                  const SizedBox(height: 8),
+                  SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
                       children: [
-                        Text(
-                          'LKR ${_priceRange.start.round()}',
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: isDarkMode ? Colors.white70 : Colors.black54,
-                          ),
+                        _buildSortOption(
+                            'price_low_to_high', 'Price: Low to High'),
+                        _buildSortOption(
+                            'price_high_to_low', 'Price: High to Low'),
+                        _buildSortOption('newest_first', 'Newest First'),
+                        _buildSortOption('rating', 'Highest Rated'),
+                      ],
+                    ),
+                  ),
+
+                  const SizedBox(height: 20),
+
+                  // Price range filter
+                  Text(
+                    'Price Range (LKR per day)',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: isDarkMode ? Colors.white : Colors.black87,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      Text(
+                        'LKR ${_priceRange.start.round()}',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: isDarkMode ? Colors.white70 : Colors.black54,
                         ),
-                        Expanded(
-                          child: RangeSlider(
-                            values: _priceRange,
-                            min: 0,
-                            max: 50000,
-                            divisions: 50,
-                            activeColor: AppColors.primary,
-                            inactiveColor: AppColors.primary.withOpacity(0.3),
-                            labels: RangeLabels(
-                              'LKR ${_priceRange.start.round()}',
-                              'LKR ${_priceRange.end.round()}',
-                            ),
-                            onChanged: _updatePriceRange,
-                            onChangeEnd: (_) => _applyPriceRangeFilter(),
+                      ),
+                      Expanded(
+                        child: RangeSlider(
+                          values: _priceRange,
+                          min: 0,
+                          max: 50000,
+                          divisions: 50,
+                          activeColor: AppColors.primary,
+                          inactiveColor: AppColors.primary.withOpacity(0.3),
+                          labels: RangeLabels(
+                            'LKR ${_priceRange.start.round()}',
+                            'LKR ${_priceRange.end.round()}',
                           ),
+                          onChanged: _updatePriceRange,
                         ),
-                        Text(
-                          'LKR ${_priceRange.end.round()}',
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: isDarkMode ? Colors.white70 : Colors.black54,
-                          ),
+                      ),
+                      Text(
+                        'LKR ${_priceRange.end.round()}',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: isDarkMode ? Colors.white70 : Colors.black54,
                         ),
-                      ],
-                    ),
-
-                    const SizedBox(height: 20),
-
-                    // Rent mode section
-                    Text(
-                      'Rent Mode',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: isDarkMode ? Colors.white : Colors.black87,
                       ),
-                    ),
-                    const SizedBox(height: 8),
-                    Wrap(
-                      spacing: 8,
-                      runSpacing: 8,
-                      children: [
-                        _buildFilterChip('Vehicle Only', 'Vehicle Only'),
-                        _buildFilterChip('With Driver', 'With Driver'),
-                        _buildFilterChip('Self Drive', 'Self Drive'),
-                      ],
-                    ),
+                    ],
+                  ),
 
-                    const SizedBox(height: 20),
+                  const SizedBox(height: 20),
 
-                    // Fuel type section
-                    Text(
-                      'Fuel Type',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: isDarkMode ? Colors.white : Colors.black87,
-                      ),
+                  // Rent mode section
+                  Text(
+                    'Rent Mode',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: isDarkMode ? Colors.white : Colors.black87,
                     ),
-                    const SizedBox(height: 8),
-                    Wrap(
-                      spacing: 8,
-                      runSpacing: 8,
-                      children: [
-                        _buildFuelTypeChip('Petrol'),
-                        _buildFuelTypeChip('Diesel'),
-                        _buildFuelTypeChip('Electric'),
-                        _buildFuelTypeChip('Hybrid'),
-                      ],
-                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: [
+                      _buildFilterChip(
+                          'Vehicle Only', _selectedRentModes, _toggleRentMode),
+                      _buildFilterChip(
+                          'With Driver', _selectedRentModes, _toggleRentMode),
+                      _buildFilterChip(
+                          'Self Drive', _selectedRentModes, _toggleRentMode),
+                    ],
+                  ),
 
-                    const SizedBox(height: 20),
+                  const SizedBox(height: 20),
 
-                    // Transmission section
-                    Text(
-                      'Transmission',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: isDarkMode ? Colors.white : Colors.black87,
-                      ),
+                  // Fuel type section
+                  Text(
+                    'Fuel Type',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: isDarkMode ? Colors.white : Colors.black87,
                     ),
-                    const SizedBox(height: 8),
-                    Wrap(
-                      spacing: 8,
-                      runSpacing: 8,
-                      children: [
-                        _buildTransmissionChip('Automatic'),
-                        _buildTransmissionChip('Manual'),
-                      ],
-                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: [
+                      _buildFilterChip(
+                          'Petrol', _selectedFuelTypes, _toggleFuelType),
+                      _buildFilterChip(
+                          'Diesel', _selectedFuelTypes, _toggleFuelType),
+                      _buildFilterChip(
+                          'Electric', _selectedFuelTypes, _toggleFuelType),
+                      _buildFilterChip(
+                          'Hybrid', _selectedFuelTypes, _toggleFuelType),
+                    ],
+                  ),
 
-                    const SizedBox(height: 20),
+                  const SizedBox(height: 20),
 
-                    // Features section
-                    Text(
-                      'Features',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: isDarkMode ? Colors.white : Colors.black87,
-                      ),
+                  // Transmission section
+                  Text(
+                    'Transmission',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: isDarkMode ? Colors.white : Colors.black87,
                     ),
-                    const SizedBox(height: 8),
-                    Wrap(
-                      spacing: 8,
-                      runSpacing: 8,
-                      children: _commonFeatures
-                          .map((feature) => _buildFeatureChip(feature))
-                          .toList(),
+                  ),
+                  const SizedBox(height: 8),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: [
+                      _buildFilterChip('Automatic', _selectedTransmissionTypes,
+                          _toggleTransmissionType),
+                      _buildFilterChip('Manual', _selectedTransmissionTypes,
+                          _toggleTransmissionType),
+                    ],
+                  ),
+
+                  const SizedBox(height: 20),
+
+                  // Features section
+                  Text(
+                    'Features',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: isDarkMode ? Colors.white : Colors.black87,
                     ),
-                  ],
-                ),
+                  ),
+                  const SizedBox(height: 8),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: _commonFeatures
+                        .map((feature) => _buildFilterChip(
+                            feature, _selectedFeatures, _toggleFeature))
+                        .toList(),
+                  ),
+                ],
               ),
             ),
           ),
 
-          // Results count and apply button
+          // Bottom buttons
           Container(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             decoration: BoxDecoration(
               color: isDarkMode ? Colors.black : Colors.white,
               boxShadow: [
                 BoxShadow(
                   color: Colors.black.withOpacity(0.1),
-                  spreadRadius: 1,
-                  blurRadius: 1,
-                  offset: Offset(0, -1),
+                  spreadRadius: 0,
+                  blurRadius: 5,
+                  offset: const Offset(0, -3),
                 ),
               ],
             ),
             child: Row(
               children: [
+                // Close button
                 Expanded(
-                  child: Text(
-                    _isLoading
-                        ? 'Loading results...'
-                        : '${_filteredResults.length} vehicles found',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
+                  flex: 1,
+                  child: TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    style: TextButton.styleFrom(
+                      foregroundColor: AppColors.primary,
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        side: BorderSide(color: AppColors.primary),
+                      ),
                     ),
+                    child: const Text('CLOSE'),
                   ),
                 ),
-                ElevatedButton(
-                  onPressed: _showFilteredResults,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primary,
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 24, vertical: 12),
-                  ),
-                  child: const Text(
-                    'APPLY FILTERS',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
+                const SizedBox(width: 12),
+
+                // Apply button
+                Expanded(
+                  flex: 2,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      // Apply filters
+                      _applyFilters();
+
+                      // Pass filtered results and all filter state back to parent
+                      widget.onFiltersApplied(
+                          _filteredResults,
+                          _selectedSortOption,
+                          _priceRange,
+                          _selectedFeatures,
+                          _selectedFuelTypes,
+                          _selectedTransmissionTypes,
+                          _selectedRentModes);
+
+                      // Close the drawer
+                      Navigator.pop(context);
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primary,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    child: const Text(
+                      'APPLY FILTERS',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14,
+                      ),
                     ),
                   ),
                 ),
@@ -697,45 +708,13 @@ class _FilterResultsScreenState extends State<FilterResultsScreen> {
     );
   }
 
-  Widget _buildFilterChip(String rentMode, String label) {
-    final isSelected = _selectedRentModes.contains(rentMode);
+  Widget _buildFilterChip(
+      String label, Set<String> selectedItems, Function(String) onToggle) {
+    final isSelected = selectedItems.contains(label);
     return FilterChip(
       selected: isSelected,
       label: Text(label),
-      onSelected: (_) => _toggleRentMode(rentMode),
-      selectedColor: AppColors.primary.withOpacity(0.2),
-      checkmarkColor: AppColors.primary,
-    );
-  }
-
-  Widget _buildFuelTypeChip(String fuelType) {
-    final isSelected = _selectedFuelTypes.contains(fuelType);
-    return FilterChip(
-      selected: isSelected,
-      label: Text(fuelType),
-      onSelected: (_) => _toggleFuelType(fuelType),
-      selectedColor: AppColors.primary.withOpacity(0.2),
-      checkmarkColor: AppColors.primary,
-    );
-  }
-
-  Widget _buildTransmissionChip(String transmissionType) {
-    final isSelected = _selectedTransmissionTypes.contains(transmissionType);
-    return FilterChip(
-      selected: isSelected,
-      label: Text(transmissionType),
-      onSelected: (_) => _toggleTransmissionType(transmissionType),
-      selectedColor: AppColors.primary.withOpacity(0.2),
-      checkmarkColor: AppColors.primary,
-    );
-  }
-
-  Widget _buildFeatureChip(String feature) {
-    final isSelected = _selectedFeatures.contains(feature);
-    return FilterChip(
-      selected: isSelected,
-      label: Text(feature),
-      onSelected: (_) => _toggleFeature(feature),
+      onSelected: (_) => onToggle(label),
       selectedColor: AppColors.primary.withOpacity(0.2),
       checkmarkColor: AppColors.primary,
     );
