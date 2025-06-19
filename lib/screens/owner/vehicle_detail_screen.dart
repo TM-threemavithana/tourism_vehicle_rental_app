@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:carousel_slider/carousel_slider.dart';
+// Remove carousel_slider import
 import 'package:cached_network_image/cached_network_image.dart';
 
 class VehicleDetailScreen extends StatefulWidget {
@@ -19,6 +19,8 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
   int _currentImageIndex = 0;
   List<String> _imageUrls = [];
   Map<String, dynamic> _vehicleDetails = {};
+  // Add PageController for images
+  final PageController _pageController = PageController();
 
   bool get isDarkMode => Theme.of(context).brightness == Brightness.dark;
 
@@ -28,11 +30,15 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
     _tabController = TabController(length: 4, vsync: this);
     _vehicleDetails = widget.vehicle;
 
-    // Add this debug call
     _debugPrintVehicleData();
-
-    // Extract all images
     _extractImages();
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    _pageController.dispose(); // Dispose the page controller
+    super.dispose();
   }
 
   void _extractImages() {
@@ -58,12 +64,6 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
   }
 
   @override
-  void dispose() {
-    _tabController.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
@@ -78,23 +78,20 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
             flexibleSpace: FlexibleSpaceBar(
               background: Stack(
                 children: [
-                  // Image carousel
-                  CarouselSlider(
-                    options: CarouselOptions(
-                      height: 300,
-                      viewportFraction: 1.0,
-                      enlargeCenterPage: false,
-                      onPageChanged: (index, reason) {
-                        setState(() {
-                          _currentImageIndex = index;
-                        });
-                      },
-                    ),
-                    items: _imageUrls.isNotEmpty
-                        ? _imageUrls
-                            .map((url) => _buildCarouselItem(url))
-                            .toList()
-                        : [_buildPlaceholderImage()],
+                  // Replace CarouselSlider with PageView
+                  PageView.builder(
+                    controller: _pageController,
+                    itemCount: _imageUrls.isNotEmpty ? _imageUrls.length : 1,
+                    onPageChanged: (index) {
+                      setState(() {
+                        _currentImageIndex = index;
+                      });
+                    },
+                    itemBuilder: (context, index) {
+                      return _imageUrls.isNotEmpty
+                          ? _buildCarouselItem(_imageUrls[index])
+                          : _buildPlaceholderImage();
+                    },
                   ),
 
                   // Dots indicator

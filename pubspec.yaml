@@ -37,13 +37,13 @@ dependencies:
   firebase_core: ^2.26.0
   firebase_auth: ^4.17.0
   google_sign_in: ^6.2.1  # Add this line
-  cached_network_image: ^3.4.0
+  cached_network_image: ^3.3.0
   cloud_firestore: ^4.15.5  # Add this line
   cloudinary_public: ^0.21.0   # Add this for Cloudinary upload
   image_picker: ^1.0.7         # Add this for picking images from gallery/camera
   fl_chart: ^0.65.0
-  intl: ^0.18.0
-  carousel_slider: ^5.1.1
+  intl: ^0.18.1
+  carousel_slider: ^4.2.1
   flutter_datetime_picker_plus: ^2.1.0
 
 dev_dependencies:
@@ -103,3 +103,6 @@ flutter:
         - asset: assets/fonts/Montserrat-Regular.ttf
         - asset: assets/fonts/Montserrat-Bold.ttf
           weight: 700
+
+dependency_overrides:
+  carousel_slider: 4.2.1  # Use the version you're currently using
