@@ -26,14 +26,20 @@ class _VehicleDetailPageState extends State<VehicleDetailPage> {
   void initState() {
     super.initState();
     _vehicleDetails = widget.vehicle;
+    _debugPrintVehicleImages(); // Add this for debugging
+  }
+
+  // Debug method to check image structure
+  void _debugPrintVehicleImages() {
+    debugPrint('Vehicle data: ${widget.vehicle['id']}');
+    debugPrint('Image data: ${widget.vehicle['images']}');
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CustomAppBar(
-        title:
-            "${widget.vehicle['make'] ?? ''} ${widget.vehicle['model'] ?? ''}",
+        title: "${widget.vehicle['make'] ?? ''} ${widget.vehicle['model'] ?? ''}",
         vehicleDetails: widget.vehicle,
         showBackButton: true,
         showShareButton: true,
