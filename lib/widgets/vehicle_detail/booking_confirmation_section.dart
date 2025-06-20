@@ -628,7 +628,7 @@ class _BookingConfirmationSectionState
     } else if (_requestStatus == "pending") {
       return "Request Pending";
     } else {
-      return "Booking Summary";
+      return "Booking Confirmation";
     }
   }
 

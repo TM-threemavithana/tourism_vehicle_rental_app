@@ -16,13 +16,20 @@ class BookingFormSection extends StatefulWidget {
 }
 
 class _BookingFormSectionState extends State<BookingFormSection> {
+  // Current booking details that update as user makes changes
   DateTime _pickupDate = DateTime.now().add(const Duration(days: 1));
   TimeOfDay _pickupTime = const TimeOfDay(hour: 10, minute: 0);
   DateTime _returnDate = DateTime.now().add(const Duration(days: 2));
   TimeOfDay _returnTime = const TimeOfDay(hour: 10, minute: 0);
   bool _withDriver = false;
-  // We're removing the _showConfirmation flag since we always want to show it
-  bool _hasApplied = false; // This tracks if Apply has been clicked
+  bool _hasApplied = false;
+
+  // Confirmation values that only update when Apply is clicked
+  DateTime _confirmedPickupDate = DateTime.now().add(const Duration(days: 1));
+  TimeOfDay _confirmedPickupTime = const TimeOfDay(hour: 10, minute: 0);
+  DateTime _confirmedReturnDate = DateTime.now().add(const Duration(days: 2));
+  TimeOfDay _confirmedReturnTime = const TimeOfDay(hour: 10, minute: 0);
+  bool _confirmedWithDriver = false;
 
   String _formatDateTime(DateTime date, TimeOfDay time) {
     final formattedDate = DateFormat('MMM dd, yyyy').format(date);
@@ -72,6 +79,13 @@ class _BookingFormSectionState extends State<BookingFormSection> {
   void _applyForBooking() {
     setState(() {
       _hasApplied = true;
+
+      // Update confirmed values only when Apply is clicked
+      _confirmedPickupDate = _pickupDate;
+      _confirmedPickupTime = _pickupTime;
+      _confirmedReturnDate = _returnDate;
+      _confirmedReturnTime = _returnTime;
+      _confirmedWithDriver = _withDriver;
     });
 
     // For debugging - print the booking details
@@ -265,14 +279,14 @@ class _BookingFormSectionState extends State<BookingFormSection> {
 
         const SizedBox(height: 16),
 
-        // Always show the booking confirmation section, but use different styling based on whether user has applied
+        // Always show the booking confirmation section, but pass the confirmed values
         BookingConfirmationSection(
           vehicleDetails: widget.vehicleDetails,
-          pickupDate: _pickupDate,
-          pickupTime: _pickupTime,
-          returnDate: _returnDate,
-          returnTime: _returnTime,
-          withDriver: _withDriver,
+          pickupDate: _confirmedPickupDate,
+          pickupTime: _confirmedPickupTime,
+          returnDate: _confirmedReturnDate,
+          returnTime: _confirmedReturnTime,
+          withDriver: _confirmedWithDriver,
           hasApplied: _hasApplied,
         ),
       ],
