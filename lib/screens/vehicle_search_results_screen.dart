@@ -5,6 +5,7 @@ import '../utils/app_colors.dart';
 import 'filter_results.dart';
 import 'vehicle_detail_page.dart';
 import '../services/favorites_service.dart';
+import '../helpers/car_logo_helper.dart'; // Add this import at the top
 
 class VehicleSearchResultsScreen extends StatefulWidget {
   final Set<String> selectedVehicleTypes;
@@ -347,9 +348,11 @@ class _VehicleSearchResultsScreenState
     );
   }
 
-  // Replace the _buildVehicleCard method with this updated version:
-  Widget _buildVehicleCard(BuildContext context, Map<String, dynamic> vehicle, bool isDarkMode) {
+  // Update the vehicle card in the search results
+  Widget _buildVehicleCard(
+      BuildContext context, Map<String, dynamic> vehicle, bool isDarkMode) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final String make = vehicle['make'] ?? 'Unknown';
 
     return GestureDetector(
       onTap: () {
@@ -444,17 +447,19 @@ class _VehicleSearchResultsScreenState
                   children: [
                     Row(
                       children: [
+                        // Replace the generic car icon container with car logo
                         Container(
                           width: 24,
                           height: 24,
                           decoration: BoxDecoration(
-                            color: AppColors.primary,
+                            color: isDarkMode
+                                ? Colors.grey[800]
+                                : Colors.grey[100],
                             borderRadius: BorderRadius.circular(4),
                           ),
-                          child: const Icon(
-                            Icons.directions_car,
-                            color: Colors.white,
-                            size: 16,
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(4),
+                            child: CarLogoHelper.getCarLogo(make),
                           ),
                         ),
                         const SizedBox(width: 8),
@@ -618,7 +623,7 @@ class _VehicleSearchResultsScreenState
   // Also fix the buildResultsListView method:
   Widget _buildResultsListView() {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    
+
     return ListView.builder(
       padding: const EdgeInsets.all(16),
       itemCount: _searchResults.length,
