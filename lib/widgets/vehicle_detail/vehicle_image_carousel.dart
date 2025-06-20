@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:share_plus/share_plus.dart';
-import '../../services/favorites_service.dart';
 
 class VehicleImageCarousel extends StatefulWidget {
   final Map<String, dynamic> vehicleDetails;
@@ -18,16 +16,12 @@ class VehicleImageCarousel extends StatefulWidget {
 class _VehicleImageCarouselState extends State<VehicleImageCarousel> {
   int _currentImageIndex = 0;
   final PageController _pageController = PageController();
-  final FavoritesService _favoritesService = FavoritesService();
-  bool _isFavorite = false;
-  bool _loading = true;
   List<String> _imageUrls = [];
 
   @override
   void initState() {
     super.initState();
     _extractImages();
-    _checkFavoriteStatus();
   }
 
   void _extractImages() {
@@ -58,99 +52,12 @@ class _VehicleImageCarouselState extends State<VehicleImageCarousel> {
     }
   }
 
-  Future<void> _checkFavoriteStatus() async {
-    try {
-      bool isFav = await _favoritesService.isFavorite(widget.vehicleDetails['id']);
-      if (mounted) {
-        setState(() {
-          _isFavorite = isFav;
-          _loading = false;
-        });
-      }
-    } catch (e) {
-      if (mounted) {
-        setState(() {
-          _loading = false;
-        });
-      }
-    }
-  }
-
-  Future<void> _toggleFavorite() async {
-    try {
-      final bool newStatus = await _favoritesService.toggleFavorite(widget.vehicleDetails);
-      if (mounted) {
-        setState(() {
-          _isFavorite = newStatus;
-        });
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(_isFavorite 
-              ? 'Added to favorites' 
-              : 'Removed from favorites'),
-            duration: const Duration(seconds: 2),
-          ),
-        );
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error: $e'),
-            duration: const Duration(seconds: 2),
-          ),
-        );
-      }
-    }
-  }
-
-  Future<void> _shareVehicle() async {
-    try {
-      // Create a shareable text with vehicle details
-      final String vehicleName = '${widget.vehicleDetails['make'] ?? ''} ${widget.vehicleDetails['model'] ?? ''}';
-      final String vehicleType = widget.vehicleDetails['type'] ?? 'Vehicle';
-      final String year = widget.vehicleDetails['year'] != null ? '(${widget.vehicleDetails['year']})' : '';
-      final String transmission = widget.vehicleDetails['transmission'] ?? '';
-      final String fuelType = widget.vehicleDetails['fuelType'] ?? '';
-      
-      // Get price information
-      String priceText = 'Contact for pricing';
-      if (widget.vehicleDetails['pricing']?['daily']?['vehicleOnly']?['price'] != null) {
-        final price = widget.vehicleDetails['pricing']['daily']['vehicleOnly']['price'];
-        priceText = 'LKR ${price.toString()}/day';
-      }
-      
-      // Get location
-      final String location = '${widget.vehicleDetails['collectionPoint']?['city'] ?? ''} ${widget.vehicleDetails['collectionPoint']?['district'] ?? ''}';
-      
-      // Construct share text
-      String shareText = 'Check out this $vehicleType: $vehicleName $year\n\n'
-          '• $transmission, $fuelType\n'
-          '• Price: $priceText\n'
-          '• Location: $location\n\n'
-          'Find this and more vehicles on Tourism Vehicle Rental App!';
-      
-      // Include image if available
-      final String? imageUrl = _imageUrls.isNotEmpty ? _imageUrls[0] : null;
-      
-      // Share using share_plus package
-      await Share.share(shareText, subject: 'Check out this $vehicleName!');
-      
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error sharing: $e')),
-      );
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
-    return SliverAppBar(
-      expandedHeight: 300,
-      pinned: true,
-      backgroundColor: Colors.black,
-      flexibleSpace: FlexibleSpaceBar(
-        background: Stack(
+    return SliverToBoxAdapter(
+      child: SizedBox(
+        height: 300,
+        child: Stack(
           children: [
             // PageView for swiping through images
             PageView.builder(
@@ -222,47 +129,8 @@ class _VehicleImageCarouselState extends State<VehicleImageCarousel> {
                   }).toList(),
                 ),
               ),
-              
-            // Favorite button
-            Positioned(
-              top: 8,
-              right: 8,
-              child: IconButton(
-                icon: _loading 
-                    ? const SizedBox(
-                        width: 24, 
-                        height: 24, 
-                        child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-                    : Icon(
-                        _isFavorite ? Icons.favorite : Icons.favorite_border,
-                        color: _isFavorite ? Colors.red : Colors.white,
-                      ),
-                onPressed: _toggleFavorite,
-              ),
-            ),
-            
-            // Share button
-            Positioned(
-              top: 8,
-              right: 56,
-              child: IconButton(
-                icon: const Icon(Icons.share, color: Colors.white),
-                onPressed: _shareVehicle,
-              ),
-            ),
           ],
         ),
-      ),
-      leading: IconButton(
-        icon: Container(
-          padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            color: Colors.black.withOpacity(0.4),
-            shape: BoxShape.circle,
-          ),
-          child: const Icon(Icons.arrow_back, color: Colors.white),
-        ),
-        onPressed: () => Navigator.pop(context),
       ),
     );
   }

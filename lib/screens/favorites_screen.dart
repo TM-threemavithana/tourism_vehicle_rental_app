@@ -6,6 +6,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import '../models/favorite_model.dart';
 import '../services/favorites_service.dart';
 import '../widgets/side_menu.dart';
+import '../widgets/custom_app_bar.dart';
 import 'vehicle_detail_page.dart';
 
 class FavoritesScreen extends StatefulWidget {
@@ -15,7 +16,8 @@ class FavoritesScreen extends StatefulWidget {
   State<FavoritesScreen> createState() => _FavoritesScreenState();
 }
 
-class _FavoritesScreenState extends State<FavoritesScreen> with SingleTickerProviderStateMixin {
+class _FavoritesScreenState extends State<FavoritesScreen>
+    with SingleTickerProviderStateMixin {
   final FavoritesService _favoritesService = FavoritesService();
   bool _isMenuOpen = false;
   String _currentTab = 'Favorites';
@@ -85,12 +87,13 @@ class _FavoritesScreenState extends State<FavoritesScreen> with SingleTickerProv
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Favorite Vehicles'),
+      appBar: CustomAppBar(
+        title: 'Favorite Vehicles',
+        showBackButton: false,
         backgroundColor: theme.colorScheme.primary,
-        foregroundColor: Colors.white,
-        leading: IconButton(
-          icon: const Icon(Icons.menu),
+        iconColor: Colors.white,
+        leadingWidget: IconButton(
+          icon: const Icon(Icons.menu, color: Colors.white),
           onPressed: _toggleMenu,
         ),
       ),
@@ -156,7 +159,8 @@ class _FavoritesScreenState extends State<FavoritesScreen> with SingleTickerProv
                             style: ElevatedButton.styleFrom(
                               backgroundColor: theme.colorScheme.primary,
                               foregroundColor: Colors.white,
-                              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 24, vertical: 12),
                             ),
                             child: const Text('Browse Vehicles'),
                           ),
@@ -174,9 +178,9 @@ class _FavoritesScreenState extends State<FavoritesScreen> with SingleTickerProv
                       itemCount: favorites.length,
                       itemBuilder: (context, index) {
                         final favorite = favorites[index];
-                        
+
                         return _buildFavoriteCard(
-                          context, 
+                          context,
                           favorite,
                           isDarkMode,
                         );
@@ -252,13 +256,14 @@ class _FavoritesScreenState extends State<FavoritesScreen> with SingleTickerProv
     );
   }
 
-  Widget _buildFavoriteCard(BuildContext context, Favorite favorite, bool isDarkMode) {
+  Widget _buildFavoriteCard(
+      BuildContext context, Favorite favorite, bool isDarkMode) {
     final vehicleData = favorite.vehicleData;
     final theme = Theme.of(context);
-    
+
     // Get main image URL or placeholder
     final String mainImageUrl = _getMainImageUrl(vehicleData);
-    
+
     // Format price
     final price = vehicleData['pricing']?['daily']?['baseRate'] ?? 0;
     final formattedPrice = 'LKR ${_currencyFormat.format(price)}';
@@ -299,13 +304,14 @@ class _FavoritesScreenState extends State<FavoritesScreen> with SingleTickerProv
                     ),
                   ),
                 ),
-                
+
                 // Price badge
                 Positioned(
                   bottom: 12,
                   right: 12,
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                     decoration: BoxDecoration(
                       color: theme.colorScheme.primary,
                       borderRadius: BorderRadius.circular(30),
@@ -319,7 +325,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> with SingleTickerProv
                     ),
                   ),
                 ),
-                
+
                 // Favorite icon button
                 Positioned(
                   top: 8,
@@ -343,7 +349,8 @@ class _FavoritesScreenState extends State<FavoritesScreen> with SingleTickerProv
                   top: 10,
                   left: 10,
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                     decoration: BoxDecoration(
                       color: Colors.black.withOpacity(0.7),
                       borderRadius: BorderRadius.circular(20),
@@ -360,7 +367,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> with SingleTickerProv
                 ),
               ],
             ),
-            
+
             // Vehicle details
             Padding(
               padding: const EdgeInsets.all(12),
@@ -377,7 +384,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> with SingleTickerProv
                     ),
                   ),
                   const SizedBox(height: 6),
-                  
+
                   // Location
                   Row(
                     children: [
@@ -389,10 +396,13 @@ class _FavoritesScreenState extends State<FavoritesScreen> with SingleTickerProv
                       const SizedBox(width: 4),
                       Expanded(
                         child: Text(
-                          vehicleData['collectionPoint']?['district'] ?? 'Location not specified',
+                          vehicleData['collectionPoint']?['district'] ??
+                              'Location not specified',
                           style: TextStyle(
                             fontSize: 14,
-                            color: isDarkMode ? Colors.grey[400] : Colors.grey[700],
+                            color: isDarkMode
+                                ? Colors.grey[400]
+                                : Colors.grey[700],
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
@@ -401,7 +411,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> with SingleTickerProv
                     ],
                   ),
                   const SizedBox(height: 8),
-                  
+
                   // Vehicle specs row
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -449,11 +459,12 @@ class _FavoritesScreenState extends State<FavoritesScreen> with SingleTickerProv
       if (imagesMap['primaryImageUrl'] != null) {
         return imagesMap['primaryImageUrl'].toString();
       }
-      if (imagesMap['additionalImages'] is List && (imagesMap['additionalImages'] as List).isNotEmpty) {
+      if (imagesMap['additionalImages'] is List &&
+          (imagesMap['additionalImages'] as List).isNotEmpty) {
         return (imagesMap['additionalImages'] as List).first.toString();
       }
     }
-    
+
     return 'https://via.placeholder.com/400x250?text=No+Image+Available';
   }
 
@@ -468,8 +479,8 @@ class _FavoritesScreenState extends State<FavoritesScreen> with SingleTickerProv
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(
-            icon, 
-            size: 14, 
+            icon,
+            size: 14,
             color: isDarkMode ? Colors.white70 : Colors.black87,
           ),
           const SizedBox(width: 4),

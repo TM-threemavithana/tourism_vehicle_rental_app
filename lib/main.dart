@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
-import 'services/onesignal_service.dart'; // Use OneSignal service
+import 'services/onesignal_service.dart'; 
+import 'services/dynamic_links_service.dart';
 import 'screens/splash_screen.dart';
 import 'screens/home_screen.dart';
 import 'screens/auth/auth_wrapper.dart';
-import 'screens/favorites_screen.dart'; // Import FavoritesScreen
+import 'screens/favorites_screen.dart'; 
+import 'screens/vehicle_detail_page.dart'; // Add this import
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -27,8 +29,20 @@ void main() async {
   }
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class MyApp extends StatefulWidget {
+  const MyApp({Key? key}) : super(key: key);
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  @override
+  void initState() {
+    super.initState();
+    
+    // Remove or comment out the dynamic links initialization
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -50,7 +64,11 @@ class MyApp extends StatelessWidget {
         '/': (context) => const SplashScreen(),
         '/home': (context) => const HomeScreen(),
         '/auth': (context) => const AuthWrapper(),
-        '/favorites': (context) => const FavoritesScreen(), // Add this line
+        '/favorites': (context) => const FavoritesScreen(),
+        '/vehicle-detail': (context) {
+          final args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>?;
+          return VehicleDetailPage(vehicle: args ?? {});
+        },
       },
     );
   }

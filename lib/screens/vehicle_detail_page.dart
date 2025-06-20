@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../widgets/custom_app_bar.dart';
 import '../widgets/vehicle_detail/vehicle_image_carousel.dart';
 import '../widgets/vehicle_detail/vehicle_info_header.dart';
 import '../widgets/vehicle_detail/vehicle_specifications_section.dart';
@@ -10,9 +11,9 @@ class VehicleDetailPage extends StatefulWidget {
   final Map<String, dynamic> vehicle;
 
   const VehicleDetailPage({
-    super.key,
+    Key? key,
     required this.vehicle,
-  });
+  }) : super(key: key);
 
   @override
   State<VehicleDetailPage> createState() => _VehicleDetailPageState();
@@ -30,6 +31,15 @@ class _VehicleDetailPageState extends State<VehicleDetailPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: CustomAppBar(
+        title:
+            "${widget.vehicle['make'] ?? ''} ${widget.vehicle['model'] ?? ''}",
+        vehicleDetails: widget.vehicle,
+        showBackButton: true,
+        showShareButton: true,
+        showFavoriteButton: true,
+        backgroundColor: Colors.transparent,
+      ),
       body: CustomScrollView(
         slivers: [
           // Image Carousel in App Bar

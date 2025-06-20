@@ -47,7 +47,7 @@ dependencies:
   flutter_datetime_picker_plus: ^2.1.0
   onesignal_flutter: ^5.3.3
   http: ^1.4.0  # Add this line
-  share_plus: ^7.2.1  # Add this line
+  share_plus: ^7.2.1
 
 dev_dependencies:
   flutter_test:
