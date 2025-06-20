@@ -11,9 +11,9 @@ class VehicleDetailPage extends StatefulWidget {
   final Map<String, dynamic> vehicle;
 
   const VehicleDetailPage({
-    Key? key,
+    super.key,
     required this.vehicle,
-  }) : super(key: key);
+  });
 
   @override
   State<VehicleDetailPage> createState() => _VehicleDetailPageState();

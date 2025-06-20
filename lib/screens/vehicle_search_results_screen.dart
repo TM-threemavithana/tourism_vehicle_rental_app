@@ -4,7 +4,6 @@ import 'Refine_search.dart';
 import '../utils/app_colors.dart';
 import 'filter_results.dart';
 import 'vehicle_detail_page.dart';
-import '../services/favorites_service.dart';
 import '../helpers/car_logo_helper.dart'; // Add this import at the top
 
 class VehicleSearchResultsScreen extends StatefulWidget {

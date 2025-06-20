@@ -5,9 +5,9 @@ class VehicleImageCarousel extends StatefulWidget {
   final Map<String, dynamic> vehicleDetails;
 
   const VehicleImageCarousel({
-    Key? key,
+    super.key,
     required this.vehicleDetails,
-  }) : super(key: key);
+  });
 
   @override
   State<VehicleImageCarousel> createState() => _VehicleImageCarouselState();
@@ -83,7 +83,7 @@ class _VehicleImageCarouselState extends State<VehicleImageCarousel> {
   @override
   Widget build(BuildContext context) {
     return SliverToBoxAdapter(
-      child: Container(
+      child: SizedBox(
         height: 300,
         child: Stack(
           children: [

@@ -362,6 +362,9 @@ class _SideMenuState extends State<SideMenu> {
           case 'Search Vehicles':
             Navigator.pushReplacementNamed(context, '/home');
             break;
+          case 'Notifications':
+            Navigator.pushReplacementNamed(context, '/notifications');
+            break;
           // Add other cases as needed
         }
       },

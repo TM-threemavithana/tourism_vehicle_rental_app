@@ -15,7 +15,7 @@ class CustomAppBar extends StatefulWidget implements PreferredSizeWidget {
   final Widget? leadingWidget; // Add this field
 
   const CustomAppBar({
-    Key? key,
+    super.key,
     required this.title,
     this.vehicleDetails,
     this.showBackButton = true,
@@ -25,7 +25,7 @@ class CustomAppBar extends StatefulWidget implements PreferredSizeWidget {
     this.backgroundColor = Colors.transparent,
     this.iconColor = Colors.white,
     this.leadingWidget, // Add this parameter
-  }) : super(key: key);
+  });
 
   @override
   State<CustomAppBar> createState() => _CustomAppBarState();

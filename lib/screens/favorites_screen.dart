@@ -10,7 +10,7 @@ import '../widgets/custom_app_bar.dart';
 import 'vehicle_detail_page.dart';
 
 class FavoritesScreen extends StatefulWidget {
-  const FavoritesScreen({Key? key}) : super(key: key);
+  const FavoritesScreen({super.key});
 
   @override
   State<FavoritesScreen> createState() => _FavoritesScreenState();

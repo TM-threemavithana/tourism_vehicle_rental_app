@@ -71,7 +71,7 @@ class OneSignalService {
 
     try {
       // Get the device state to retrieve the player ID
-      final userId = await OneSignal.User.pushSubscription.id;
+      final userId = OneSignal.User.pushSubscription.id;
       debugPrint("OneSignal Player ID: $userId");
 
       if (userId != null) {

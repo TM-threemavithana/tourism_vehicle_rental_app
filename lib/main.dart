@@ -8,6 +8,7 @@ import 'screens/home_screen.dart';
 import 'screens/auth/auth_wrapper.dart';
 import 'screens/favorites_screen.dart'; 
 import 'screens/vehicle_detail_page.dart'; // Add this import
+import 'screens/notifications_screen.dart'; // Import the new screen
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -30,7 +31,7 @@ void main() async {
 }
 
 class MyApp extends StatefulWidget {
-  const MyApp({Key? key}) : super(key: key);
+  const MyApp({super.key});
 
   @override
   State<MyApp> createState() => _MyAppState();
@@ -69,6 +70,7 @@ class _MyAppState extends State<MyApp> {
           final args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>?;
           return VehicleDetailPage(vehicle: args ?? {});
         },
+        '/notifications': (context) => const NotificationsScreen(), // Add the new route
       },
     );
   }
