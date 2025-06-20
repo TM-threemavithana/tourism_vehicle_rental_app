@@ -9,6 +9,7 @@ import '../../widgets/side_menu.dart';
 import '../profile_screen.dart';
 import 'add_vehicle_screen.dart';
 import 'vehicle_detail_screen.dart'; // Import the vehicle detail screen
+import 'booking_requests_screen.dart'; // Import the booking requests screen
 
 class OwnerDashboardScreen extends StatefulWidget {
   const OwnerDashboardScreen({super.key});
@@ -704,6 +705,38 @@ class _OwnerDashboardScreenState extends State<OwnerDashboardScreen>
 
                                     // Fetch and display vehicles from Firestore
                                     _buildVehiclesList(),
+
+                                    // View All Booking Requests button
+                                    Container(
+                                      margin: const EdgeInsets.only(
+                                          top: 16, bottom: 8),
+                                      width: double.infinity,
+                                      child: OutlinedButton.icon(
+                                        onPressed: () {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    const BookingRequestsScreen()),
+                                          );
+                                        },
+                                        icon: const Icon(Icons.list_alt),
+                                        label: const Text(
+                                            'View All Booking Requests'),
+                                        style: OutlinedButton.styleFrom(
+                                          padding: const EdgeInsets.symmetric(
+                                              vertical: 12),
+                                          side: BorderSide(
+                                              color: Theme.of(context)
+                                                  .colorScheme
+                                                  .primary),
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(8),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
                                   ],
                                 ),
                               ),

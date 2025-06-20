@@ -4,6 +4,7 @@ import 'Refine_search.dart';
 import '../utils/app_colors.dart';
 import 'filter_results.dart';
 import 'vehicle_detail_page.dart';
+import '../services/favorites_service.dart';
 
 class VehicleSearchResultsScreen extends StatefulWidget {
   final Set<String> selectedVehicleTypes;
@@ -346,7 +347,8 @@ class _VehicleSearchResultsScreenState
     );
   }
 
-  Widget _buildVehicleCard(Map<String, dynamic> vehicle) {
+  // Replace the _buildVehicleCard method with this updated version:
+  Widget _buildVehicleCard(BuildContext context, Map<String, dynamic> vehicle, bool isDarkMode) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
     return GestureDetector(
@@ -613,12 +615,15 @@ class _VehicleSearchResultsScreenState
     );
   }
 
+  // Also fix the buildResultsListView method:
   Widget _buildResultsListView() {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    
     return ListView.builder(
       padding: const EdgeInsets.all(16),
       itemCount: _searchResults.length,
       itemBuilder: (context, index) {
-        return _buildVehicleCard(_searchResults[index]);
+        return _buildVehicleCard(context, _searchResults[index], isDarkMode);
       },
     );
   }

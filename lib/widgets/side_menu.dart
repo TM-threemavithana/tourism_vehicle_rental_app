@@ -339,6 +339,8 @@ class _SideMenuState extends State<SideMenu> {
             isActive: widget.currentTab == 'Help & Support'),
         _buildMenuItem(context, Icons.info_outline, 'About',
             isActive: widget.currentTab == 'About'),
+        _buildMenuItem(context, Icons.book_online, 'My Booking Requests',
+            isActive: widget.currentTab == 'My Booking Requests'),
       ];
     }
   }
@@ -350,6 +352,17 @@ class _SideMenuState extends State<SideMenu> {
         widget.onClose();
         if (widget.onTabChange != null) {
           widget.onTabChange!(title);
+        }
+
+        // Add navigation for specific menu items
+        switch (title) {
+          case 'Favorites':
+            Navigator.pushReplacementNamed(context, '/favorites');
+            break;
+          case 'Search Vehicles':
+            Navigator.pushReplacementNamed(context, '/home');
+            break;
+          // Add other cases as needed
         }
       },
       child: Container(

@@ -1,18 +1,30 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
+import 'services/onesignal_service.dart'; // Use OneSignal service
 import 'screens/splash_screen.dart';
 import 'screens/home_screen.dart';
 import 'screens/auth/auth_wrapper.dart';
-import 'services/notification_service.dart'; // Import the notification service
+import 'screens/favorites_screen.dart'; // Import FavoritesScreen
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
 
-  // Initialize notification service
-  await NotificationService().initialize();
+  try {
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
 
-  runApp(const MyApp());
+    // Initialize OneSignal
+    await OneSignalService().initialize();
+    print("OneSignal initialized successfully");
+
+    runApp(const MyApp());
+  } catch (e) {
+    print('Error during initialization: $e');
+    // Run app even if services fail to initialize
+    runApp(const MyApp());
+  }
 }
 
 class MyApp extends StatelessWidget {
@@ -21,7 +33,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Wayz.lk', // Updated app name here
+      title: 'Wayz.lk',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
@@ -38,6 +50,7 @@ class MyApp extends StatelessWidget {
         '/': (context) => const SplashScreen(),
         '/home': (context) => const HomeScreen(),
         '/auth': (context) => const AuthWrapper(),
+        '/favorites': (context) => const FavoritesScreen(), // Add this line
       },
     );
   }

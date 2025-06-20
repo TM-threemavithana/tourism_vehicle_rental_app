@@ -3,10 +3,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:intl/intl.dart';
 import '../../utils/app_colors.dart';
-import '../../services/onesignal_service.dart';
 
-class BookingRequestsScreen extends StatelessWidget {
-  const BookingRequestsScreen({super.key});
+class MyBookingRequestsScreen extends StatelessWidget {
+  const MyBookingRequestsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -15,22 +14,22 @@ class BookingRequestsScreen extends StatelessWidget {
 
     if (currentUser == null) {
       return Scaffold(
-        appBar: AppBar(title: const Text('Booking Requests')),
-        body:
-            const Center(child: Text('Please log in to view booking requests')),
+        appBar: AppBar(title: const Text('My Booking Requests')),
+        body: const Center(
+            child: Text('Please log in to view your booking requests')),
       );
     }
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Booking Requests'),
+        title: const Text('My Booking Requests'),
         backgroundColor: AppColors.primary,
         foregroundColor: Colors.white,
       ),
       body: StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance
             .collection('bookingRequests')
-            .where('ownerId', isEqualTo: currentUser.uid)
+            .where('userId', isEqualTo: currentUser.uid)
             .orderBy('createdAt', descending: true)
             .snapshots(),
         builder: (context, snapshot) {
@@ -50,7 +49,7 @@ class BookingRequestsScreen extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(
-                    Icons.inbox_outlined,
+                    Icons.car_rental,
                     size: 80,
                     color: isDarkMode
                         ? Colors.grey.shade700
@@ -69,7 +68,7 @@ class BookingRequestsScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'When users request to book your vehicles, they\'ll appear here.',
+                    'Your booking requests will appear here',
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       color: isDarkMode
@@ -89,7 +88,7 @@ class BookingRequestsScreen extends StatelessWidget {
               final doc = snapshot.data!.docs[index];
               final data = doc.data() as Map<String, dynamic>;
 
-              return _buildRequestCard(context, doc.id, data, isDarkMode);
+              return _buildRequestCard(context, data, isDarkMode);
             },
           );
         },
@@ -97,48 +96,45 @@ class BookingRequestsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildRequestCard(BuildContext context, String docId,
-      Map<String, dynamic> data, bool isDarkMode) {
+  Widget _buildRequestCard(
+      BuildContext context, Map<String, dynamic> data, bool isDarkMode) {
     final currencyFormat = NumberFormat("#,##0.00", "en_US");
     final status = data['status'] as String;
     final vehicleInfo = data['vehicleInfo'] as Map<String, dynamic>;
-    final userName = data['userName'] as String;
     final pricing = data['pricing'] as Map<String, dynamic>;
     final withDriver = data['withDriver'] as bool;
-    final unitLabel = pricing['unitLabel'] as String;
-    final unitCount = pricing['unitCount'] as int;
-    final rentalCost = pricing['rentalCost'] as double;
 
+    // Format dates
     final pickupDateTime = DateTime.parse(data['pickupDateTime']);
     final returnDateTime = DateTime.parse(data['returnDateTime']);
 
-    final isPending = status == 'pending';
-
-    // Determine card styling based on status
+    // Set status color
     Color statusColor;
-    Color cardBorderColor;
-
     switch (status) {
       case 'approved':
         statusColor = Colors.green;
-        cardBorderColor = Colors.green.shade200;
         break;
       case 'rejected':
-        statusColor = Colors.red;
-        cardBorderColor = Colors.red.shade200;
+        statusColor = Colors.red.shade400;
         break;
       case 'pending':
-        statusColor = Colors.orange;
-        cardBorderColor = Colors.orange.shade200;
-        break;
       default:
-        statusColor = Colors.grey;
-        cardBorderColor = Colors.grey.shade300;
+        statusColor = Colors.orange;
+        break;
     }
 
+    // Card border color
+    final cardBorderColor = status == 'pending'
+        ? Colors.orange
+        : status == 'approved'
+            ? Colors.green
+            : Colors.red.shade300;
+
+    final theme = Theme.of(context);
+
     return Card(
-      elevation: 2,
       margin: const EdgeInsets.only(bottom: 16),
+      elevation: 2,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
         side: BorderSide(color: cardBorderColor, width: 1.5),
@@ -230,23 +226,6 @@ class BookingRequestsScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Requester info
-                Row(
-                  children: [
-                    const Icon(Icons.person, size: 18),
-                    const SizedBox(width: 8),
-                    Text(
-                      'Request from $userName',
-                      style: const TextStyle(
-                        fontWeight: FontWeight.w500,
-                        fontSize: 15,
-                      ),
-                    ),
-                  ],
-                ),
-
-                const SizedBox(height: 16),
-
                 // Trip details
                 Text(
                   'Trip Details',
@@ -265,7 +244,8 @@ class BookingRequestsScreen extends StatelessWidget {
                   context,
                   icon: Icons.date_range,
                   label: 'Duration',
-                  value: '$unitCount ${unitLabel.toLowerCase()}(s)',
+                  value:
+                      '${pricing['unitCount']} ${pricing['unitLabel'].toLowerCase()}(s)',
                 ),
                 _buildDetailRow(
                   context,
@@ -291,7 +271,7 @@ class BookingRequestsScreen extends StatelessWidget {
                   context,
                   icon: Icons.payments_outlined,
                   label: 'Rental Cost',
-                  value: 'Rs. ${currencyFormat.format(rentalCost)}',
+                  value: 'Rs. ${currencyFormat.format(pricing['rentalCost'])}',
                   isHighlighted: true,
                 ),
 
@@ -311,46 +291,31 @@ class BookingRequestsScreen extends StatelessWidget {
                     ),
                   ),
 
-                // Response options for pending requests
-                if (isPending) ...[
+                // Action buttons based on status
+                if (status == 'approved') ...[
                   const SizedBox(height: 24),
                   const Divider(),
                   const SizedBox(height: 16),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: ElevatedButton(
-                          onPressed: () =>
-                              _respondToRequest(context, docId, 'rejected'),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.red.shade50,
-                            foregroundColor: Colors.red,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
-                              side: BorderSide(color: Colors.red.shade300),
-                            ),
-                            padding: const EdgeInsets.symmetric(vertical: 12),
-                          ),
-                          child: const Text('Decline'),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        // Navigate to payment screen
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                              content: Text('Proceeding to payment...')),
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.green,
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
                         ),
+                        padding: const EdgeInsets.symmetric(vertical: 12),
                       ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: ElevatedButton(
-                          onPressed: () =>
-                              _respondToRequest(context, docId, 'approved'),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.green,
-                            foregroundColor: Colors.white,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            padding: const EdgeInsets.symmetric(vertical: 12),
-                          ),
-                          child: const Text('Accept'),
-                        ),
-                      ),
-                    ],
+                      child: const Text('Proceed to Payment'),
+                    ),
                   ),
                 ],
               ],
@@ -405,99 +370,5 @@ class BookingRequestsScreen extends StatelessWidget {
         ],
       ),
     );
-  }
-
-  // Update the response method to include OneSignal notifications
-
-  Future<void> _respondToRequest(
-      BuildContext context, String docId, String status) async {
-    try {
-      debugPrint("Responding to request $docId with status: $status");
-      
-      // Get the request document to access user information
-      final requestDoc = await FirebaseFirestore.instance
-          .collection('bookingRequests')
-          .doc(docId)
-          .get();
-
-      if (!requestDoc.exists) {
-        debugPrint("Request document not found!");
-        return;
-      }
-
-      final data = requestDoc.data() as Map<String, dynamic>;
-      final renterId = data['userId'];
-      final vehicleInfo = data['vehicleInfo'] as Map<String, dynamic>;
-
-      debugPrint("Renter ID: $renterId");
-      debugPrint("Vehicle: ${vehicleInfo['make']} ${vehicleInfo['model']}");
-
-      // Update the request status
-      await FirebaseFirestore.instance
-          .collection('bookingRequests')
-          .doc(docId)
-          .update({
-        'status': status,
-        'respondedAt': FieldValue.serverTimestamp(),
-        'notified': false, // Reset notified flag to trigger notification to renter
-      });
-
-      debugPrint("Request status updated to $status");
-
-      // Get the renter's OneSignal player ID
-      final renterDoc = await FirebaseFirestore.instance
-          .collection('users')
-          .doc(renterId)
-          .get();
-
-      if (!renterDoc.exists) {
-        debugPrint("Renter document not found!");
-        return;
-      }
-
-      final renterData = renterDoc.data();
-      final renterOneSignalId = renterData?['oneSignalPlayerId'];
-      
-      debugPrint("Renter OneSignal ID: $renterOneSignalId");
-
-      if (renterOneSignalId != null) {
-        // Send push notification to renter using OneSignal
-        final oneSignalService = OneSignalService();
-        final vehicleName = '${vehicleInfo['make']} ${vehicleInfo['model']}';
-        debugPrint("Sending notification to renter...");
-        
-        await oneSignalService.sendNotificationToUser(
-          playerId: renterOneSignalId,
-          title: status == 'approved' ? 'Booking Approved' : 'Booking Declined',
-          content: status == 'approved'
-              ? 'Your booking request for $vehicleName has been approved! You can now proceed to payment.'
-              : 'Your request for $vehicleName was declined by the owner.',
-          notificationType: 'booking_response',
-          data: {'requestId': docId},
-        );
-      } else {
-        debugPrint("⚠️ Renter doesn't have a OneSignal ID registered!");
-      }
-
-      // Show success message
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(status == 'approved'
-              ? 'You have accepted the booking request'
-              : 'You have declined the booking request'),
-          backgroundColor:
-              status == 'approved' ? Colors.green : Colors.red.shade400,
-          duration: const Duration(seconds: 2),
-        ),
-      );
-    } catch (e) {
-      debugPrint("❌ Error responding to request: $e");
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Error: $e'),
-          backgroundColor: Colors.red,
-        ),
-      );
-    }
   }
 }

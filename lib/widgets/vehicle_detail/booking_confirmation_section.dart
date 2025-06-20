@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import '../../services/onesignal_service.dart';
 
 class BookingConfirmationSection extends StatefulWidget {
   final Map<String, dynamic> vehicleDetails;
@@ -33,6 +34,43 @@ class _BookingConfirmationSectionState
   bool _isRequesting = false;
   bool _requestSent = false;
   String _requestStatus = ""; // "pending", "approved", "rejected"
+  String? _requestId;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkExistingRequest();
+  }
+
+  Future<void> _checkExistingRequest() async {
+    final currentUser = FirebaseAuth.instance.currentUser;
+    if (currentUser == null) return;
+
+    try {
+      // Check for existing requests for this vehicle by this user
+      final requestsSnapshot = await FirebaseFirestore.instance
+          .collection('bookingRequests')
+          .where('userId', isEqualTo: currentUser.uid)
+          .where('vehicleId', isEqualTo: widget.vehicleDetails['id'])
+          .where('status', whereIn: ['pending', 'approved', 'rejected'])
+          .orderBy('createdAt', descending: true)
+          .limit(1)
+          .get();
+
+      if (requestsSnapshot.docs.isNotEmpty) {
+        final latestRequest = requestsSnapshot.docs.first;
+        final data = latestRequest.data();
+
+        setState(() {
+          _requestSent = true;
+          _requestId = latestRequest.id;
+          _requestStatus = data['status'];
+        });
+      }
+    } catch (e) {
+      print('Error checking existing request: $e');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -323,6 +361,46 @@ class _BookingConfirmationSectionState
               ),
             ),
 
+          // Show status based on request response
+          if (_requestSent && !_isRequesting)
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: _getStatusBackgroundColor(),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Row(
+                children: [
+                  Icon(
+                    _getStatusIcon(),
+                    color: _getStatusColor(),
+                    size: 20,
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      _getStatusMessage(),
+                      style: TextStyle(
+                        color: _getStatusColor(),
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                  if (_requestStatus == "approved")
+                    TextButton(
+                      onPressed: () {
+                        // Navigate to payment screen
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                              content: Text('Proceeding to payment...')),
+                        );
+                      },
+                      child: const Text('Pay Now'),
+                    ),
+                ],
+              ),
+            ),
+
           // Hint for user if not applied
           if (!widget.hasApplied && !_requestSent)
             Padding(
@@ -515,6 +593,8 @@ class _BookingConfirmationSectionState
         'userId': currentUser.uid,
         'userName': currentUser.displayName ?? 'Guest',
         'userEmail': currentUser.email,
+        'userPhone': currentUser.phoneNumber,
+        'userPhotoUrl': currentUser.photoURL,
         'vehicleId': widget.vehicleDetails['id'],
         'vehicleInfo': {
           'make': widget.vehicleDetails['make'],
@@ -538,18 +618,41 @@ class _BookingConfirmationSectionState
         'status': 'pending',
         'createdAt': FieldValue.serverTimestamp(),
         'notified': false,
+        'ownerNotified': false,
       };
 
       // Add to Firestore
-      await FirebaseFirestore.instance
+      final docRef = await FirebaseFirestore.instance
           .collection('bookingRequests')
           .add(bookingRequest);
+
+      // Find owner's OneSignal player ID
+      final ownerDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(widget.vehicleDetails['ownerId'])
+          .get();
+      
+      final ownerOneSignalId = ownerDoc.data()?['oneSignalPlayerId'];
+
+      if (ownerOneSignalId != null) {
+        final oneSignalService = OneSignalService();
+        
+        // Send notification to owner about new booking request
+        await oneSignalService.sendNotificationToUser(
+          playerId: ownerOneSignalId,
+          title: "New Booking Request",
+          content: "${currentUser.displayName} wants to rent your ${widget.vehicleDetails['make']} ${widget.vehicleDetails['model']}",
+          notificationType: 'booking_request',
+          data: {'requestId': _requestId},
+        );
+      }
 
       // Update state to show request sent
       setState(() {
         _isRequesting = false;
         _requestSent = true;
         _requestStatus = "pending";
+        _requestId = docRef.id;
       });
 
       // Show success message
@@ -572,6 +675,26 @@ class _BookingConfirmationSectionState
           backgroundColor: Colors.red,
         ),
       );
+    }
+  }
+
+  // Send push notification to vehicle owner
+  Future<void> _sendOwnerNotification(
+      String ownerOneSignalId, String userName, String vehicleName) async {
+    try {
+      // Get the OneSignalService instance
+      final oneSignalService = OneSignalService();
+
+      // Send the notification
+      await oneSignalService.sendNotificationToUser(
+        playerId: ownerOneSignalId,
+        title: "New Booking Request",
+        content: "$userName wants to rent your $vehicleName",
+        notificationType: 'booking_request',
+        data: {'requestId': _requestId},
+      );
+    } catch (e) {
+      print('Error sending OneSignal notification: $e');
     }
   }
 
