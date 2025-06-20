@@ -110,16 +110,14 @@ class _FilterResultsDrawerState extends State<FilterResultsDrawer> {
 
   // Update the _applyFilters method to not set a default sort option
   void _applyFilters() {
-    // Start with a fresh copy of the initial results
+    // Start with a fresh copy of all initial results
     List<Map<String, dynamic>> results = List.from(widget.initialResults);
-    print("Initial results count: ${results.length}");
 
     // Apply price range filter
     results = results.where((vehicle) {
       final price = vehicle['pricing']?['daily']?['vehicleOnly']?['price'];
       if (price == null) return false;
 
-      // Handle both num and String price values
       double numPrice;
       if (price is num) {
         numPrice = price.toDouble();
@@ -131,84 +129,57 @@ class _FilterResultsDrawerState extends State<FilterResultsDrawer> {
 
       return numPrice >= _priceRange.start && numPrice <= _priceRange.end;
     }).toList();
-    print("After price filter: ${results.length}");
 
-    // Apply rent mode filter
+    // Only apply rent mode filter if modes are selected
     if (_selectedRentModes.isNotEmpty) {
       results = results.where((vehicle) {
         final rentMode = vehicle['rentalConditions']?['rentMode'];
         if (rentMode == null) return false;
 
-        // Handle special cases in rental modes
         String normalizedRentMode = rentMode.toString().trim();
 
-        // For "With or Without Driver" match either "With Driver" or "Vehicle Only"
-        if (normalizedRentMode == 'With or Without Driver') {
-          return _selectedRentModes
-              .any((mode) => mode == 'With Driver' || mode == 'Vehicle Only');
-        }
-
-        // For "Vehicle Only" also match "Self Drive" if it's in the selected modes
-        if (normalizedRentMode == 'Vehicle Only' &&
-            _selectedRentModes.contains('Self Drive')) {
-          return true;
-        }
-
-        // For "Self Drive" also match "Vehicle Only" if it's in the selected modes
-        if (normalizedRentMode == 'Self Drive' &&
-            _selectedRentModes.contains('Vehicle Only')) {
-          return true;
+        // Special logic for "With or Without Driver"
+        if (_selectedRentModes.contains('With or Without Driver')) {
+          if (normalizedRentMode == 'With Driver' ||
+              normalizedRentMode == 'Vehicle Only') {
+            return true;
+          }
         }
 
         return _selectedRentModes.contains(normalizedRentMode);
       }).toList();
-      print("After rentMode filter: ${results.length}");
     }
 
-    // Apply fuel type filter with case-insensitive comparison
     if (_selectedFuelTypes.isNotEmpty) {
       results = results.where((vehicle) {
         final fuelType = vehicle['fuelType'];
         if (fuelType == null) return false;
-
-        final normalizedFuelType = fuelType.toString().trim();
-
-        return _selectedFuelTypes.any(
-            (type) => type.toLowerCase() == normalizedFuelType.toLowerCase());
+        String normalizedFuelType = fuelType.toString().trim();
+        return _selectedFuelTypes.contains(normalizedFuelType);
       }).toList();
-      print("After fuelType filter: ${results.length}");
     }
 
-    // Apply transmission filter with case-insensitive comparison
     if (_selectedTransmissionTypes.isNotEmpty) {
       results = results.where((vehicle) {
         final transmission = vehicle['transmission'];
         if (transmission == null) return false;
-
-        final normalizedTransmission = transmission.toString().trim();
-
-        return _selectedTransmissionTypes.any((type) =>
-            type.toLowerCase() == normalizedTransmission.toLowerCase());
+        String normalizedTransmission = transmission.toString().trim();
+        return _selectedTransmissionTypes.contains(normalizedTransmission);
       }).toList();
-      print("After transmission filter: ${results.length}");
     }
 
-    // Apply features filter - only include vehicles that have ALL selected features
     if (_selectedFeatures.isNotEmpty) {
       results = results.where((vehicle) {
         final features =
             vehicle['extras']?['features'] as Map<String, dynamic>?;
         if (features == null) return false;
 
-        // Check if vehicle has all selected features
         for (var feature in _selectedFeatures) {
           bool featureFound = false;
 
-          // Check exact match first
           if (features[feature] == true) {
             featureFound = true;
           } else {
-            // Try case-insensitive matches for feature keys
             for (var key in features.keys) {
               if (key.toString().toLowerCase() == feature.toLowerCase() &&
                   features[key] == true) {
@@ -222,19 +193,17 @@ class _FilterResultsDrawerState extends State<FilterResultsDrawer> {
         }
         return true;
       }).toList();
-      print("After features filter: ${results.length}");
     }
 
-    // Only apply sort if a sort option is explicitly selected
+    // Sort results if a sort option is selected
     if (_selectedSortOption.isNotEmpty) {
       _sortResults(results);
     }
 
-    // Update state with filtered results
+    // Update filtered results
     setState(() {
       _filteredResults = results;
     });
-    print("Final filtered results: ${_filteredResults.length}");
   }
 
   // Update the sort method to handle different data types
@@ -294,6 +263,17 @@ class _FilterResultsDrawerState extends State<FilterResultsDrawer> {
     return 0.0;
   }
 
+  void _toggleRentMode(String rentMode) {
+    setState(() {
+      if (_selectedRentModes.contains(rentMode)) {
+        _selectedRentModes.remove(rentMode);
+      } else {
+        _selectedRentModes.add(rentMode);
+      }
+      _applyFilters(); // Apply filters after toggling
+    });
+  }
+
   void _toggleFeature(String feature) {
     setState(() {
       if (_selectedFeatures.contains(feature)) {
@@ -301,6 +281,7 @@ class _FilterResultsDrawerState extends State<FilterResultsDrawer> {
       } else {
         _selectedFeatures.add(feature);
       }
+      _applyFilters(); // Apply filters after toggling
     });
   }
 
@@ -311,6 +292,7 @@ class _FilterResultsDrawerState extends State<FilterResultsDrawer> {
       } else {
         _selectedFuelTypes.add(fuelType);
       }
+      _applyFilters(); // Apply filters after toggling
     });
   }
 
@@ -321,16 +303,7 @@ class _FilterResultsDrawerState extends State<FilterResultsDrawer> {
       } else {
         _selectedTransmissionTypes.add(transmissionType);
       }
-    });
-  }
-
-  void _toggleRentMode(String rentMode) {
-    setState(() {
-      if (_selectedRentModes.contains(rentMode)) {
-        _selectedRentModes.remove(rentMode);
-      } else {
-        _selectedRentModes.add(rentMode);
-      }
+      _applyFilters(); // Apply filters after toggling
     });
   }
 
@@ -343,6 +316,7 @@ class _FilterResultsDrawerState extends State<FilterResultsDrawer> {
   void _changeSortOption(String option) {
     setState(() {
       _selectedSortOption = option;
+      _applyFilters();
     });
   }
 
@@ -355,27 +329,27 @@ class _FilterResultsDrawerState extends State<FilterResultsDrawer> {
 
       // Reset price range to the initial range
       if (widget.initialResults.isNotEmpty) {
-        double minPrice = double.infinity;
-        double maxPrice = 0;
-
-        for (var vehicle in widget.initialResults) {
-          final price = vehicle['pricing']?['daily']?['vehicleOnly']?['price'];
-          if (price != null && price is num) {
-            if (price < minPrice) minPrice = price.toDouble();
-            if (price > maxPrice) maxPrice = price.toDouble();
-          }
-        }
-
-        maxPrice = maxPrice + 5000;
-        if (maxPrice > 50000) maxPrice = 50000;
-        if (minPrice == double.infinity) minPrice = 0;
-
-        _priceRange = RangeValues(minPrice, maxPrice);
+        _setPriceRangeFromData();
       } else {
-        _priceRange = RangeValues(0, 50000);
+        _priceRange = const RangeValues(0, 50000);
       }
 
-      _filteredResults = List.from(widget.initialResults);
+      // Clear sort option
+      _selectedSortOption = '';
+
+      // Apply filters to update results
+      _applyFilters();
+
+      // Immediately pass the updated results back to the parent screen
+      widget.onFiltersApplied(
+        _filteredResults,
+        _selectedSortOption,
+        _priceRange,
+        _selectedFeatures,
+        _selectedFuelTypes,
+        _selectedTransmissionTypes,
+        _selectedRentModes,
+      );
     });
   }
 
@@ -501,6 +475,9 @@ class _FilterResultsDrawerState extends State<FilterResultsDrawer> {
                             'LKR ${_priceRange.end.round()}',
                           ),
                           onChanged: _updatePriceRange,
+                          onChangeEnd: (values) {
+                            _applyFilters(); // Apply filters when sliding ends
+                          },
                         ),
                       ),
                       Text(
@@ -523,11 +500,11 @@ class _FilterResultsDrawerState extends State<FilterResultsDrawer> {
                     runSpacing: 8,
                     children: [
                       _buildFilterChip(
-                          'Vehicle Only', _selectedRentModes, _toggleRentMode),
-                      _buildFilterChip(
                           'With Driver', _selectedRentModes, _toggleRentMode),
+                      _buildFilterChip('With or Without Driver',
+                          _selectedRentModes, _toggleRentMode),
                       _buildFilterChip(
-                          'Self Drive', _selectedRentModes, _toggleRentMode),
+                          'Vehicle Only', _selectedRentModes, _toggleRentMode),
                     ],
                   ),
 
@@ -625,37 +602,19 @@ class _FilterResultsDrawerState extends State<FilterResultsDrawer> {
                 Expanded(
                   flex: 2,
                   child: ElevatedButton(
-                    onPressed: () {
-                      // Apply filters
-                      _applyFilters();
-
-                      // Pass filtered results and all filter state back to parent
-                      widget.onFiltersApplied(
-                          _filteredResults,
-                          _selectedSortOption,
-                          _priceRange,
-                          _selectedFeatures,
-                          _selectedFuelTypes,
-                          _selectedTransmissionTypes,
-                          _selectedRentModes);
-
-                      // Close the drawer
-                      Navigator.pop(context);
-                    },
+                    onPressed: _applyAndReturn,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.primary,
-                      elevation: 2,
-                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      minimumSize: const Size(double.infinity, 50),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
                       ),
                     ),
                     child: const Text(
-                      'APPLY FILTERS',
+                      'Apply Filters',
                       style: TextStyle(
-                        color: Colors.white,
+                        fontSize: 16,
                         fontWeight: FontWeight.bold,
-                        fontSize: 14,
                       ),
                     ),
                   ),
@@ -761,5 +720,53 @@ class _FilterResultsDrawerState extends State<FilterResultsDrawer> {
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 0),
       visualDensity: VisualDensity.compact,
     );
+  }
+
+  // When filters are applied, ensure proper results or error message
+  void _applyAndReturn() {
+    // First apply the current filters
+    _applyFilters();
+
+    // Check if filters have been removed/changed and results are empty
+    if (_filteredResults.isEmpty) {
+      // Pass the filtered results and current filter state back to parent
+      widget.onFiltersApplied(
+        _filteredResults,
+        _selectedSortOption,
+        _priceRange,
+        _selectedFeatures,
+        _selectedFuelTypes,
+        _selectedTransmissionTypes,
+        _selectedRentModes,
+      );
+
+      // Close the filter drawer
+      Navigator.pop(context);
+
+      // Trigger a new search in the parent to refresh results
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (context.mounted) {
+          // Find the parent scaffold and open the refine search drawer
+          final scaffold = Scaffold.of(context);
+          if (scaffold.hasDrawer) {
+            // This will trigger the _applyFilters in VehicleSearchResultsScreen
+            scaffold.openDrawer();
+          }
+        }
+      });
+      return;
+    }
+
+    // Normal case with results
+    widget.onFiltersApplied(
+      _filteredResults,
+      _selectedSortOption,
+      _priceRange,
+      _selectedFeatures,
+      _selectedFuelTypes,
+      _selectedTransmissionTypes,
+      _selectedRentModes,
+    );
+    Navigator.pop(context);
   }
 }

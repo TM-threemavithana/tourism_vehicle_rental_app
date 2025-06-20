@@ -143,44 +143,56 @@ class _VehicleSearchResultsScreenState
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      enableDrag: false,
-      isDismissible: false,
-      barrierColor: Colors.transparent,
-      backgroundColor: Colors.transparent,
-      builder: (context) => Align(
-        alignment: Alignment.centerRight,
-        child: SizedBox(
-          height: MediaQuery.of(context).size.height,
-          child: FilterResultsDrawer(
-            selectedVehicleTypes: widget.selectedVehicleTypes,
-            initialResults: _searchResults,
-            initialSortOption: _selectedSortOption,
-            initialPriceRange: _priceRange,
-            initialFeatures: _selectedFeatures,
-            initialFuelTypes: _selectedFuelTypes,
-            initialTransmissionTypes: _selectedTransmissionTypes,
-            initialRentModes: _selectedRentModes,
-            onFiltersApplied: (filteredResults, sortOption, priceRange,
-                features, fuelTypes, transmissionTypes, rentModes) {
-              setState(() {
-                _searchResults = filteredResults;
-                _selectedSortOption = sortOption;
-                _priceRange = priceRange;
-                _selectedFeatures = features;
-                _selectedFuelTypes = fuelTypes;
-                _selectedTransmissionTypes = transmissionTypes;
-                _selectedRentModes = rentModes;
-
-                if (_searchResults.isEmpty) {
-                  _errorMessage = "No vehicles match your filter criteria";
-                } else {
-                  _errorMessage = null;
-                }
-              });
-            },
-          ),
-        ),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20.0)),
       ),
+      builder: (context) {
+        return FilterResultsDrawer(
+          selectedVehicleTypes: widget.selectedVehicleTypes,
+          initialResults: _searchResults,
+          onFiltersApplied: (filteredResults, sortOption, priceRange, features,
+              fuelTypes, transmissionTypes, rentModes) {
+            setState(() {
+              _searchResults = filteredResults;
+              _selectedSortOption = sortOption;
+              _priceRange = priceRange;
+              _selectedFeatures = features;
+              _selectedFuelTypes = fuelTypes;
+              _selectedTransmissionTypes = transmissionTypes;
+              _selectedRentModes = rentModes;
+
+              // If the filtered results are empty after applying filters
+              if (_searchResults.isEmpty) {
+                // Check if we should perform a new search
+                bool shouldRefineSearch =
+                    true; // Default to true for empty results
+
+                // Set appropriate error message
+                _errorMessage = "No vehicles match your filter criteria";
+
+                // This signals to the Refine Search to update with current filters
+                if (shouldRefineSearch) {
+                  // Schedule this for after the current build cycle
+                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                    if (mounted) {
+                      _performSearch();
+                    }
+                  });
+                }
+              } else {
+                // Clear error message when we have results
+                _errorMessage = null;
+              }
+            });
+          },
+          initialPriceRange: _priceRange,
+          initialSortOption: _selectedSortOption,
+          initialFeatures: _selectedFeatures,
+          initialFuelTypes: _selectedFuelTypes,
+          initialTransmissionTypes: _selectedTransmissionTypes,
+          initialRentModes: _selectedRentModes,
+        );
+      },
     );
   }
 
