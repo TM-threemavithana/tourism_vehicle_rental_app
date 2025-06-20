@@ -70,7 +70,7 @@ class _OwnerDashboardScreenState extends State<OwnerDashboardScreen>
     );
 
     _animationController.forward();
-    
+
     // Add this line to fetch statistics when the screen loads
     _fetchVehicleStatistics();
     _fetchRecentBookings();
@@ -155,38 +155,37 @@ class _OwnerDashboardScreenState extends State<OwnerDashboardScreen>
   Future<void> _fetchVehicleStatistics() async {
     final userId = FirebaseAuth.instance.currentUser?.uid;
     if (userId == null) return;
-    
+
     try {
       // Get vehicles count
       final vehiclesSnapshot = await FirebaseFirestore.instance
           .collection('vehicles')
           .where('ownerId', isEqualTo: userId)
           .get();
-      
+
       final vehicleCount = vehiclesSnapshot.docs.length.toString();
-      
+
       // Get active rentals (this depends on your rental data structure)
       final activeRentalsSnapshot = await FirebaseFirestore.instance
           .collection('bookings')
           .where('ownerId', isEqualTo: userId)
           .where('status', isEqualTo: 'Active')
           .get();
-      
+
       final activeRentals = activeRentalsSnapshot.docs.length.toString();
-      
+
       // Calculate earnings (simplified - you'll need to adjust based on your data model)
       double totalEarnings = 0;
       final bookingsSnapshot = await FirebaseFirestore.instance
           .collection('bookings')
           .where('ownerId', isEqualTo: userId)
-          .where('status', whereIn: ['Completed', 'Active'])
-          .get();
-      
+          .where('status', whereIn: ['Completed', 'Active']).get();
+
       for (var doc in bookingsSnapshot.docs) {
         final booking = doc.data();
         totalEarnings += booking['amount'] ?? 0;
       }
-      
+
       // Calculate average rating (simplified)
       double totalRating = 0;
       int ratingCount = 0;
@@ -194,17 +193,17 @@ class _OwnerDashboardScreenState extends State<OwnerDashboardScreen>
           .collection('ratings')
           .where('ownerId', isEqualTo: userId)
           .get();
-      
+
       for (var doc in ratingsSnapshot.docs) {
         final rating = doc.data();
         totalRating += rating['rating'] ?? 0;
         ratingCount++;
       }
-      
-      final avgRating = ratingCount > 0 
+
+      final avgRating = ratingCount > 0
           ? '${(totalRating / ratingCount).toStringAsFixed(1)}/5'
           : 'No ratings';
-      
+
       if (mounted) {
         setState(() {
           _vehicleStats = {
@@ -224,7 +223,7 @@ class _OwnerDashboardScreenState extends State<OwnerDashboardScreen>
   Future<void> _fetchRecentBookings() async {
     final userId = FirebaseAuth.instance.currentUser?.uid;
     if (userId == null) return;
-    
+
     try {
       final bookingsSnapshot = await FirebaseFirestore.instance
           .collection('bookings')
@@ -232,30 +231,32 @@ class _OwnerDashboardScreenState extends State<OwnerDashboardScreen>
           .orderBy('startDate', descending: true)
           .limit(5)
           .get();
-      
+
       final bookings = await Future.wait(
         bookingsSnapshot.docs.map((doc) async {
           final bookingData = doc.data();
-          
+
           // Get renter information (adjust according to your data structure)
           String renterName = 'Unknown Renter';
-          String renterAvatar = 'https://ui-avatars.com/api/?name=Unknown&background=random';
-          
+          String renterAvatar =
+              'https://ui-avatars.com/api/?name=Unknown&background=random';
+
           if (bookingData['renterId'] != null) {
             final renterSnapshot = await FirebaseFirestore.instance
                 .collection('users')
                 .doc(bookingData['renterId'])
                 .get();
-            
+
             if (renterSnapshot.exists) {
               final renterData = renterSnapshot.data()!;
               renterName = renterData['name'] ?? renterName;
               renterAvatar = renterData['profilePic'] ?? renterAvatar;
             }
           }
-          
+
           return {
-            'vehicleName': '${bookingData['vehicleMake'] ?? 'Vehicle'} ${bookingData['vehicleModel'] ?? ''}',
+            'vehicleName':
+                '${bookingData['vehicleMake'] ?? 'Vehicle'} ${bookingData['vehicleModel'] ?? ''}',
             'renterName': renterName,
             'startDate': bookingData['startDate'].toDate(),
             'endDate': bookingData['endDate'].toDate(),
@@ -265,7 +266,7 @@ class _OwnerDashboardScreenState extends State<OwnerDashboardScreen>
           };
         }),
       );
-      
+
       if (mounted) {
         setState(() {
           _recentBookings = bookings;
@@ -406,7 +407,8 @@ class _OwnerDashboardScreenState extends State<OwnerDashboardScreen>
                                           'Welcome back,',
                                           style: TextStyle(
                                             fontSize: 16,
-                                            color: Colors.white.withOpacity(0.9),
+                                            color:
+                                                Colors.white.withOpacity(0.9),
                                           ),
                                         ),
                                         const SizedBox(height: 4),
@@ -440,7 +442,8 @@ class _OwnerDashboardScreenState extends State<OwnerDashboardScreen>
                                         ),
                                         decoration: BoxDecoration(
                                           color: Colors.white.withOpacity(0.2),
-                                          borderRadius: BorderRadius.circular(12),
+                                          borderRadius:
+                                              BorderRadius.circular(12),
                                         ),
                                         child: Row(
                                           mainAxisSize: MainAxisSize.min,
@@ -509,28 +512,35 @@ class _OwnerDashboardScreenState extends State<OwnerDashboardScreen>
                                           _buildStatCard(
                                             icon: Icons.directions_car,
                                             title: 'Vehicles Listed',
-                                            value: _vehicleStats['vehiclesListed'] ?? '0',
+                                            value: _vehicleStats[
+                                                    'vehiclesListed'] ??
+                                                '0',
                                             color: const Color(0xFF6C63FF),
                                             change: 'Total vehicles',
                                           ),
                                           _buildStatCard(
                                             icon: Icons.access_time,
                                             title: 'Active Rentals',
-                                            value: _vehicleStats['activeRentals'] ?? '0',
+                                            value: _vehicleStats[
+                                                    'activeRentals'] ??
+                                                '0',
                                             color: const Color(0xFF4CAF50),
                                             change: 'Currently rented',
                                           ),
                                           _buildStatCard(
                                             icon: Icons.attach_money,
                                             title: 'Total Earnings',
-                                            value: _vehicleStats['totalEarnings'] ?? 'LKR 0',
+                                            value: _vehicleStats[
+                                                    'totalEarnings'] ??
+                                                'LKR 0',
                                             color: const Color(0xFFF9A825),
                                             change: 'All time earnings',
                                           ),
                                           _buildStatCard(
                                             icon: Icons.star,
                                             title: 'Avg Rating',
-                                            value: _vehicleStats['avgRating'] ?? 'No ratings',
+                                            value: _vehicleStats['avgRating'] ??
+                                                'No ratings',
                                             color: const Color(0xFFE53935),
                                             change: 'From customer reviews',
                                           ),
@@ -550,7 +560,8 @@ class _OwnerDashboardScreenState extends State<OwnerDashboardScreen>
                                         borderRadius: BorderRadius.circular(16),
                                         boxShadow: [
                                           BoxShadow(
-                                            color: Colors.black.withOpacity(0.05),
+                                            color:
+                                                Colors.black.withOpacity(0.05),
                                             blurRadius: 10,
                                             offset: const Offset(0, 4),
                                           ),
@@ -729,7 +740,8 @@ class _OwnerDashboardScreenState extends State<OwnerDashboardScreen>
                 onClose: _closeMenu,
                 onSignOut: _signOut,
                 onTabChange: _updateCurrentTab,
-                onProfileTap: _navigateToProfile,
+                onProfileTap:
+                    _navigateToProfile, // This calls a method that navigates to profile
                 width: 0.7,
                 user: FirebaseAuth.instance.currentUser,
                 currentTab: _currentTab,
@@ -1083,23 +1095,26 @@ class _OwnerDashboardScreenState extends State<OwnerDashboardScreen>
               children: [
                 // Vehicle Image
                 ClipRRect(
-                  borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+                  borderRadius:
+                      const BorderRadius.vertical(top: Radius.circular(20)),
                   child: AspectRatio(
                     aspectRatio: 16 / 9,
                     child: Image.network(
-                      vehicle['images']?['primaryImageUrl'] ?? 'https://via.placeholder.com/400x200?text=No+Image',
+                      vehicle['images']?['primaryImageUrl'] ??
+                          'https://via.placeholder.com/400x200?text=No+Image',
                       width: double.infinity,
                       fit: BoxFit.cover,
                       errorBuilder: (context, error, stackTrace) {
                         return Container(
                           color: Colors.grey[300],
-                          child: const Icon(Icons.car_rental, size: 50, color: Colors.grey),
+                          child: const Icon(Icons.car_rental,
+                              size: 50, color: Colors.grey),
                         );
                       },
                     ),
                   ),
                 ),
-                
+
                 // Gradient overlay at the bottom
                 Positioned(
                   bottom: 0,
@@ -1119,15 +1134,19 @@ class _OwnerDashboardScreenState extends State<OwnerDashboardScreen>
                     ),
                   ),
                 ),
-                
+
                 // Vehicle type icon badge
                 Positioned(
                   top: 16,
                   left: 16,
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                     decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.primary.withOpacity(0.8),
+                      color: Theme.of(context)
+                          .colorScheme
+                          .primary
+                          .withOpacity(0.8),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Row(
@@ -1150,13 +1169,14 @@ class _OwnerDashboardScreenState extends State<OwnerDashboardScreen>
                     ),
                   ),
                 ),
-                
+
                 // Status badge
                 Positioned(
                   top: 16,
                   right: 16,
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                     decoration: BoxDecoration(
                       color: _getStatusColor(vehicle['status'] as String?),
                       borderRadius: BorderRadius.circular(12),
@@ -1171,14 +1191,15 @@ class _OwnerDashboardScreenState extends State<OwnerDashboardScreen>
                     ),
                   ),
                 ),
-                
+
                 // Price badge at bottom
                 if (vehicle['pricing']?['daily']?['baseRate'] != null)
                   Positioned(
                     bottom: 12,
                     right: 16,
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 6),
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(12),
@@ -1202,7 +1223,7 @@ class _OwnerDashboardScreenState extends State<OwnerDashboardScreen>
                   ),
               ],
             ),
-            
+
             // Vehicle details
             Padding(
               padding: const EdgeInsets.all(16),
@@ -1218,37 +1239,37 @@ class _OwnerDashboardScreenState extends State<OwnerDashboardScreen>
                       color: isDarkMode ? Colors.white : Colors.black87,
                     ),
                   ),
-                  
+
                   const SizedBox(height: 8),
-                  
+
                   // Vehicle details row
                   Row(
                     children: [
                       _buildVehicleDetailTag(
-                        icon: Icons.calendar_today_outlined, 
+                        icon: Icons.calendar_today_outlined,
                         text: vehicle['year']?.toString() ?? 'N/A',
                         isDark: isDarkMode,
                       ),
                       _buildVehicleDetailTag(
-                        icon: Icons.speed, 
+                        icon: Icons.speed,
                         text: '${vehicle['engineCapacity'] ?? 'N/A'} cc',
                         isDark: isDarkMode,
                       ),
                       _buildVehicleDetailTag(
-                        icon: Icons.settings, 
+                        icon: Icons.settings,
                         text: vehicle['transmission'] ?? 'N/A',
                         isDark: isDarkMode,
                       ),
                       _buildVehicleDetailTag(
-                        icon: Icons.local_gas_station, 
+                        icon: Icons.local_gas_station,
                         text: vehicle['fuelType'] ?? 'N/A',
                         isDark: isDarkMode,
                       ),
                     ],
                   ),
-                  
+
                   const SizedBox(height: 16),
-                  
+
                   // Location and view details button
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -1259,19 +1280,23 @@ class _OwnerDashboardScreenState extends State<OwnerDashboardScreen>
                           Icon(
                             Icons.location_on_outlined,
                             size: 16,
-                            color: isDarkMode ? Colors.white70 : Colors.grey[600],
+                            color:
+                                isDarkMode ? Colors.white70 : Colors.grey[600],
                           ),
                           const SizedBox(width: 4),
                           Text(
-                            vehicle['collectionPoint']?['district'] ?? 'Location not set',
+                            vehicle['collectionPoint']?['district'] ??
+                                'Location not set',
                             style: TextStyle(
                               fontSize: 14,
-                              color: isDarkMode ? Colors.white70 : Colors.grey[600],
+                              color: isDarkMode
+                                  ? Colors.white70
+                                  : Colors.grey[600],
                             ),
                           ),
                         ],
                       ),
-                      
+
                       // View details button
                       TextButton(
                         onPressed: () => _navigateToVehicleDetails(vehicle),

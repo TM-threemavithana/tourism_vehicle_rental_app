@@ -190,8 +190,9 @@ class _HomeScreenState extends State<HomeScreen>
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) =>
-            ProfileScreen(user: FirebaseAuth.instance.currentUser),
+        builder: (context) => ProfileScreen(
+          user: FirebaseAuth.instance.currentUser,
+        ),
       ),
     );
   }
@@ -701,7 +702,8 @@ class _HomeScreenState extends State<HomeScreen>
                   onClose: _closeMenu,
                   onSignOut: _signOut,
                   onTabChange: _updateCurrentTab,
-                  onProfileTap: _navigateToProfile,
+                  onProfileTap:
+                      _navigateToProfile, // Use the navigation method here
                   width: 0.7,
                   user: FirebaseAuth.instance.currentUser,
                   currentTab: _currentTab,

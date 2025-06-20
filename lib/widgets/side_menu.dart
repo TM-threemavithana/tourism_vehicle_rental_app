@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
-class SideMenu extends StatelessWidget {
+class SideMenu extends StatefulWidget {
   final Function onClose;
   final Function onSignOut;
   final Function(String)? onTabChange;
-  final Function? onProfileTap; // Add this callback for profile navigation
+  final Function? onProfileTap;
   final double width;
   final User? user;
   final String currentTab;
@@ -16,263 +17,340 @@ class SideMenu extends StatelessWidget {
     required this.onClose,
     required this.onSignOut,
     this.onTabChange,
-    this.onProfileTap, // Add this parameter
+    this.onProfileTap,
     this.width = 0.8,
     required this.user,
     this.currentTab = 'Search',
   });
 
   @override
+  State<SideMenu> createState() => _SideMenuState();
+}
+
+class _SideMenuState extends State<SideMenu> {
+  String? userType;
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchUserType();
+  }
+
+  Future<void> _fetchUserType() async {
+    if (widget.user?.uid != null) {
+      try {
+        final doc = await FirebaseFirestore.instance
+            .collection('users')
+            .doc(widget.user!.uid)
+            .get();
+
+        if (doc.exists) {
+          setState(() {
+            userType = doc.data()?['userType'] ?? 'renter';
+            isLoading = false;
+          });
+        } else {
+          setState(() {
+            userType = 'renter';
+            isLoading = false;
+          });
+        }
+      } catch (e) {
+        setState(() {
+          userType = 'renter';
+          isLoading = false;
+        });
+      }
+    } else {
+      setState(() {
+        userType = 'renter';
+        isLoading = false;
+      });
+    }
+  }
+
+  String getInitials() {
+    if (widget.user == null ||
+        widget.user!.displayName == null ||
+        widget.user!.displayName!.isEmpty) {
+      return 'U';
+    }
+    List<String> names = widget.user!.displayName!.split(' ');
+    if (names.length == 1) {
+      return names[0].substring(0, 1).toUpperCase();
+    } else {
+      return '${names[0].substring(0, 1)}${names[1].substring(0, 1)}'
+          .toUpperCase();
+    }
+  }
+
+  String getDisplayName() {
+    return widget.user?.displayName ?? 'User';
+  }
+
+  String getEmail() {
+    return widget.user?.email ?? 'No email';
+  }
+
+  @override
   Widget build(BuildContext context) {
-    // Get initials for avatar
-    String getInitials() {
-      if (user == null ||
-          user!.displayName == null ||
-          user!.displayName!.isEmpty) {
-        return 'U'; // Default if no name available
-      }
-
-      final nameParts = user!.displayName!.split(' ');
-      if (nameParts.length > 1) {
-        return '${nameParts[0][0]}${nameParts[1][0]}';
-      }
-      return nameParts[0][0];
-    }
-
-    // Get display name or email
-    String getDisplayName() {
-      if (user == null) {
-        return 'Guest User';
-      }
-      return user!.displayName ?? 'User';
-    }
-
-    // Get email or empty string
-    String getEmail() {
-      if (user == null) {
-        return '';
-      }
-      return user!.email ?? '';
+    if (isLoading) {
+      return Container(
+        width: MediaQuery.of(context).size.width * widget.width,
+        color: Colors.white,
+        child: const Center(child: CircularProgressIndicator()),
+      );
     }
 
     return Container(
-      width: MediaQuery.of(context).size.width * width,
-      height: MediaQuery.of(context).size.height,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 10,
-            spreadRadius: 0,
-          ),
-        ],
-      ),
-      child: SafeArea(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // User Profile Section
-            Container(
-              padding: const EdgeInsets.all(20.0),
-              child: InkWell(
-                onTap: () {
-                  // Close the menu and navigate to profile
-                  onClose();
-                  if (onProfileTap != null) {
-                    onProfileTap!();
-                  }
-                },
-                borderRadius: BorderRadius.circular(10),
-                child: Row(
-                  children: [
-                    // Profile Avatar - using initials or photoURL
-                    user?.photoURL != null
-                        ? Container(
-                            width: 50,
-                            height: 50,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(25),
-                            ),
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(25),
-                              child: CachedNetworkImage(
-                                imageUrl: user!.photoURL!,
-                                fit: BoxFit.cover,
-                                placeholder: (context, url) => Container(
-                                  color: Colors.grey[300],
-                                  child: const Center(
-                                    child: SizedBox(
-                                      width: 24,
-                                      height: 24,
-                                      child: CircularProgressIndicator(
-                                          strokeWidth: 2.0),
-                                    ),
-                                  ),
-                                ),
-                                errorWidget: (context, url, error) => Container(
-                                  width: 50,
-                                  height: 50,
-                                  decoration: BoxDecoration(
-                                    color: Colors.orange,
-                                    borderRadius: BorderRadius.circular(25),
-                                  ),
-                                  child: Center(
-                                    child: Text(
-                                      getInitials(),
-                                      style: const TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.bold,
-                                      ),
+      width: MediaQuery.of(context).size.width * widget.width,
+      color: Colors.white,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Add top spacing
+          const SizedBox(height: 20),
+
+          // User Profile Section
+          Container(
+            padding: const EdgeInsets.all(20.0),
+            child: InkWell(
+              onTap: () {
+                widget.onClose();
+                if (widget.onProfileTap != null) {
+                  widget.onProfileTap!();
+                }
+              },
+              borderRadius: BorderRadius.circular(10),
+              child: Row(
+                children: [
+                  // Profile Avatar
+                  widget.user?.photoURL != null
+                      ? Container(
+                          width: 50,
+                          height: 50,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(25),
+                          ),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(25),
+                            child: CachedNetworkImage(
+                              imageUrl: widget.user!.photoURL!,
+                              fit: BoxFit.cover,
+                              placeholder: (context, url) => Container(
+                                color: Colors.grey[300],
+                                child: const Center(
+                                  child: SizedBox(
+                                    width: 24,
+                                    height: 24,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
                                     ),
                                   ),
                                 ),
                               ),
-                            ),
-                          )
-                        : Container(
-                            width: 50,
-                            height: 50,
-                            decoration: BoxDecoration(
-                              color: Colors.orange,
-                              borderRadius: BorderRadius.circular(25),
-                            ),
-                            child: Center(
-                              child: Text(
-                                getInitials(),
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
+                              errorWidget: (context, url, error) => Container(
+                                color: Colors.grey[300],
+                                child: Icon(
+                                  Icons.person,
+                                  color: Colors.grey[600],
+                                  size: 30,
                                 ),
                               ),
                             ),
                           ),
-                    const SizedBox(width: 12),
-                    // User Info - Dynamic from user data
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            getDisplayName(),
-                            style: const TextStyle(
-                              color: Colors.black,
-                              fontSize: 16,
+                        )
+                      : Container(
+                          width: 50,
+                          height: 50,
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).colorScheme.primary,
+                            borderRadius: BorderRadius.circular(25),
+                          ),
+                          child: Center(
+                            child: Text(
+                              getInitials(),
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ),
+                  const SizedBox(width: 12),
+                  // User Info
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          getDisplayName(),
+                          style: const TextStyle(
+                            color: Colors.black,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          getEmail(),
+                          style: const TextStyle(
+                            color: Colors.black,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        const SizedBox(height: 2),
+                        // User type badge
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 8, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: userType == 'owner'
+                                ? Colors.orange.withOpacity(0.2)
+                                : Colors.blue.withOpacity(0.2),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Text(
+                            userType == 'owner' ? 'Vehicle Owner' : 'Renter',
+                            style: TextStyle(
+                              color: userType == 'owner'
+                                  ? Colors.orange
+                                  : Colors.blue,
+                              fontSize: 10,
                               fontWeight: FontWeight.w600,
                             ),
                           ),
-                          const SizedBox(height: 2),
-                          Text(
-                            getEmail(),
-                            style: const TextStyle(
-                              color: Colors.black,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
+                        ),
+                        const SizedBox(height: 4),
+                        Row(
+                          children: [
+                            const Text(
+                              'View Profile',
+                              style: TextStyle(
+                                color: Colors.grey,
+                                fontSize: 12,
+                              ),
                             ),
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          const SizedBox(height: 2),
-                          Row(
-                            children: [
-                              const Text(
-                                'View Profile',
-                                style: TextStyle(
-                                  color: Colors.grey,
-                                  fontSize: 12,
-                                ),
-                              ),
-                              const SizedBox(width: 4),
-                              Icon(
-                                Icons.arrow_forward_ios,
-                                size: 10,
-                                color: Theme.of(context).colorScheme.primary,
-                              ),
-                            ],
-                          ),
-                        ],
+                            const SizedBox(width: 4),
+                            Icon(
+                              Icons.arrow_forward_ios,
+                              size: 10,
+                              color: Theme.of(context).colorScheme.primary,
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+
+          const Divider(),
+
+          // Add space between divider and menu items
+          const SizedBox(height: 16),
+
+          // Menu Items
+          Expanded(
+            child: ListView(
+              padding: const EdgeInsets.only(top: 8), // Adjust padding here
+              children: _buildMenuItems(),
+            ),
+          ),
+
+          // Logout Section
+          Container(
+            margin: const EdgeInsets.all(16),
+            child: InkWell(
+              onTap: () => widget.onSignOut(),
+              borderRadius: BorderRadius.circular(8),
+              child: Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                decoration: BoxDecoration(
+                  color: Colors.grey[100],
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Row(
+                  children: [
+                    Icon(
+                      Icons.logout,
+                      color: Colors.grey,
+                      size: 20,
+                    ),
+                    SizedBox(width: 12),
+                    Text(
+                      'Logout',
+                      style: TextStyle(
+                        color: Colors.grey,
+                        fontSize: 14,
                       ),
                     ),
                   ],
                 ),
               ),
             ),
-
-            // Menu Items
-            Expanded(
-              child: ListView(
-                padding: EdgeInsets.zero,
-                children: [
-                  _buildMenuItem(context, Icons.search, 'Search',
-                      isActive: currentTab ==
-                          'Search'), // Changed from 'Home' to 'Search'
-                  _buildMenuItem(context, Icons.calendar_today_outlined,
-                      'Vehicle Bookings',
-                      isActive: currentTab == 'Vehicle Bookings'),
-                  _buildMenuItem(
-                      context, Icons.directions_car_outlined, 'Your Vehicles',
-                      isActive: currentTab == 'Your Vehicles'),
-                  _buildMenuItem(
-                      context, Icons.notifications_outlined, 'Notifications',
-                      isActive: currentTab == 'Notifications'),
-                  _buildMenuItem(context, Icons.help_outline, 'FAQ',
-                      isActive: currentTab == 'FAQ'),
-                  _buildMenuItem(context, Icons.info_outline, 'About Us',
-                      isActive: currentTab == 'About Us'),
-                ],
-              ),
-            ),
-
-            // Logout Section
-            Container(
-              margin: const EdgeInsets.all(16),
-              child: InkWell(
-                onTap: () => onSignOut(),
-                borderRadius: BorderRadius.circular(8),
-                child: Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                  decoration: BoxDecoration(
-                    color: Colors.grey[100],
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: const Row(
-                    children: [
-                      Icon(
-                        Icons.logout,
-                        color: Colors.grey,
-                        size: 20,
-                      ),
-                      SizedBox(width: 12),
-                      Text(
-                        'Logout',
-                        style: TextStyle(
-                          color: Colors.grey,
-                          fontSize: 14,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
+  }
+
+  List<Widget> _buildMenuItems() {
+    if (userType == 'owner') {
+      return [
+        _buildMenuItem(context, Icons.dashboard_outlined, 'Dashboard',
+            isActive: widget.currentTab == 'Dashboard'),
+        _buildMenuItem(context, Icons.directions_car_outlined, 'My Vehicles',
+            isActive: widget.currentTab == 'My Vehicles'),
+        _buildMenuItem(context, Icons.calendar_today_outlined, 'Bookings',
+            isActive: widget.currentTab == 'Bookings'),
+        _buildMenuItem(context, Icons.analytics_outlined, 'Analytics',
+            isActive: widget.currentTab == 'Analytics'),
+        _buildMenuItem(
+            context, Icons.account_balance_wallet_outlined, 'Earnings',
+            isActive: widget.currentTab == 'Earnings'),
+        _buildMenuItem(context, Icons.notifications_outlined, 'Notifications',
+            isActive: widget.currentTab == 'Notifications'),
+        _buildMenuItem(context, Icons.settings_outlined, 'Settings',
+            isActive: widget.currentTab == 'Settings'),
+        _buildMenuItem(context, Icons.help_outline, 'Help & Support',
+            isActive: widget.currentTab == 'Help & Support'),
+      ];
+    } else {
+      return [
+        _buildMenuItem(context, Icons.search, 'Search Vehicles',
+            isActive: widget.currentTab == 'Search'),
+        _buildMenuItem(context, Icons.history_outlined, 'My Rentals',
+            isActive: widget.currentTab == 'My Rentals'),
+        _buildMenuItem(context, Icons.favorite_outline, 'Favorites',
+            isActive: widget.currentTab == 'Favorites'),
+        _buildMenuItem(context, Icons.notifications_outlined, 'Notifications',
+            isActive: widget.currentTab == 'Notifications'),
+        _buildMenuItem(context, Icons.payment_outlined, 'Payment Methods',
+            isActive: widget.currentTab == 'Payment Methods'),
+        _buildMenuItem(context, Icons.help_outline, 'Help & Support',
+            isActive: widget.currentTab == 'Help & Support'),
+        _buildMenuItem(context, Icons.info_outline, 'About',
+            isActive: widget.currentTab == 'About'),
+      ];
+    }
   }
 
   Widget _buildMenuItem(BuildContext context, IconData icon, String title,
       {bool isActive = false}) {
     return InkWell(
       onTap: () {
-        onClose();
-        // Call the tab change callback if provided
-        if (onTabChange != null) {
-          onTabChange!(title);
+        widget.onClose();
+        if (widget.onTabChange != null) {
+          widget.onTabChange!(title);
         }
-        // Navigation logic would go here
       },
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),

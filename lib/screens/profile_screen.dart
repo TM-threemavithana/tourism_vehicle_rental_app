@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import '../services/cloudinary_service.dart';
 import '../services/auth_service.dart';
 import '../screens/auth/auth_wrapper.dart';
@@ -19,12 +20,12 @@ class ProfileScreen extends StatefulWidget {
   State<ProfileScreen> createState() => _ProfileScreenState();
 }
 
-// Add the SingleTickerProviderStateMixin here
 class _ProfileScreenState extends State<ProfileScreen>
     with SingleTickerProviderStateMixin {
   bool _isLoading = false;
   bool _isUploadingImage = false;
   bool _isMenuOpen = false;
+  String? userType;
   final TextEditingController _nameController = TextEditingController();
   final CloudinaryService _cloudinaryService = CloudinaryService();
   final AuthService _authService = AuthService();
@@ -41,12 +42,16 @@ class _ProfileScreenState extends State<ProfileScreen>
     'totalReviews': '0',
     'vehiclesListed': '0',
     'activeRentals': '0',
+    'favoriteVehicles': '0',
+    'totalSpent': '0',
+    'totalEarnings': '0',
   };
 
   @override
   void initState() {
     super.initState();
     _nameController.text = widget.user?.displayName ?? '';
+    _fetchUserType();
 
     // Initialize the animation controller
     _menuIconController = AnimationController(
@@ -55,10 +60,35 @@ class _ProfileScreenState extends State<ProfileScreen>
     );
   }
 
+  Future<void> _fetchUserType() async {
+    if (widget.user?.uid != null) {
+      try {
+        final doc = await FirebaseFirestore.instance
+            .collection('users')
+            .doc(widget.user!.uid)
+            .get();
+
+        if (doc.exists) {
+          setState(() {
+            userType = doc.data()?['userType'] ?? 'renter';
+          });
+        } else {
+          setState(() {
+            userType = 'renter';
+          });
+        }
+      } catch (e) {
+        setState(() {
+          userType = 'renter';
+        });
+      }
+    }
+  }
+
   @override
   void dispose() {
     _nameController.dispose();
-    _menuIconController.dispose(); // Don't forget to dispose the controller
+    _menuIconController.dispose();
     super.dispose();
   }
 
@@ -77,6 +107,7 @@ class _ProfileScreenState extends State<ProfileScreen>
   void _closeMenu() {
     setState(() {
       _isMenuOpen = false;
+      _menuIconController.reverse();
     });
   }
 
@@ -93,18 +124,15 @@ class _ProfileScreenState extends State<ProfileScreen>
         );
         break;
       case 'Vehicle Bookings':
-        // Navigate to bookings
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Bookings Screen - Coming Soon')),
         );
         break;
       case 'Your Vehicles':
-        // Navigate to vehicles
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Your Vehicles Screen - Coming Soon')),
         );
         break;
-      // Handle other tabs...
     }
   }
 
@@ -218,6 +246,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                   ),
               ],
             ),
+            const SizedBox(height: 20),
           ],
         ),
       ),
@@ -231,12 +260,9 @@ class _ProfileScreenState extends State<ProfileScreen>
     required VoidCallback onTap,
   }) {
     return InkWell(
-      onTap: _isUploadingImage || _isLoading
-          ? null
-          : onTap, // Disable when either loading state is true
+      onTap: _isUploadingImage || _isLoading ? null : onTap,
       borderRadius: BorderRadius.circular(15),
       child: Column(
-        mainAxisSize: MainAxisSize.min,
         children: [
           Container(
             padding: const EdgeInsets.all(15),
@@ -346,26 +372,27 @@ class _ProfileScreenState extends State<ProfileScreen>
 
     // Show confirmation dialog
     final bool confirm = await showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Remove Profile Picture'),
-        content:
-            const Text('Are you sure you want to remove your profile picture?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: const Text('Cancel'),
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('Remove Profile Picture'),
+            content: const Text(
+                'Are you sure you want to remove your profile picture?'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(false),
+                child: const Text('Cancel'),
+              ),
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(true),
+                child: const Text(
+                  'Remove',
+                  style: TextStyle(color: Colors.red),
+                ),
+              ),
+            ],
           ),
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(true),
-            child: const Text(
-              'Remove',
-              style: TextStyle(color: Colors.red),
-            ),
-          ),
-        ],
-      ),
-    );
+        ) ??
+        false;
 
     if (confirm != true) return;
 
@@ -464,16 +491,16 @@ class _ProfileScreenState extends State<ProfileScreen>
 
     return Scaffold(
       backgroundColor: Colors.grey[100],
-      extendBodyBehindAppBar: true, // Important for menu overlay
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
-        title: const Text(
-          'My Profile',
-          style: TextStyle(
+        title: Text(
+          userType == 'owner' ? 'Owner Profile' : 'My Profile',
+          style: const TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: 20,
           ),
         ),
-        backgroundColor: Colors.transparent, // Make transparent to see gradient
+        backgroundColor: Colors.transparent,
         foregroundColor: Colors.white,
         elevation: 0,
         leading: IconButton(
@@ -484,6 +511,25 @@ class _ProfileScreenState extends State<ProfileScreen>
           onPressed: _toggleMenu,
         ),
         actions: [
+          // User type indicator badge
+          Container(
+            margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            decoration: BoxDecoration(
+              color: userType == 'owner'
+                  ? Colors.orange.withOpacity(0.9)
+                  : Colors.blue.withOpacity(0.9),
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Text(
+              userType == 'owner' ? 'OWNER' : 'RENTER',
+              style: const TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            ),
+          ),
           IconButton(
             icon: const Icon(Icons.arrow_back_ios),
             onPressed: () => Navigator.of(context).pop(),
@@ -496,163 +542,145 @@ class _ProfileScreenState extends State<ProfileScreen>
           SingleChildScrollView(
             child: Column(
               children: [
-                // Profile header with user info and stats
+                // Profile header with gradient background
                 Container(
                   width: double.infinity,
                   decoration: BoxDecoration(
-                    gradient: AppColors.profileHeaderGradient,
+                    gradient: userType == 'owner'
+                        ? LinearGradient(
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                            colors: [
+                              Colors.orange.shade400,
+                              Colors.deepOrange.shade600,
+                            ],
+                          )
+                        : AppColors.profileHeaderGradient,
                     boxShadow: [
                       BoxShadow(
                         color: Colors.black.withOpacity(0.1),
                         blurRadius: 10,
                         spreadRadius: 0,
-                        offset: const Offset(0, 4),
+                        offset: const Offset(0, 5),
                       ),
                     ],
                   ),
-                  child: Column(
-                    children: [
-                      const SizedBox(height: 100), // Increased space from top
-
-                      // Profile avatar with edit button
-                      Stack(
-                        alignment: Alignment.center,
-                        clipBehavior: Clip.none, // Ensure nothing gets clipped
+                  child: SafeArea(
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(20, 80, 20, 30),
+                      child: Column(
                         children: [
-                          // Container for the avatar
-                          Container(
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              border: Border.all(
-                                color: Colors.white,
-                                width: 4,
-                              ),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withOpacity(0.2),
-                                  blurRadius: 10,
-                                  spreadRadius: 2,
-                                ),
-                              ],
-                            ),
-                            child: _isUploadingImage
-                                ? Container(
-                                    width: 140,
-                                    height: 140,
-                                    decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      color: theme.colorScheme.secondary
-                                          .withOpacity(0.2),
-                                    ),
-                                    child: Center(
-                                      child: CircularProgressIndicator(
-                                        color: theme.colorScheme.secondary,
-                                        strokeWidth: 3,
+                          // Profile picture with edit button
+                          Stack(
+                            children: [
+                              // Profile picture
+                              _isUploadingImage
+                                  ? Container(
+                                      width: 140,
+                                      height: 140,
+                                      decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        color: Colors.white.withOpacity(0.2),
                                       ),
+                                      child: const Center(
+                                        child: CircularProgressIndicator(
+                                          color: Colors.white,
+                                          strokeWidth: 3,
+                                        ),
+                                      ),
+                                    )
+                                  : CircleAvatar(
+                                      radius: 70,
+                                      backgroundColor:
+                                          Colors.white.withOpacity(0.3),
+                                      backgroundImage:
+                                          widget.user?.photoURL != null
+                                              ? CachedNetworkImageProvider(
+                                                  widget.user!.photoURL!)
+                                              : null,
+                                      child: widget.user?.photoURL == null
+                                          ? Text(
+                                              _getInitials(),
+                                              style: const TextStyle(
+                                                fontSize: 42,
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.white,
+                                              ),
+                                            )
+                                          : null,
                                     ),
-                                  )
-                                : CircleAvatar(
-                                    radius: 70,
-                                    backgroundColor: theme.colorScheme.primary
-                                        .withOpacity(0.3),
-                                    backgroundImage:
-                                        widget.user?.photoURL != null
-                                            ? CachedNetworkImageProvider(
-                                                widget.user!.photoURL!)
-                                            : null,
-                                    child: widget.user?.photoURL == null
-                                        ? Text(
-                                            _getInitials(),
-                                            style: const TextStyle(
-                                              fontSize: 42,
-                                              fontWeight: FontWeight.bold,
-                                              color: Colors.white,
-                                            ),
-                                          )
-                                        : null,
+
+                              // Edit button
+                              Positioned(
+                                bottom: 5,
+                                right: 5,
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    shape: BoxShape.circle,
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withOpacity(0.2),
+                                        blurRadius: 5,
+                                        spreadRadius: 1,
+                                      ),
+                                    ],
                                   ),
+                                  child: IconButton(
+                                    icon: Icon(
+                                      Icons.camera_alt,
+                                      color: theme.colorScheme.primary,
+                                      size: 20,
+                                    ),
+                                    onPressed: _isUploadingImage || _isLoading
+                                        ? null
+                                        : _updateProfilePicture,
+                                    constraints: const BoxConstraints(
+                                      minWidth: 40,
+                                      minHeight: 40,
+                                    ),
+                                    padding: const EdgeInsets.all(8),
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
 
-                          // Edit button - positioned outside the avatar area
-                          Positioned(
-                            bottom: 5,
-                            right: 5,
-                            child: Container(
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                shape: BoxShape.circle,
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black.withOpacity(0.2),
-                                    blurRadius: 5,
-                                    spreadRadius: 1,
-                                  ),
-                                ],
-                              ),
-                              child: IconButton(
-                                icon: Icon(
-                                  Icons.camera_alt,
-                                  color: theme.colorScheme.primary,
-                                  size: 20,
-                                ),
-                                onPressed: _isUploadingImage || _isLoading
-                                    ? null
-                                    : _updateProfilePicture,
-                                constraints: const BoxConstraints(
-                                  minWidth: 40,
-                                  minHeight: 40,
-                                ),
-                                padding: const EdgeInsets.all(8),
-                              ),
+                          const SizedBox(height: 20),
+
+                          // User name
+                          Text(
+                            widget.user?.displayName ?? 'User',
+                            style: const TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
                             ),
                           ),
+
+                          // User email
+                          Text(
+                            widget.user?.email ?? '',
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: Colors.white.withOpacity(0.8),
+                            ),
+                          ),
+
+                          const SizedBox(height: 30),
                         ],
                       ),
-
-                      const SizedBox(height: 20),
-
-                      // User name
-                      Text(
-                        widget.user?.displayName ?? 'User',
-                        style: const TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
-
-                      // User email
-                      Text(
-                        widget.user?.email ?? '',
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: Colors.white.withOpacity(0.8),
-                        ),
-                      ),
-
-                      const SizedBox(height: 30),
-
-                      // Curved bottom edge
-                      Container(
-                        height: 30,
-                        decoration: BoxDecoration(
-                          color: Colors.grey[100],
-                          borderRadius: const BorderRadius.only(
-                            topLeft: Radius.circular(30),
-                            topRight: Radius.circular(30),
-                          ),
-                        ),
-                      ),
-                    ],
+                    ),
                   ),
                 ),
 
-                // Info Cards Section
+                // Content area
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  padding: const EdgeInsets.all(20),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      // Personal Information Section
                       const Text(
                         'Personal Information',
                         style: TextStyle(
@@ -663,7 +691,6 @@ class _ProfileScreenState extends State<ProfileScreen>
                       ),
                       const SizedBox(height: 16),
 
-                      // Personal Info Card
                       Card(
                         elevation: 2,
                         shape: RoundedRectangleBorder(
@@ -698,6 +725,10 @@ class _ProfileScreenState extends State<ProfileScreen>
 
                       const SizedBox(height: 24),
 
+                      // User Type Specific Options
+                      _buildUserTypeSpecificOptions(theme),
+
+                      // Account & Security Section
                       const Text(
                         'Account & Security',
                         style: TextStyle(
@@ -708,7 +739,6 @@ class _ProfileScreenState extends State<ProfileScreen>
                       ),
                       const SizedBox(height: 16),
 
-                      // Security Options
                       Card(
                         elevation: 2,
                         shape: RoundedRectangleBorder(
@@ -726,8 +756,12 @@ class _ProfileScreenState extends State<ProfileScreen>
                             _buildDivider(),
                             _buildMenuOption(
                               icon: Icons.account_balance_outlined,
-                              title: 'Bank Account',
-                              subtitle: 'Set up for deposits and withdrawals',
+                              title: userType == 'owner'
+                                  ? 'Bank Account'
+                                  : 'Payment Settings',
+                              subtitle: userType == 'owner'
+                                  ? 'Set up for deposits and withdrawals'
+                                  : 'Manage payment preferences',
                               iconColor: Colors.blue,
                               theme: theme,
                             ),
@@ -752,8 +786,12 @@ class _ProfileScreenState extends State<ProfileScreen>
                             _buildDivider(),
                             _buildMenuOption(
                               icon: Icons.swap_horiz,
-                              title: 'Switch Account Type',
-                              subtitle: 'Toggle between renter and owner modes',
+                              title: userType == 'owner'
+                                  ? 'Switch to Renter'
+                                  : 'Become Vehicle Owner',
+                              subtitle: userType == 'owner'
+                                  ? 'Switch to renter mode'
+                                  : 'Start renting out your vehicles',
                               iconColor: Colors.purple,
                               theme: theme,
                             ),
@@ -763,7 +801,7 @@ class _ProfileScreenState extends State<ProfileScreen>
 
                       const SizedBox(height: 24),
 
-                      // Statistics Section - Data from Firestore
+                      // Statistics Section
                       const Text(
                         'Activity Statistics',
                         style: TextStyle(
@@ -774,56 +812,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                       ),
                       const SizedBox(height: 16),
 
-                      Card(
-                        elevation: 2,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(15),
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(16),
-                          child: Column(
-                            children: [
-                              Row(
-                                children: [
-                                  Expanded(
-                                    child: _buildStatItem(
-                                        _userStats['vehiclesRented'] ?? '0',
-                                        'Vehicles\nRented',
-                                        AppColors.rentedColor,
-                                        Icons.directions_car_outlined),
-                                  ),
-                                  Expanded(
-                                    child: _buildStatItem(
-                                        _userStats['totalReviews'] ?? '0',
-                                        'Total\nReviews',
-                                        AppColors.reviewColor,
-                                        Icons.star_outline),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 20),
-                              Row(
-                                children: [
-                                  Expanded(
-                                    child: _buildStatItem(
-                                        _userStats['vehiclesListed'] ?? '0',
-                                        'Vehicles\nListed',
-                                        AppColors.listedColor,
-                                        Icons.add_circle_outline),
-                                  ),
-                                  Expanded(
-                                    child: _buildStatItem(
-                                        _userStats['activeRentals'] ?? '0',
-                                        'Active\nRentals',
-                                        AppColors.activeRentalsColor,
-                                        Icons.local_activity_outlined),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
+                      _buildUserTypeSpecificStats(),
 
                       const SizedBox(height: 24),
 
@@ -873,7 +862,12 @@ class _ProfileScreenState extends State<ProfileScreen>
                 onClose: _closeMenu,
                 onSignOut: _signOut,
                 onTabChange: _updateCurrentTab,
-                onProfileTap: () => _closeMenu(), // We're already on profile
+                onProfileTap: () {
+                  // First close the menu
+                  _closeMenu();
+                  // No need to navigate since we're already on the profile screen
+                  // Or if you want to refresh: _refreshUserData();
+                },
                 width: 0.7,
                 user: widget.user,
                 currentTab: _currentTab,
@@ -1236,23 +1230,21 @@ class _ProfileScreenState extends State<ProfileScreen>
     switch (title) {
       case 'Payment Methods':
         onTap = () {
-          // Navigate to payment methods screen or show dialog
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Payment Methods - Coming Soon')),
           );
         };
         break;
       case 'Bank Account':
+      case 'Payment Settings':
         onTap = () {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-                content: Text('Bank Account Settings - Coming Soon')),
+            SnackBar(content: Text('$title - Coming Soon')),
           );
         };
         break;
       case 'License Verification':
         onTap = () {
-          // Show license upload dialog or navigate to verification screen
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('License Verification - Coming Soon')),
           );
@@ -1263,14 +1255,76 @@ class _ProfileScreenState extends State<ProfileScreen>
           _showChangePasswordDialog();
         };
         break;
+      case 'Switch to Renter':
+      case 'Become Vehicle Owner':
+        onTap = () {
+          _switchUserType();
+        };
+        break;
       case 'Delete Account':
         onTap = () {
           _showDeleteAccountConfirmation();
         };
         break;
-      case 'Switch Account Type':
+      case 'Vehicle Management':
+        onTap = () {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Vehicle Management - Coming Soon')),
+          );
+        };
+        break;
+      case 'Earnings Analytics':
+        onTap = () {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Earnings Analytics - Coming Soon')),
+          );
+        };
+        break;
+      case 'Booking Management':
+        onTap = () {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Booking Management - Coming Soon')),
+          );
+        };
+        break;
+      case 'Vehicle Verification':
+        onTap = () {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Vehicle Verification - Coming Soon')),
+          );
+        };
+        break;
+      case 'Rental History':
+        onTap = () {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Rental History - Coming Soon')),
+          );
+        };
+        break;
+      case 'Favorite Vehicles':
+        onTap = () {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Favorite Vehicles - Coming Soon')),
+          );
+        };
+        break;
+      case 'My Reviews':
+        onTap = () {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('My Reviews - Coming Soon')),
+          );
+        };
+        break;
+      case 'Become a Vehicle Owner':
         onTap = () {
           _switchUserType();
+        };
+        break;
+      default:
+        onTap = () {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('$title - Coming Soon')),
+          );
         };
         break;
     }
@@ -1400,5 +1454,223 @@ class _ProfileScreenState extends State<ProfileScreen>
       return '${nameParts[0][0]}${nameParts[1][0]}'.toUpperCase();
     }
     return nameParts[0][0].toUpperCase();
+  }
+
+  Widget _buildUserTypeSpecificOptions(ThemeData theme) {
+    if (userType == 'owner') {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Vehicle Owner Tools',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: Colors.black87,
+            ),
+          ),
+          const SizedBox(height: 16),
+          Card(
+            elevation: 2,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(15),
+            ),
+            child: Column(
+              children: [
+                _buildMenuOption(
+                  icon: Icons.directions_car_outlined,
+                  title: 'Vehicle Management',
+                  subtitle: 'Add, edit, or remove your vehicles',
+                  iconColor: Colors.blue,
+                  theme: theme,
+                ),
+                _buildDivider(),
+                _buildMenuOption(
+                  icon: Icons.analytics_outlined,
+                  title: 'Earnings Analytics',
+                  subtitle: 'View your rental income and statistics',
+                  iconColor: Colors.green,
+                  theme: theme,
+                ),
+                _buildDivider(),
+                _buildMenuOption(
+                  icon: Icons.calendar_today_outlined,
+                  title: 'Booking Management',
+                  subtitle: 'Manage vehicle bookings and availability',
+                  iconColor: Colors.orange,
+                  theme: theme,
+                ),
+                _buildDivider(),
+                _buildMenuOption(
+                  icon: Icons.verified_outlined,
+                  title: 'Vehicle Verification',
+                  subtitle: 'Upload and manage vehicle documents',
+                  iconColor: Colors.purple,
+                  theme: theme,
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 24),
+        ],
+      );
+    } else {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Renter Features',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: Colors.black87,
+            ),
+          ),
+          const SizedBox(height: 16),
+          Card(
+            elevation: 2,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(15),
+            ),
+            child: Column(
+              children: [
+                _buildMenuOption(
+                  icon: Icons.history_outlined,
+                  title: 'Rental History',
+                  subtitle: 'View your past and current rentals',
+                  iconColor: Colors.blue,
+                  theme: theme,
+                ),
+                _buildDivider(),
+                _buildMenuOption(
+                  icon: Icons.favorite_outline,
+                  title: 'Favorite Vehicles',
+                  subtitle: 'Manage your saved vehicles',
+                  iconColor: Colors.red,
+                  theme: theme,
+                ),
+                _buildDivider(),
+                _buildMenuOption(
+                  icon: Icons.rate_review_outlined,
+                  title: 'My Reviews',
+                  subtitle: 'View and manage your vehicle reviews',
+                  iconColor: Colors.amber,
+                  theme: theme,
+                ),
+                _buildDivider(),
+                _buildMenuOption(
+                  icon: Icons.car_rental_outlined,
+                  title: 'Become a Vehicle Owner',
+                  subtitle: 'Start renting out your own vehicles',
+                  iconColor: Colors.green,
+                  theme: theme,
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 24),
+        ],
+      );
+    }
+  }
+
+  Widget _buildUserTypeSpecificStats() {
+    if (userType == 'owner') {
+      return Card(
+        elevation: 2,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(15),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                    child: _buildStatItem(
+                        _userStats['vehiclesListed'] ?? '0',
+                        'Vehicles\nListed',
+                        Colors.blue,
+                        Icons.directions_car_outlined),
+                  ),
+                  Expanded(
+                    child: _buildStatItem(
+                        _userStats['activeRentals'] ?? '0',
+                        'Active\nRentals',
+                        Colors.green,
+                        Icons.local_activity_outlined),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 20),
+              Row(
+                children: [
+                  Expanded(
+                    child: _buildStatItem(
+                        'LKR ${_userStats['totalEarnings'] ?? '0'}',
+                        'Total\nEarnings',
+                        Colors.orange,
+                        Icons.account_balance_wallet_outlined),
+                  ),
+                  Expanded(
+                    child: _buildStatItem(_userStats['totalReviews'] ?? '0',
+                        'Total\nReviews', Colors.purple, Icons.star_outline),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      );
+    } else {
+      return Card(
+        elevation: 2,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(15),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                    child: _buildStatItem(
+                        _userStats['vehiclesRented'] ?? '0',
+                        'Vehicles\nRented',
+                        Colors.blue,
+                        Icons.directions_car_outlined),
+                  ),
+                  Expanded(
+                    child: _buildStatItem(_userStats['totalReviews'] ?? '0',
+                        'Reviews\nGiven', Colors.orange, Icons.star_outline),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 20),
+              Row(
+                children: [
+                  Expanded(
+                    child: _buildStatItem(
+                        _userStats['favoriteVehicles'] ?? '0',
+                        'Favorite\nVehicles',
+                        Colors.red,
+                        Icons.favorite_outline),
+                  ),
+                  Expanded(
+                    child: _buildStatItem(
+                        'LKR ${_userStats['totalSpent'] ?? '0'}',
+                        'Total\nSpent',
+                        Colors.green,
+                        Icons.payment_outlined),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      );
+    }
   }
 }
