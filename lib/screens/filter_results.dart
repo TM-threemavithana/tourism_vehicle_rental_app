@@ -360,17 +360,19 @@ class _FilterResultsDrawerState extends State<FilterResultsDrawer> {
     final isDarkMode = theme.brightness == Brightness.dark;
     final screenSize = MediaQuery.of(context).size;
 
+    // Modify to take full height but only part of the width for side drawer
     return Container(
-      width: screenSize.width * 0.85,
+      width: screenSize.width * 0.85, // Keep width at 85%
       height: screenSize.height,
       decoration: BoxDecoration(
         color: isDarkMode ? AppColors.neutralDark : Colors.white,
+        // Change shadow direction for right side
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.3),
             spreadRadius: 1,
             blurRadius: 10,
-            offset: const Offset(-5, 0),
+            offset: const Offset(-5, 0), // Shadow on the left side
           ),
         ],
       ),
@@ -743,17 +745,7 @@ class _FilterResultsDrawerState extends State<FilterResultsDrawer> {
       // Close the filter drawer
       Navigator.pop(context);
 
-      // Trigger a new search in the parent to refresh results
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (context.mounted) {
-          // Find the parent scaffold and open the refine search drawer
-          final scaffold = Scaffold.of(context);
-          if (scaffold.hasDrawer) {
-            // This will trigger the _applyFilters in VehicleSearchResultsScreen
-            scaffold.openDrawer();
-          }
-        }
-      });
+      // No need to trigger refine search if using end drawer
       return;
     }
 

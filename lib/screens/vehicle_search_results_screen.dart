@@ -41,6 +41,9 @@ class _VehicleSearchResultsScreenState
   String? _errorMessage;
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
+  // Add a new GlobalKey for the end drawer
+  final GlobalKey<ScaffoldState> _filterDrawerKey = GlobalKey<ScaffoldState>();
+
   String _selectedSortOption = '';
   RangeValues _priceRange = const RangeValues(0, 50000);
   Set<String> _selectedFeatures = {};
@@ -139,61 +142,10 @@ class _VehicleSearchResultsScreenState
     }
   }
 
+  // Replace the _showFilterResultsDrawer method
   void _showFilterResultsDrawer() {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20.0)),
-      ),
-      builder: (context) {
-        return FilterResultsDrawer(
-          selectedVehicleTypes: widget.selectedVehicleTypes,
-          initialResults: _searchResults,
-          onFiltersApplied: (filteredResults, sortOption, priceRange, features,
-              fuelTypes, transmissionTypes, rentModes) {
-            setState(() {
-              _searchResults = filteredResults;
-              _selectedSortOption = sortOption;
-              _priceRange = priceRange;
-              _selectedFeatures = features;
-              _selectedFuelTypes = fuelTypes;
-              _selectedTransmissionTypes = transmissionTypes;
-              _selectedRentModes = rentModes;
-
-              // If the filtered results are empty after applying filters
-              if (_searchResults.isEmpty) {
-                // Check if we should perform a new search
-                bool shouldRefineSearch =
-                    true; // Default to true for empty results
-
-                // Set appropriate error message
-                _errorMessage = "No vehicles match your filter criteria";
-
-                // This signals to the Refine Search to update with current filters
-                if (shouldRefineSearch) {
-                  // Schedule this for after the current build cycle
-                  WidgetsBinding.instance.addPostFrameCallback((_) {
-                    if (mounted) {
-                      _performSearch();
-                    }
-                  });
-                }
-              } else {
-                // Clear error message when we have results
-                _errorMessage = null;
-              }
-            });
-          },
-          initialPriceRange: _priceRange,
-          initialSortOption: _selectedSortOption,
-          initialFeatures: _selectedFeatures,
-          initialFuelTypes: _selectedFuelTypes,
-          initialTransmissionTypes: _selectedTransmissionTypes,
-          initialRentModes: _selectedRentModes,
-        );
-      },
-    );
+    // Use the end drawer instead of modal bottom sheet
+    _filterDrawerKey.currentState?.openEndDrawer();
   }
 
   @override
@@ -201,7 +153,7 @@ class _VehicleSearchResultsScreenState
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
-      key: _scaffoldKey,
+      key: _filterDrawerKey, // Change from _scaffoldKey to _filterDrawerKey
       backgroundColor:
           isDarkMode ? AppColors.neutralDark : AppColors.neutralBackground,
       drawer: RefineSearch(
@@ -213,6 +165,43 @@ class _VehicleSearchResultsScreenState
         returnTime: widget.returnTime,
         flexibleDates: widget.flexibleDates,
         onApplyFilters: _applyFilters,
+      ),
+      // Add the end drawer for filter results
+      endDrawer: FilterResultsDrawer(
+        selectedVehicleTypes: widget.selectedVehicleTypes,
+        initialResults: _searchResults,
+        initialSortOption: _selectedSortOption,
+        initialPriceRange: _priceRange,
+        initialFeatures: _selectedFeatures,
+        initialFuelTypes: _selectedFuelTypes,
+        initialTransmissionTypes: _selectedTransmissionTypes,
+        initialRentModes: _selectedRentModes,
+        onFiltersApplied: (filteredResults, sortOption, priceRange, features,
+            fuelTypes, transmissionTypes, rentModes) {
+          setState(() {
+            _searchResults = filteredResults;
+            _selectedSortOption = sortOption;
+            _priceRange = priceRange;
+            _selectedFeatures = features;
+            _selectedFuelTypes = fuelTypes;
+            _selectedTransmissionTypes = transmissionTypes;
+            _selectedRentModes = rentModes;
+
+            // If the filtered results are empty after applying filters
+            if (_searchResults.isEmpty) {
+              bool shouldRefineSearch = true;
+              _errorMessage = "No vehicles match your filter criteria";
+              // Schedule for after the current build cycle
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                if (mounted && shouldRefineSearch) {
+                  _performSearch();
+                }
+              });
+            } else {
+              _errorMessage = null;
+            }
+          });
+        },
       ),
       appBar: AppBar(
         backgroundColor: AppColors.primary,
