@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../../helpers/feature_icon_helper.dart';
-import '../../utils/app_colors.dart';
 
 class VehicleFeaturesSection extends StatelessWidget {
   final Map<String, dynamic> vehicleDetails;
