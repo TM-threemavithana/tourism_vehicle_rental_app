@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:share_plus/share_plus.dart';
 import '../services/favorites_service.dart';
 import '../services/dynamic_links_service.dart';
 

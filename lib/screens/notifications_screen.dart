@@ -7,7 +7,7 @@ import 'owner/booking_requests_screen.dart';
 import 'vehicle_detail_page.dart';
 
 class NotificationsScreen extends StatefulWidget {
-  const NotificationsScreen({Key? key}) : super(key: key);
+  const NotificationsScreen({super.key});
 
   @override
   State<NotificationsScreen> createState() => _NotificationsScreenState();
@@ -15,7 +15,7 @@ class NotificationsScreen extends StatefulWidget {
 
 class _NotificationsScreenState extends State<NotificationsScreen> {
   bool _isMenuOpen = false;
-  String _currentTab = 'Notifications';
+  final String _currentTab = 'Notifications';
   String _userType = 'renter'; // Default, will be updated in initState
 
   @override
