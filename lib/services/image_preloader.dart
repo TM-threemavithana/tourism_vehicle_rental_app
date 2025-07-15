@@ -10,11 +10,8 @@ class ImagePreloader {
   final Map<String, bool> _preloadedImages = {};
   bool _preloadingComplete = false;
 
-  // List of all critical images - include all onboarding images first
+  // List of all critical images - onboarding images removed
   final List<String> _criticalImages = [
-    'assets/images/image1.jpg', // Slide 1 - load this first
-    'assets/images/image2.jpg', // Slide 2
-    'assets/images/image3.jpg', // Slide 3
     'assets/images/road_background.jpg', // Home screen
     'assets/images/logo.png',
     'assets/images/splash_background.png',

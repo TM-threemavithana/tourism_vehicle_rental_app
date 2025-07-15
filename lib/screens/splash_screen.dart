@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'dart:async';
 import 'dart:math' as math;
-import 'onboarding/onboarding_screen.dart';
-import 'auth/auth_wrapper.dart';
+import 'welcome_screen.dart';
 import '../services/image_preloader.dart'; // Add this import
 
 class SplashScreen extends StatefulWidget {
@@ -148,15 +147,12 @@ class _SplashScreenState extends State<SplashScreen>
 
   // Method to handle navigation
   void _navigateToNextScreen() {
-    // Check if user has seen onboarding before
-    final bool hasSeenOnboarding = false; // Replace with actual logic
-
+    // Navigate to WelcomeScreen after splash
     Navigator.pushReplacement(
       context,
       PageRouteBuilder(
         transitionDuration: const Duration(milliseconds: 800),
-        pageBuilder: (_, __, ___) =>
-            hasSeenOnboarding ? const AuthWrapper() : const OnboardingScreen(),
+        pageBuilder: (_, __, ___) => const WelcomeScreen(),
         transitionsBuilder: (_, animation, __, child) {
           return FadeTransition(
             opacity: animation,
