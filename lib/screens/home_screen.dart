@@ -233,13 +233,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           ),
           onPressed: _toggleMenu,
         ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.logout, color: Colors.white, size: 22),
-            onPressed: _signOut,
-            tooltip: 'Sign Out',
-          ),
-        ],
+        // Removed logout button from actions
       ),
       body: Stack(
         children: [
@@ -258,8 +252,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                   colors: [
-                    Colors.black.withOpacity(0.15),
-                    Colors.black.withOpacity(0.4),
+                    Colors.black.withOpacity(0.05), // Reduced from 0.15
+                    Colors.black.withOpacity(0.2), // Reduced from 0.4
                   ],
                 ),
               ),

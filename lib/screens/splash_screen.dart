@@ -174,10 +174,9 @@ class _SplashScreenState extends State<SplashScreen>
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    precacheImage(
-        const AssetImage('assets/images/login_background.jpg'), context);
-    precacheImage(
-        const AssetImage('assets/images/signup_background.jpg'), context);
+    precacheImage(const AssetImage('assets/images/splash_background.png'), context);
+    precacheImage(const AssetImage('assets/images/login_background.jpg'), context);
+    precacheImage(const AssetImage('assets/images/signup_background.jpg'), context);
   }
 
   // New method to ensure splash screen shows for minimum time

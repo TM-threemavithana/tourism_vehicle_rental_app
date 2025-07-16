@@ -148,9 +148,21 @@ class _SideMenuState extends State<SideMenu> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Removed the top row with menu icon
-          // Add top spacing
-          const SizedBox(height: 20),
+          // Top row with menu icon
+          Padding(
+            padding: const EdgeInsets.only(top: 20.0, left: 8.0, bottom: 8.0),
+            child: Container(
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                shape: BoxShape.circle,
+              ),
+              child: IconButton(
+                icon: const Icon(Icons.menu, color: Colors.black, size: 28),
+                onPressed: () => widget.onClose(),
+                tooltip: 'Close Menu',
+              ),
+            ),
+          ),
 
           // User Profile Section
           Container(
