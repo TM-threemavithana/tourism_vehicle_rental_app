@@ -295,6 +295,11 @@ class _OwnerDashboardScreenState extends State<OwnerDashboardScreen>
     return Scaffold(
       body: Stack(
         children: [
+          // Yellow status bar overlay
+          Container(
+            height: MediaQuery.of(context).padding.top,
+            color: const Color(0xFFFFC107),
+          ),
           // Background with gradient
           Container(
             decoration: BoxDecoration(

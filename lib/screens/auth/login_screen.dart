@@ -42,6 +42,13 @@ class _LoginScreenState extends State<LoginScreen>
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    precacheImage(
+        const AssetImage('assets/images/login_background.jpg'), context);
+  }
+
+  @override
   void dispose() {
     _emailController.dispose();
     _passwordController.dispose();

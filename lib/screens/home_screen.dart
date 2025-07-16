@@ -13,9 +13,10 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen>
-    with SingleTickerProviderStateMixin {
+class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   late AnimationController _controller;
+  late AnimationController _menuController;
+  late Animation<double> _menuAnimation;
   final List<String> _vehicleTypes = [
     'Bike',
     'Three-Wheeler',
@@ -67,24 +68,40 @@ class _HomeScreenState extends State<HomeScreen>
       duration: const Duration(seconds: 15),
       vsync: this,
     )..repeat();
+
+    _menuController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 600),
+    );
+    _menuAnimation = CurvedAnimation(
+      parent: _menuController,
+      curve: Curves.easeInOut,
+    );
   }
 
   @override
   void dispose() {
     _controller.dispose();
     _locationController.dispose();
+    _menuController.dispose();
     super.dispose();
   }
 
   void _toggleMenu() {
     setState(() {
       _isMenuOpen = !_isMenuOpen;
+      if (_isMenuOpen) {
+        _menuController.forward();
+      } else {
+        _menuController.reverse();
+      }
     });
   }
 
   void _closeMenu() {
     setState(() {
       _isMenuOpen = false;
+      _menuController.reverse();
     });
   }
 
@@ -209,9 +226,9 @@ class _HomeScreenState extends State<HomeScreen>
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(
-            _isMenuOpen ? Icons.close : Icons.menu,
-            color: _isMenuOpen ? Colors.black : Colors.white,
+          icon: const Icon(
+            Icons.menu,
+            color: Colors.white,
             size: 24,
           ),
           onPressed: _toggleMenu,
@@ -677,36 +694,12 @@ class _HomeScreenState extends State<HomeScreen>
             ),
           ),
           // Side menu and overlay
-          if (_isMenuOpen) ...[
+          if (_isMenuOpen || _menuController.value > 0) ...[
             Positioned.fill(
               child: GestureDetector(
                 onTap: _closeMenu,
                 child: Container(
-                  color: Colors.black.withOpacity(0.5),
-                ),
-              ),
-            ),
-            Positioned(
-              top: 0,
-              left: 0,
-              bottom: 0,
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 300),
-                curve: Curves.easeInOut,
-                transform: Matrix4.translationValues(
-                  _isMenuOpen ? 0 : -MediaQuery.of(context).size.width * 0.7,
-                  0,
-                  0,
-                ),
-                child: SideMenu(
-                  onClose: _closeMenu,
-                  onSignOut: _signOut,
-                  onTabChange: _updateCurrentTab,
-                  onProfileTap:
-                      _navigateToProfile, // Use the navigation method here
-                  width: 0.7,
-                  user: FirebaseAuth.instance.currentUser,
-                  currentTab: _currentTab,
+                  color: Colors.black.withOpacity(0.5 * _menuController.value),
                 ),
               ),
             ),
@@ -722,7 +715,45 @@ class _HomeScreenState extends State<HomeScreen>
                 onPressed: _toggleMenu,
               ),
             ),
+            Positioned(
+              top: 0,
+              left: 0,
+              bottom: 0,
+              child: AnimatedBuilder(
+                animation: _menuAnimation,
+                builder: (context, child) {
+                  return Transform.translate(
+                    offset: Offset(
+                      -MediaQuery.of(context).size.width *
+                          0.7 *
+                          (1 - _menuAnimation.value),
+                      0,
+                    ),
+                    child: child,
+                  );
+                },
+                child: SideMenu(
+                  onClose: _closeMenu,
+                  onSignOut: _signOut,
+                  onTabChange: _updateCurrentTab,
+                  onProfileTap: _navigateToProfile,
+                  width: 0.7,
+                  user: FirebaseAuth.instance.currentUser,
+                  currentTab: _currentTab,
+                ),
+              ),
+            ),
           ],
+          // Yellow status bar overlay (always on top)
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            child: Container(
+              height: MediaQuery.of(context).padding.top,
+              color: const Color(0xFFFFC107),
+            ),
+          ),
         ],
       ),
     );

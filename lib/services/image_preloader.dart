@@ -15,6 +15,16 @@ class ImagePreloader {
     'assets/images/road_background.jpg', // Home screen
     'assets/images/logo.png',
     'assets/images/splash_background.png',
+    'assets/images/login_background.jpg',
+    'assets/images/signup_background.jpg',
+    'assets/images/browse_vehicle.png',
+    'assets/images/request_vehicle.png',
+    'assets/images/main_sample.jpg',
+    'assets/images/front_sample.jpg',
+    'assets/images/rear_sample.jpg',
+    'assets/images/side_sample.jpg',
+    'assets/images/dashboard_sample.jpg',
+    'assets/images/additional_sample.jpg',
   ];
 
   // Check if preloading has completed

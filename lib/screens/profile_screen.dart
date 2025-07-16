@@ -538,6 +538,11 @@ class _ProfileScreenState extends State<ProfileScreen>
       ),
       body: Stack(
         children: [
+          // Yellow status bar overlay
+          Container(
+            height: MediaQuery.of(context).padding.top,
+            color: const Color(0xFFFFC107),
+          ),
           // Main content
           SingleChildScrollView(
             child: Column(

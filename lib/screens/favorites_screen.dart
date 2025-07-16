@@ -99,6 +99,11 @@ class _FavoritesScreenState extends State<FavoritesScreen>
       ),
       body: Stack(
         children: [
+          // Yellow status bar overlay
+          Container(
+            height: MediaQuery.of(context).padding.top,
+            color: const Color(0xFFFFC107),
+          ),
           // Main content
           SafeArea(
             child: FadeTransition(

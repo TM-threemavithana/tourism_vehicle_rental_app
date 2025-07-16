@@ -44,6 +44,13 @@ class _SignupScreenState extends State<SignupScreen>
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    precacheImage(
+        const AssetImage('assets/images/signup_background.jpg'), context);
+  }
+
+  @override
   void dispose() {
     _nameController.dispose();
     _emailController.dispose();

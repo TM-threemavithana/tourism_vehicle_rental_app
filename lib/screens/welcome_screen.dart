@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'home_screen.dart';
 
 class WelcomeScreen extends StatelessWidget {
   const WelcomeScreen({super.key});
@@ -7,52 +8,66 @@ class WelcomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF7FBEF),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Center(
-                child: Padding(
-                  padding: const EdgeInsets.only(top: 8, bottom: 16),
-                  child: Text(
-                    'Wayz',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black.withOpacity(0.8),
+      body: Stack(
+        children: [
+          // Yellow status bar overlay
+          Container(
+            height: MediaQuery.of(context).padding.top,
+            color: const Color(0xFFFFC107),
+          ),
+          SafeArea(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Center(
+                    child: Padding(
+                      padding: const EdgeInsets.only(top: 8, bottom: 16),
+                      child: Text(
+                        'Wayz',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black.withOpacity(0.8),
+                        ),
+                      ),
                     ),
                   ),
-                ),
+                  _FeatureCard(
+                    image:
+                        'assets/images/browse_vehicle.png', // Replace with your asset
+                    title: 'Browse Vehicles',
+                    description:
+                        "Explore our diverse fleet of vehicles, from scooters to luxury cars, perfect for your Sri Lankan adventure.",
+                    buttonText: 'Browse',
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const HomeScreen(),
+                        ),
+                      );
+                    },
+                  ),
+                  const SizedBox(height: 20),
+                  _FeatureCard(
+                    image:
+                        'assets/images/request_vehicle.png', // Replace with your asset
+                    title: 'Request a Vehicle',
+                    description:
+                        "Can't find what you're looking for? Post a request and let our network of providers find the perfect vehicle for you.",
+                    buttonText: 'Request',
+                    onPressed: () {
+                      // TODO: Navigate to request vehicle
+                    },
+                    buttonColor: Color(0xFFB6E23A),
+                  ),
+                ],
               ),
-              _FeatureCard(
-                image:
-                    'assets/images/browse_vehicle.png', // Replace with your asset
-                title: 'Browse Vehicles',
-                description:
-                    "Explore our diverse fleet of vehicles, from scooters to luxury cars, perfect for your Sri Lankan adventure.",
-                buttonText: 'Browse',
-                onPressed: () {
-                  // TODO: Navigate to browse vehicles
-                },
-              ),
-              const SizedBox(height: 20),
-              _FeatureCard(
-                image:
-                    'assets/images/request_vehicle.png', // Replace with your asset
-                title: 'Request a Vehicle',
-                description:
-                    "Can't find what you're looking for? Post a request and let our network of providers find the perfect vehicle for you.",
-                buttonText: 'Request',
-                onPressed: () {
-                  // TODO: Navigate to request vehicle
-                },
-                buttonColor: Color(0xFFB6E23A),
-              ),
-            ],
+            ),
           ),
-        ),
+        ],
       ),
     );
   }

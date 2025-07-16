@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/services.dart';
 
 class SideMenu extends StatefulWidget {
   final Function onClose;
@@ -103,12 +104,51 @@ class _SideMenuState extends State<SideMenu> {
       );
     }
 
+    // If not logged in, show only Sign In and Create Account at the bottom
+    if (widget.user == null) {
+      return Container(
+        width: MediaQuery.of(context).size.width * widget.width,
+        color: Colors.white,
+        child: Column(
+          children: [
+            Expanded(child: Container()), // Empty space at the top
+            Padding(
+              padding: const EdgeInsets.only(bottom: 40.0),
+              child: Column(
+                children: [
+                  ListTile(
+                    leading: const Icon(Icons.login, color: Colors.black),
+                    title: const Text('Sign In',
+                        style: TextStyle(fontWeight: FontWeight.bold)),
+                    onTap: () {
+                      widget.onClose();
+                      Navigator.pushReplacementNamed(context, '/auth');
+                    },
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.person_add, color: Colors.black),
+                    title: const Text('Create Account',
+                        style: TextStyle(fontWeight: FontWeight.bold)),
+                    onTap: () {
+                      widget.onClose();
+                      Navigator.pushReplacementNamed(context, '/auth');
+                    },
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
     return Container(
       width: MediaQuery.of(context).size.width * widget.width,
       color: Colors.white,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Removed the top row with menu icon
           // Add top spacing
           const SizedBox(height: 20),
 

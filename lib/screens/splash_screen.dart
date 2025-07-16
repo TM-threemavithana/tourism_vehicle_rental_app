@@ -4,6 +4,75 @@ import 'dart:async';
 import 'dart:math' as math;
 import 'welcome_screen.dart';
 import '../services/image_preloader.dart'; // Add this import
+import 'dart:typed_data';
+
+// Transparent image for FadeInImage placeholder
+const List<int> kTransparentImage = <int>[
+  0x89,
+  0x50,
+  0x4E,
+  0x47,
+  0x0D,
+  0x0A,
+  0x1A,
+  0x0A,
+  0x00,
+  0x00,
+  0x00,
+  0x0D,
+  0x49,
+  0x48,
+  0x44,
+  0x52,
+  0x00,
+  0x00,
+  0x00,
+  0x01,
+  0x00,
+  0x00,
+  0x00,
+  0x01,
+  0x08,
+  0x06,
+  0x00,
+  0x00,
+  0x00,
+  0x1F,
+  0x15,
+  0xC4,
+  0x89,
+  0x00,
+  0x00,
+  0x00,
+  0x0A,
+  0x49,
+  0x44,
+  0x41,
+  0x54,
+  0x78,
+  0x9C,
+  0x63,
+  0x00,
+  0x01,
+  0x00,
+  0x00,
+  0x05,
+  0x00,
+  0x01,
+  0x0D,
+  0x0A,
+  0x2D,
+  0xB4,
+  0x00,
+  0x00,
+  0x00,
+  0x00,
+  0x49,
+  0x45,
+  0x4E,
+  0x44,
+  0xAE,
+];
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -102,6 +171,15 @@ class _SplashScreenState extends State<SplashScreen>
     _ensureMinimumSplashTime();
   }
 
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    precacheImage(
+        const AssetImage('assets/images/login_background.jpg'), context);
+    precacheImage(
+        const AssetImage('assets/images/signup_background.jpg'), context);
+  }
+
   // New method to ensure splash screen shows for minimum time
   void _ensureMinimumSplashTime() {
     Future.delayed(const Duration(seconds: 3), () {
@@ -178,9 +256,11 @@ class _SplashScreenState extends State<SplashScreen>
         fit: StackFit.expand,
         children: [
           // Background image with overlay gradient
-          Image.asset(
-            'assets/images/splash_background.png',
+          FadeInImage(
+            placeholder: MemoryImage(Uint8List.fromList(kTransparentImage)),
+            image: AssetImage('assets/images/splash_background.png'),
             fit: BoxFit.cover,
+            fadeInDuration: Duration(milliseconds: 400),
           ),
 
           // Animated waves at the bottom

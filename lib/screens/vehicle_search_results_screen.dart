@@ -221,79 +221,90 @@ class _VehicleSearchResultsScreenState
         ),
         automaticallyImplyLeading: false,
       ),
-      body: Column(
+      body: Stack(
         children: [
+          // Yellow status bar overlay
           Container(
-            color: isDarkMode ? AppColors.neutralDark : AppColors.secondary,
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            child: Row(
-              children: [
-                Expanded(
-                  child: GestureDetector(
-                    onTap: () {
-                      _scaffoldKey.currentState?.openDrawer();
-                    },
-                    child: Row(
-                      children: const [
-                        Icon(Icons.tune, color: Colors.white, size: 20),
-                        SizedBox(width: 8),
-                        Text(
-                          'Refine Search',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                Container(
-                  height: 24,
-                  width: 1,
-                  color: Colors.white.withOpacity(0.3),
-                ),
-                Expanded(
-                  child: GestureDetector(
-                    onTap: _showFilterResultsDrawer,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: const [
-                        Icon(Icons.filter_list, color: Colors.white, size: 20),
-                        SizedBox(width: 8),
-                        Text(
-                          'Filter Results',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
+            height: MediaQuery.of(context).padding.top,
+            color: const Color(0xFFFFC107),
           ),
-          Expanded(
-            child: _isLoading
-                ? Center(
-                    child: CircularProgressIndicator(
-                      color: AppColors.primary,
+          Column(
+            children: [
+              Container(
+                color: isDarkMode ? AppColors.neutralDark : AppColors.secondary,
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: () {
+                          _scaffoldKey.currentState?.openDrawer();
+                        },
+                        child: Row(
+                          children: const [
+                            Icon(Icons.tune, color: Colors.white, size: 20),
+                            SizedBox(width: 8),
+                            Text(
+                              'Refine Search',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
-                  )
-                : _errorMessage != null
+                    Container(
+                      height: 24,
+                      width: 1,
+                      color: Colors.white.withOpacity(0.3),
+                    ),
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: _showFilterResultsDrawer,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: const [
+                            Icon(Icons.filter_list,
+                                color: Colors.white, size: 20),
+                            SizedBox(width: 8),
+                            Text(
+                              'Filter Results',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Expanded(
+                child: _isLoading
                     ? Center(
-                        child: Text(
-                          _errorMessage!,
-                          style: TextStyle(color: AppColors.error),
+                        child: CircularProgressIndicator(
+                          color: AppColors.primary,
                         ),
                       )
-                    : _searchResults.isEmpty
-                        ? _buildNoResultsView()
-                        : _buildResultsListView(),
+                    : _errorMessage != null
+                        ? Center(
+                            child: Text(
+                              _errorMessage!,
+                              style: TextStyle(color: AppColors.error),
+                            ),
+                          )
+                        : _searchResults.isEmpty
+                            ? _buildNoResultsView()
+                            : _buildResultsListView(),
+              ),
+            ],
           ),
         ],
       ),
