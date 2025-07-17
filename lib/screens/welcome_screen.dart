@@ -117,7 +117,8 @@ class _FeatureCard extends StatelessWidget {
     required this.title,
     required this.description,
     required this.buttonText,
-    required this.onPressed, // Properly initialize buttonColor
+    required this.onPressed,
+    this.buttonColor,
     this.isLoading = false,
   });
 
