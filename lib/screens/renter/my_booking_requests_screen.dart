@@ -4,6 +4,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:intl/intl.dart';
 import '../../utils/app_colors.dart';
 import '../../widgets/not_logged_in_widget.dart';
+import '../../widgets/custom_bottom_nav_bar.dart';
+import '../welcome_screen.dart';
+import '../profile_screen.dart';
 
 class MyBookingRequestsScreen extends StatelessWidget {
   const MyBookingRequestsScreen({super.key});
@@ -17,6 +20,24 @@ class MyBookingRequestsScreen extends StatelessWidget {
       return Scaffold(
         appBar: AppBar(title: const Text('My Booking Requests')),
         body: const NotLoggedInWidget(),
+        bottomNavigationBar: CustomBottomNavBar(
+          currentIndex: 1,
+          onTap: (index) {
+            if (index == 0) {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => const WelcomeScreen()),
+              );
+            } else if (index == 2) {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                    builder: (context) =>
+                        ProfileScreen(user: FirebaseAuth.instance.currentUser)),
+              );
+            }
+          },
+        ),
       );
     }
 
@@ -91,6 +112,24 @@ class MyBookingRequestsScreen extends StatelessWidget {
               return _buildRequestCard(context, data, isDarkMode);
             },
           );
+        },
+      ),
+      bottomNavigationBar: CustomBottomNavBar(
+        currentIndex: 1,
+        onTap: (index) {
+          if (index == 0) {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => const WelcomeScreen()),
+            );
+          } else if (index == 2) {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                  builder: (context) =>
+                      ProfileScreen(user: FirebaseAuth.instance.currentUser)),
+            );
+          }
         },
       ),
     );
