@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:intl/intl.dart';
 import '../../utils/app_colors.dart';
+import '../../widgets/not_logged_in_widget.dart';
 
 class MyBookingRequestsScreen extends StatelessWidget {
   const MyBookingRequestsScreen({super.key});
@@ -15,8 +16,7 @@ class MyBookingRequestsScreen extends StatelessWidget {
     if (currentUser == null) {
       return Scaffold(
         appBar: AppBar(title: const Text('My Booking Requests')),
-        body: const Center(
-            child: Text('Please log in to view your booking requests')),
+        body: const NotLoggedInWidget(),
       );
     }
 

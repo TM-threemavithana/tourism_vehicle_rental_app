@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'home_screen.dart';
 import 'request_vehicle_screen.dart';
+import '../widgets/custom_bottom_nav_bar.dart';
+import 'renter/my_booking_requests_screen.dart';
+import 'profile_screen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class WelcomeScreen extends StatefulWidget {
   const WelcomeScreen({super.key});
@@ -104,6 +108,25 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
             ),
           ),
         ],
+      ),
+      bottomNavigationBar: CustomBottomNavBar(
+        currentIndex: 0,
+        onTap: (index) {
+          if (index == 1) {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => const MyBookingRequestsScreen()),
+            );
+          } else if (index == 2) {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                  builder: (context) =>
+                      ProfileScreen(user: FirebaseAuth.instance.currentUser)),
+            );
+          }
+        },
       ),
     );
   }

@@ -10,6 +10,7 @@ import '../widgets/side_menu.dart';
 import '../utils/app_colors.dart';
 import '../screens/home_screen.dart';
 import 'owner/owner_dashboard_screen.dart';
+import '../widgets/not_logged_in_widget.dart';
 
 class ProfileScreen extends StatefulWidget {
   final User? user;
@@ -487,6 +488,11 @@ class _ProfileScreenState extends State<ProfileScreen>
 
   @override
   Widget build(BuildContext context) {
+    if (widget.user == null) {
+      return const Scaffold(
+        body: NotLoggedInWidget(),
+      );
+    }
     final theme = Theme.of(context);
 
     return Scaffold(
