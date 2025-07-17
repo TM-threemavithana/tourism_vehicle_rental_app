@@ -81,6 +81,17 @@ class _BookingConfirmationSectionState
     // Calculate rental details
     final rentalDetails = _calculateRentalDetails();
 
+    // Helper to check login and redirect
+    Future<void> handleRequestBooking() async {
+      final currentUser = FirebaseAuth.instance.currentUser;
+      if (currentUser == null) {
+        // Not logged in, navigate to login
+        Navigator.pushNamed(context, '/auth');
+        return;
+      }
+      _sendBookingRequest();
+    }
+
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 8),
       padding: const EdgeInsets.all(16),
@@ -323,7 +334,7 @@ class _BookingConfirmationSectionState
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
-                onPressed: widget.hasApplied ? _sendBookingRequest : null,
+                onPressed: widget.hasApplied ? handleRequestBooking : null,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: theme.colorScheme.primary,
                   foregroundColor: Colors.white,
@@ -631,17 +642,18 @@ class _BookingConfirmationSectionState
           .collection('users')
           .doc(widget.vehicleDetails['ownerId'])
           .get();
-      
+
       final ownerOneSignalId = ownerDoc.data()?['oneSignalPlayerId'];
 
       if (ownerOneSignalId != null) {
         final oneSignalService = OneSignalService();
-        
+
         // Send notification to owner about new booking request
         await oneSignalService.sendNotificationToUser(
           playerId: ownerOneSignalId,
           title: "New Booking Request",
-          content: "${currentUser.displayName} wants to rent your ${widget.vehicleDetails['make']} ${widget.vehicleDetails['model']}",
+          content:
+              "${currentUser.displayName} wants to rent your ${widget.vehicleDetails['make']} ${widget.vehicleDetails['model']}",
           notificationType: 'booking_request',
           data: {'requestId': _requestId},
         );

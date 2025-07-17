@@ -39,54 +39,71 @@ class _VehicleDetailPageState extends State<VehicleDetailPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CustomAppBar(
-        title: "${widget.vehicle['make'] ?? ''} ${widget.vehicle['model'] ?? ''}",
+        title:
+            "${widget.vehicle['make'] ?? ''} ${widget.vehicle['model'] ?? ''}",
         vehicleDetails: widget.vehicle,
         showBackButton: true,
         showShareButton: true,
         showFavoriteButton: true,
-        backgroundColor: Colors.transparent,
+        backgroundColor: const Color(0xFFFFC107),
+        iconColor: Colors.black,
       ),
-      body: CustomScrollView(
-        slivers: [
-          // Image Carousel in App Bar
-          VehicleImageCarousel(vehicleDetails: _vehicleDetails),
-
-          // Main content
-          SliverToBoxAdapter(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Vehicle information header with logo and name
-                VehicleInfoHeader(vehicleDetails: _vehicleDetails),
-
-                // Divider
-                const Divider(height: 1),
-
-                // Vehicle specifications section
-                VehicleSpecificationsSection(vehicleDetails: _vehicleDetails),
-
-                // Divider
-                const Divider(height: 1),
-
-                // Vehicle features section
-                VehicleFeaturesSection(vehicleDetails: _vehicleDetails),
-
-                // Divider
-                const Divider(height: 1),
-
-                // Rental information section
-                RentalInfoSection(vehicleDetails: _vehicleDetails),
-
-                // Divider
-                const Divider(height: 1),
-
-                // Booking form section
-                BookingFormSection(vehicleDetails: _vehicleDetails),
-
-                // Bottom padding
-                const SizedBox(height: 24),
-              ],
+      body: Stack(
+        children: [
+          // Yellow status bar overlay
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            child: Container(
+              height: MediaQuery.of(context).padding.top,
+              color: const Color(0xFFFFC107),
             ),
+          ),
+          CustomScrollView(
+            slivers: [
+              // Image Carousel in App Bar
+              VehicleImageCarousel(vehicleDetails: _vehicleDetails),
+
+              // Main content
+              SliverToBoxAdapter(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Vehicle information header with logo and name
+                    VehicleInfoHeader(vehicleDetails: _vehicleDetails),
+
+                    // Divider
+                    const Divider(height: 1),
+
+                    // Vehicle specifications section
+                    VehicleSpecificationsSection(
+                        vehicleDetails: _vehicleDetails),
+
+                    // Divider
+                    const Divider(height: 1),
+
+                    // Vehicle features section
+                    VehicleFeaturesSection(vehicleDetails: _vehicleDetails),
+
+                    // Divider
+                    const Divider(height: 1),
+
+                    // Rental information section
+                    RentalInfoSection(vehicleDetails: _vehicleDetails),
+
+                    // Divider
+                    const Divider(height: 1),
+
+                    // Booking form section
+                    BookingFormSection(vehicleDetails: _vehicleDetails),
+
+                    // Bottom padding
+                    const SizedBox(height: 24),
+                  ],
+                ),
+              ),
+            ],
           ),
         ],
       ),

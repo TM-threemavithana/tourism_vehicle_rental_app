@@ -26,7 +26,7 @@ class _AuthWrapperState extends State<AuthWrapper> {
           final User? user = snapshot.data;
 
           if (user == null) {
-            return const HomeScreen();
+            return const LoginScreen();
           } else {
             // Check if user is newly created (first time)
             if (user.metadata.creationTime != null &&

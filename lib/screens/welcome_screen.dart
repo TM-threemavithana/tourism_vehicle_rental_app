@@ -1,8 +1,46 @@
 import 'package:flutter/material.dart';
 import 'home_screen.dart';
 
-class WelcomeScreen extends StatelessWidget {
+class WelcomeScreen extends StatefulWidget {
   const WelcomeScreen({super.key});
+
+  @override
+  State<WelcomeScreen> createState() => _WelcomeScreenState();
+}
+
+class _WelcomeScreenState extends State<WelcomeScreen> {
+  bool _isLoading = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Precache HomeScreen images
+    precacheImage(const AssetImage('assets/images/logo.png'), context);
+    precacheImage(
+        const AssetImage('assets/images/road_background.jpg'), context);
+  }
+
+  Future<void> _navigateToHome(BuildContext context) async {
+    setState(() => _isLoading = true);
+    // Ensure images are precached before navigating
+    await precacheImage(const AssetImage('assets/images/logo.png'), context);
+    await precacheImage(
+        const AssetImage('assets/images/road_background.jpg'), context);
+    setState(() => _isLoading = false);
+    if (!mounted) return;
+    Navigator.of(context).push(
+      PageRouteBuilder(
+        transitionDuration: const Duration(milliseconds: 400),
+        pageBuilder: (_, __, ___) => const HomeScreen(),
+        transitionsBuilder: (_, animation, __, child) {
+          return FadeTransition(
+            opacity: animation,
+            child: child,
+          );
+        },
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -35,25 +73,18 @@ class WelcomeScreen extends StatelessWidget {
                     ),
                   ),
                   _FeatureCard(
-                    image:
-                        'assets/images/browse_vehicle.png', // Replace with your asset
+                    image: 'assets/images/browse_vehicle.png',
                     title: 'Browse Vehicles',
                     description:
                         "Explore our diverse fleet of vehicles, from scooters to luxury cars, perfect for your Sri Lankan adventure.",
                     buttonText: 'Browse',
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const HomeScreen(),
-                        ),
-                      );
-                    },
+                    onPressed:
+                        _isLoading ? null : () => _navigateToHome(context),
+                    isLoading: _isLoading,
                   ),
                   const SizedBox(height: 20),
                   _FeatureCard(
-                    image:
-                        'assets/images/request_vehicle.png', // Replace with your asset
+                    image: 'assets/images/request_vehicle.png',
                     title: 'Request a Vehicle',
                     description:
                         "Can't find what you're looking for? Post a request and let our network of providers find the perfect vehicle for you.",
@@ -61,7 +92,6 @@ class WelcomeScreen extends StatelessWidget {
                     onPressed: () {
                       // TODO: Navigate to request vehicle
                     },
-                    buttonColor: Color(0xFFB6E23A),
                   ),
                 ],
               ),
@@ -78,8 +108,9 @@ class _FeatureCard extends StatelessWidget {
   final String title;
   final String description;
   final String buttonText;
-  final VoidCallback onPressed;
+  final VoidCallback? onPressed;
   final Color? buttonColor;
+  final bool isLoading;
 
   const _FeatureCard({
     required this.image,
@@ -87,7 +118,8 @@ class _FeatureCard extends StatelessWidget {
     required this.description,
     required this.buttonText,
     required this.onPressed,
-    this.buttonColor,
+    this.buttonColor, // Properly initialize buttonColor
+    this.isLoading = false,
   });
 
   @override
@@ -159,7 +191,17 @@ class _FeatureCard extends StatelessWidget {
                       elevation: 0,
                     ),
                     onPressed: onPressed,
-                    child: Text(buttonText),
+                    child: isLoading
+                        ? const SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              valueColor:
+                                  AlwaysStoppedAnimation<Color>(Colors.black),
+                            ),
+                          )
+                        : Text(buttonText),
                   ),
                 ),
               ],

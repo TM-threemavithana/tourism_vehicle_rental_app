@@ -205,16 +205,16 @@ class _VehicleSearchResultsScreenState
         },
       ),
       appBar: AppBar(
-        backgroundColor: AppColors.primary,
+        backgroundColor: const Color(0xFFFFC107),
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          icon: const Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
           _buildSearchTitle(),
           style: const TextStyle(
-            color: Colors.white,
+            color: Colors.black,
             fontWeight: FontWeight.bold,
             fontSize: 18,
           ),
@@ -224,9 +224,14 @@ class _VehicleSearchResultsScreenState
       body: Stack(
         children: [
           // Yellow status bar overlay
-          Container(
-            height: MediaQuery.of(context).padding.top,
-            color: const Color(0xFFFFC107),
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            child: Container(
+              height: MediaQuery.of(context).padding.top,
+              color: const Color(0xFFFFC107),
+            ),
           ),
           Column(
             children: [
@@ -239,7 +244,7 @@ class _VehicleSearchResultsScreenState
                     Expanded(
                       child: GestureDetector(
                         onTap: () {
-                          _scaffoldKey.currentState?.openDrawer();
+                          _filterDrawerKey.currentState?.openDrawer();
                         },
                         child: Row(
                           children: const [
