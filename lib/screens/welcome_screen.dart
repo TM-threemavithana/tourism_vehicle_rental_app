@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'home_screen.dart';
+import 'request_vehicle_screen.dart';
 
 class WelcomeScreen extends StatefulWidget {
   const WelcomeScreen({super.key});
@@ -90,7 +91,12 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                         "Can't find what you're looking for? Post a request and let our network of providers find the perfect vehicle for you.",
                     buttonText: 'Request',
                     onPressed: () {
-                      // TODO: Navigate to request vehicle
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const RequestVehicleScreen(),
+                        ),
+                      );
                     },
                   ),
                 ],
