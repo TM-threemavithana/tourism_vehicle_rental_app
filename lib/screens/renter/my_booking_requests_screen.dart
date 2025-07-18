@@ -15,104 +15,128 @@ class MyBookingRequestsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final currentUser = FirebaseAuth.instance.currentUser;
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-
-    if (currentUser == null) {
-      return Scaffold(
-        appBar: AppBar(title: const Text('My Booking Requests')),
-        body: const NotLoggedInWidget(),
-        bottomNavigationBar: CustomBottomNavBar(
-          currentIndex: 1,
-          onTap: (index) {
-            if (index == 0) {
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (context) => const WelcomeScreen()),
-              );
-            } else if (index == 2) {
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(
-                    builder: (context) =>
-                        ProfileScreen(user: FirebaseAuth.instance.currentUser)),
-              );
-            }
-          },
-        ),
-      );
-    }
+    final statusBarHeight = MediaQuery.of(context).padding.top;
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('My Booking Requests'),
-        backgroundColor: AppColors.primary,
-        foregroundColor: Colors.white,
-      ),
-      body: StreamBuilder<QuerySnapshot>(
-        stream: FirebaseFirestore.instance
-            .collection('bookingRequests')
-            .where('userId', isEqualTo: currentUser.uid)
-            .orderBy('createdAt', descending: true)
-            .snapshots(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          }
-
-          if (snapshot.hasError) {
-            return Center(
-              child: Text('Error: ${snapshot.error}'),
-            );
-          }
-
-          if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.car_rental,
-                    size: 80,
-                    color: isDarkMode
-                        ? Colors.grey.shade700
-                        : Colors.grey.shade400,
+      backgroundColor: Colors.white,
+      body: Stack(
+        children: [
+          // Yellow status bar overlay (always at the very top)
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            child: Container(
+              height: statusBarHeight,
+              color: const Color(0xFFFFC107),
+            ),
+          ),
+          // Main content with SafeArea
+          SafeArea(
+            bottom: false,
+            child: Column(
+              children: [
+                // Custom AppBar look
+                Container(
+                  width: double.infinity,
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+                  decoration: const BoxDecoration(
+                    color: Colors.transparent,
                   ),
-                  const SizedBox(height: 16),
-                  Text(
-                    'No booking requests yet',
+                  child: Text(
+                    'My Booking Requests',
                     style: TextStyle(
-                      fontSize: 18,
+                      fontSize: 22,
                       fontWeight: FontWeight.bold,
-                      color: isDarkMode
-                          ? Colors.grey.shade400
-                          : Colors.grey.shade700,
+                      color: Colors.black,
+                      shadows: [
+                        Shadow(
+                          color: Colors.black.withOpacity(0.08),
+                          blurRadius: 4,
+                        ),
+                      ],
                     ),
                   ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Your booking requests will appear here',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: isDarkMode
-                          ? Colors.grey.shade500
-                          : Colors.grey.shade600,
-                    ),
-                  ),
-                ],
-              ),
-            );
-          }
-
-          return ListView.builder(
-            itemCount: snapshot.data!.docs.length,
-            padding: const EdgeInsets.all(16),
-            itemBuilder: (context, index) {
-              final doc = snapshot.data!.docs[index];
-              final data = doc.data() as Map<String, dynamic>;
-
-              return _buildRequestCard(context, data, isDarkMode);
-            },
-          );
-        },
+                ),
+                const SizedBox(height: 4),
+                Expanded(
+                  child: currentUser == null
+                      ? const NotLoggedInWidget()
+                      : StreamBuilder<QuerySnapshot>(
+                          stream: FirebaseFirestore.instance
+                              .collection('bookingRequests')
+                              .where('userId', isEqualTo: currentUser.uid)
+                              .orderBy('createdAt', descending: true)
+                              .snapshots(),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return const Center(
+                                  child: CircularProgressIndicator());
+                            }
+                            if (snapshot.hasError) {
+                              return Center(
+                                child: Text('Error: ${snapshot.error}'),
+                              );
+                            }
+                            if (!snapshot.hasData ||
+                                snapshot.data!.docs.isEmpty) {
+                              return Center(
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      Icons.car_rental,
+                                      size: 80,
+                                      color: isDarkMode
+                                          ? Colors.grey.shade700
+                                          : Colors.grey.shade400,
+                                    ),
+                                    const SizedBox(height: 16),
+                                    Text(
+                                      'No booking requests yet',
+                                      style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                        color: isDarkMode
+                                            ? Colors.grey.shade400
+                                            : Colors.grey.shade700,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 8),
+                                    Text(
+                                      'Your booking requests will appear here',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                        color: isDarkMode
+                                            ? Colors.grey.shade500
+                                            : Colors.grey.shade600,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            }
+                            return ListView.builder(
+                              padding: const EdgeInsets.all(16),
+                              itemCount: snapshot.data!.docs.length,
+                              itemBuilder: (context, index) {
+                                final doc = snapshot.data!.docs[index];
+                                final data = doc.data() as Map<String, dynamic>;
+                                return _buildRequestCard(
+                                    context, data, isDarkMode);
+                              },
+                            );
+                          },
+                        ),
+                ),
+                // Add bottom padding for nav bar
+                SizedBox(height: MediaQuery.of(context).padding.bottom + 8),
+              ],
+            ),
+          ),
+        ],
       ),
       bottomNavigationBar: CustomBottomNavBar(
         currentIndex: 1,
@@ -142,12 +166,8 @@ class MyBookingRequestsScreen extends StatelessWidget {
     final vehicleInfo = data['vehicleInfo'] as Map<String, dynamic>;
     final pricing = data['pricing'] as Map<String, dynamic>;
     final withDriver = data['withDriver'] as bool;
-
-    // Format dates
     final pickupDateTime = DateTime.parse(data['pickupDateTime']);
     final returnDateTime = DateTime.parse(data['returnDateTime']);
-
-    // Set status color
     Color statusColor;
     switch (status) {
       case 'approved':
@@ -161,16 +181,11 @@ class MyBookingRequestsScreen extends StatelessWidget {
         statusColor = Colors.orange;
         break;
     }
-
-    // Card border color
     final cardBorderColor = status == 'pending'
         ? Colors.orange
         : status == 'approved'
             ? Colors.green
             : Colors.red.shade300;
-
-    final theme = Theme.of(context);
-
     return Card(
       margin: const EdgeInsets.only(bottom: 16),
       elevation: 2,
@@ -181,7 +196,6 @@ class MyBookingRequestsScreen extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header with vehicle info and status
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             decoration: BoxDecoration(
@@ -193,7 +207,6 @@ class MyBookingRequestsScreen extends StatelessWidget {
             ),
             child: Row(
               children: [
-                // Vehicle image
                 ClipRRect(
                   borderRadius: BorderRadius.circular(8),
                   child: Image.network(
@@ -212,8 +225,6 @@ class MyBookingRequestsScreen extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 12),
-
-                // Vehicle details
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -236,8 +247,6 @@ class MyBookingRequestsScreen extends StatelessWidget {
                     ],
                   ),
                 ),
-
-                // Status chip
                 Container(
                   padding:
                       const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
@@ -258,14 +267,11 @@ class MyBookingRequestsScreen extends StatelessWidget {
               ],
             ),
           ),
-
-          // Request details
           Padding(
             padding: const EdgeInsets.all(16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Trip details
                 Text(
                   'Trip Details',
                   style: TextStyle(
@@ -277,8 +283,6 @@ class MyBookingRequestsScreen extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 8),
-
-                // Rental period
                 _buildDetailRow(
                   context,
                   icon: Icons.date_range,
@@ -313,8 +317,6 @@ class MyBookingRequestsScreen extends StatelessWidget {
                   value: 'Rs. ${currencyFormat.format(pricing['rentalCost'])}',
                   isHighlighted: true,
                 ),
-
-                // Request date
                 if (data['createdAt'] != null)
                   Padding(
                     padding: const EdgeInsets.only(top: 16),
@@ -329,8 +331,6 @@ class MyBookingRequestsScreen extends StatelessWidget {
                       ),
                     ),
                   ),
-
-                // Action buttons based on status
                 if (status == 'approved') ...[
                   const SizedBox(height: 24),
                   const Divider(),
@@ -339,7 +339,6 @@ class MyBookingRequestsScreen extends StatelessWidget {
                     width: double.infinity,
                     child: ElevatedButton(
                       onPressed: () {
-                        // Navigate to payment screen
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
                               content: Text('Proceeding to payment...')),
@@ -373,7 +372,6 @@ class MyBookingRequestsScreen extends StatelessWidget {
     bool isHighlighted = false,
   }) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-
     return Padding(
       padding: const EdgeInsets.only(bottom: 8.0),
       child: Row(
