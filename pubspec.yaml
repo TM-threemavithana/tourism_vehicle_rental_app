@@ -94,7 +94,7 @@ flutter:
     - assets/images/signup_background.jpg
     - assets/images/road_background.jpg
     - assets/images/  # Add this line to include all images in the directory
-    - assets/icons/   # If you have an icons directory
+    - assets/icon/   # If you have an icons directory
     
   
   fonts:

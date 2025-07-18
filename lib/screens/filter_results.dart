@@ -360,273 +360,231 @@ class _FilterResultsDrawerState extends State<FilterResultsDrawer> {
     final isDarkMode = theme.brightness == Brightness.dark;
     final screenSize = MediaQuery.of(context).size;
 
-    // Modify to take full height but only part of the width for side drawer
-    return Container(
-      width: screenSize.width * 0.85, // Keep width at 85%
-      height: screenSize.height,
-      decoration: BoxDecoration(
-        color: isDarkMode ? AppColors.neutralDark : Colors.white,
-        // Change shadow direction for right side
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.3),
-            spreadRadius: 1,
-            blurRadius: 10,
-            offset: const Offset(-5, 0), // Shadow on the left side
-          ),
-        ],
-      ),
+    return SizedBox(
+      width: screenSize.width * 0.85,
+      height: screenSize.height - MediaQuery.of(context).padding.top,
       child: Column(
         children: [
-          // Header - Keep consistent with Refine Search
-          Container(
-            padding: const EdgeInsets.fromLTRB(16, 32, 16, 16),
-            decoration: BoxDecoration(
-              color: isDarkMode ? Colors.black : AppColors.primary,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
-                  blurRadius: 4.0,
-                  offset: const Offset(0, 2),
+            // Header - match Refine Search
+            Container(
+              decoration: BoxDecoration(
+                color: Colors.grey[900],
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(12),
+                  topRight: Radius.circular(12),
                 ),
-              ],
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text(
-                      'Filter Results',
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.close, color: Colors.white),
-                      padding: EdgeInsets.zero,
-                      constraints: const BoxConstraints(),
-                      onPressed: () => Navigator.pop(context),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 8),
-                Container(
-                  height: 2,
-                  width: 40,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(2),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.08),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
                   ),
-                ),
-              ],
-            ),
-          ),
-
-          // Filters content
-          Expanded(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                ],
+              ),
+              padding: EdgeInsets.only(
+                left: 20, right: 8, top: MediaQuery.of(context).padding.top + 16, bottom: 12),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  // Sort options
-                  _buildSectionHeader('Sort By', isDarkMode),
-                  const SizedBox(height: 12),
-                  SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Row(
-                      children: [
-                        _buildSortOption(
-                            'price_low_to_high', 'Price: Low to High'),
-                        _buildSortOption(
-                            'price_high_to_low', 'Price: High to Low'),
-                        _buildSortOption('newest_first', 'Newest First'),
-                        _buildSortOption('rating', 'Highest Rated'),
-                      ],
+                  const Text(
+                    'Filter Results',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
-
-                  const SizedBox(height: 24),
-
-                  // Price range
-                  _buildSectionHeader('Price Range (LKR per day)', isDarkMode),
-                  const SizedBox(height: 12),
-                  Row(
-                    children: [
-                      Text(
-                        'LKR ${_priceRange.start.round()}',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: isDarkMode ? Colors.white70 : Colors.black54,
-                        ),
-                      ),
-                      Expanded(
-                        child: RangeSlider(
-                          values: _priceRange,
-                          min: 0,
-                          max: 50000,
-                          divisions: 50,
-                          activeColor: AppColors.primary,
-                          inactiveColor: AppColors.primary.withOpacity(0.3),
-                          labels: RangeLabels(
-                            'LKR ${_priceRange.start.round()}',
-                            'LKR ${_priceRange.end.round()}',
-                          ),
-                          onChanged: _updatePriceRange,
-                          onChangeEnd: (values) {
-                            _applyFilters(); // Apply filters when sliding ends
-                          },
-                        ),
-                      ),
-                      Text(
-                        'LKR ${_priceRange.end.round()}',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: isDarkMode ? Colors.white70 : Colors.black54,
-                        ),
-                      ),
-                    ],
-                  ),
-
-                  const SizedBox(height: 24),
-
-                  // Rent mode section
-                  _buildSectionHeader('Rent Mode', isDarkMode),
-                  const SizedBox(height: 12),
-                  Wrap(
-                    spacing: 8,
-                    runSpacing: 8,
-                    children: [
-                      _buildFilterChip(
-                          'With Driver', _selectedRentModes, _toggleRentMode),
-                      _buildFilterChip('With or Without Driver',
-                          _selectedRentModes, _toggleRentMode),
-                      _buildFilterChip(
-                          'Vehicle Only', _selectedRentModes, _toggleRentMode),
-                    ],
-                  ),
-
-                  const SizedBox(height: 24),
-
-                  // Fuel type section
-                  _buildSectionHeader('Fuel Type', isDarkMode),
-                  const SizedBox(height: 12),
-                  Wrap(
-                    spacing: 8,
-                    runSpacing: 8,
-                    children: [
-                      _buildFilterChip(
-                          'Petrol', _selectedFuelTypes, _toggleFuelType),
-                      _buildFilterChip(
-                          'Diesel', _selectedFuelTypes, _toggleFuelType),
-                      _buildFilterChip(
-                          'Electric', _selectedFuelTypes, _toggleFuelType),
-                      _buildFilterChip(
-                          'Hybrid', _selectedFuelTypes, _toggleFuelType),
-                    ],
-                  ),
-
-                  const SizedBox(height: 24),
-
-                  // Transmission section
-                  _buildSectionHeader('Transmission', isDarkMode),
-                  const SizedBox(height: 12),
-                  Wrap(
-                    spacing: 8,
-                    runSpacing: 8,
-                    children: [
-                      _buildFilterChip('Automatic', _selectedTransmissionTypes,
-                          _toggleTransmissionType),
-                      _buildFilterChip('Manual', _selectedTransmissionTypes,
-                          _toggleTransmissionType),
-                    ],
-                  ),
-
-                  const SizedBox(height: 24),
-
-                  // Features section
-                  _buildSectionHeader('Features', isDarkMode),
-                  const SizedBox(height: 12),
-                  Wrap(
-                    spacing: 8,
-                    runSpacing: 8,
-                    children: _commonFeatures
-                        .map((feature) => _buildFilterChip(
-                            feature, _selectedFeatures, _toggleFeature))
-                        .toList(),
+                  IconButton(
+                    icon: const Icon(Icons.close, color: Colors.white),
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(),
+                    onPressed: () => Navigator.pop(context),
                   ),
                 ],
               ),
             ),
-          ),
-
-          // Bottom buttons
-          Container(
-            padding: const EdgeInsets.all(16.0),
-            decoration: BoxDecoration(
-              color: isDarkMode ? Colors.black : Colors.white,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
-                  offset: const Offset(0, -2),
-                  blurRadius: 8,
+            // Main filter content in a white card with rounded top corners
+            Expanded(
+              child: Container(
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(24),
+                    topRight: Radius.circular(24),
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Color(0x11000000),
+                      blurRadius: 12,
+                      offset: Offset(0, 2),
+                    ),
+                  ],
                 ),
-              ],
-            ),
-            child: Row(
-              children: [
-                // Close button
-                Expanded(
-                  flex: 1,
-                  child: TextButton(
-                    onPressed: () => Navigator.pop(context),
-                    style: TextButton.styleFrom(
-                      foregroundColor: AppColors.primary,
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        side: BorderSide(color: AppColors.primary),
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Sort options
+                      _buildSectionHeader('Sort By', isDarkMode),
+                      const SizedBox(height: 12),
+                      SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Row(
+                          children: [
+                            _buildSortOption('price_low_to_high', 'Price: Low to High'),
+                            _buildSortOption('price_high_to_low', 'Price: High to Low'),
+                            _buildSortOption('newest_first', 'Newest First'),
+                            _buildSortOption('rating', 'Highest Rated'),
+                          ],
+                        ),
                       ),
-                    ),
-                    child: const Text(
-                      'CLOSE',
-                      style: TextStyle(fontWeight: FontWeight.w600),
-                    ),
+                      const SizedBox(height: 24),
+                      _buildSectionHeader('Price Range (LKR per day)', isDarkMode),
+                      const SizedBox(height: 12),
+                      Row(
+                        children: [
+                          Text(
+                            'LKR ${_priceRange.start.round()}',
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.black54,
+                            ),
+                          ),
+                          Expanded(
+                            child: RangeSlider(
+                              values: _priceRange,
+                              min: 0,
+                              max: 50000,
+                              divisions: 50,
+                              activeColor: AppColors.primary,
+                              inactiveColor: AppColors.primary.withOpacity(0.3),
+                              labels: RangeLabels(
+                                'LKR ${_priceRange.start.round()}',
+                                'LKR ${_priceRange.end.round()}',
+                              ),
+                              onChanged: _updatePriceRange,
+                              onChangeEnd: (values) {
+                                _applyFilters();
+                              },
+                            ),
+                          ),
+                          Text(
+                            'LKR ${_priceRange.end.round()}',
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.black54,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 24),
+                      _buildSectionHeader('Rent Mode', isDarkMode),
+                      const SizedBox(height: 12),
+                      Wrap(
+                        spacing: 8,
+                        runSpacing: 8,
+                        children: [
+                          _buildFilterChip('With Driver', _selectedRentModes, _toggleRentMode),
+                          _buildFilterChip('With or Without Driver', _selectedRentModes, _toggleRentMode),
+                          _buildFilterChip('Vehicle Only', _selectedRentModes, _toggleRentMode),
+                        ],
+                      ),
+                      const SizedBox(height: 24),
+                      _buildSectionHeader('Fuel Type', isDarkMode),
+                      const SizedBox(height: 12),
+                      Wrap(
+                        spacing: 8,
+                        runSpacing: 8,
+                        children: [
+                          _buildFilterChip('Petrol', _selectedFuelTypes, _toggleFuelType),
+                          _buildFilterChip('Diesel', _selectedFuelTypes, _toggleFuelType),
+                          _buildFilterChip('Electric', _selectedFuelTypes, _toggleFuelType),
+                          _buildFilterChip('Hybrid', _selectedFuelTypes, _toggleFuelType),
+                        ],
+                      ),
+                      const SizedBox(height: 24),
+                      _buildSectionHeader('Transmission', isDarkMode),
+                      const SizedBox(height: 12),
+                      Wrap(
+                        spacing: 8,
+                        runSpacing: 8,
+                        children: [
+                          _buildFilterChip('Automatic', _selectedTransmissionTypes, _toggleTransmissionType),
+                          _buildFilterChip('Manual', _selectedTransmissionTypes, _toggleTransmissionType),
+                        ],
+                      ),
+                      const SizedBox(height: 24),
+                      _buildSectionHeader('Features', isDarkMode),
+                      const SizedBox(height: 12),
+                      Wrap(
+                        spacing: 8,
+                        runSpacing: 8,
+                        children: _commonFeatures
+                            .map((feature) => _buildFilterChip(feature, _selectedFeatures, _toggleFeature))
+                            .toList(),
+                      ),
+                    ],
                   ),
                 ),
-                const SizedBox(width: 12),
-
-                // Apply button
-                Expanded(
-                  flex: 2,
-                  child: ElevatedButton(
-                    onPressed: _applyAndReturn,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primary,
-                      minimumSize: const Size(double.infinity, 50),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+            // Bottom buttons
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.only(
+                  bottomLeft: Radius.circular(24),
+                  bottomRight: Radius.circular(24),
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Color(0x11000000),
+                    blurRadius: 8,
+                    offset: Offset(0, -2),
+                  ),
+                ],
+              ),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () => Navigator.pop(context),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.black,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
                       ),
-                    ),
-                    child: const Text(
-                      'Apply Filters',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
+                      child: const Text('CLOSE', style: TextStyle(fontWeight: FontWeight.w600)),
                     ),
                   ),
-                ),
-              ],
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: _applyAndReturn,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFFFFC107),
+                        foregroundColor: Colors.black,
+                        disabledBackgroundColor: Colors.grey.shade400,
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                      child: const Text('Apply Filters', style: TextStyle(fontWeight: FontWeight.bold)),
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
-        ],
-      ),
+          ],
+        ),
     );
+  
   }
 
   // Add helper method for section headers to match Refine Search

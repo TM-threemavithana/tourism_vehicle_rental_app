@@ -167,7 +167,6 @@ class _VehicleSearchResultsScreenState
         flexibleDates: widget.flexibleDates,
         onApplyFilters: _applyFilters,
       ),
-      // Add the end drawer for filter results
       endDrawer: FilterResultsDrawer(
         selectedVehicleTypes: widget.selectedVehicleTypes,
         initialResults: _searchResults,

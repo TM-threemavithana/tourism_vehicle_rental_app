@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:intl/intl.dart';
-import '../../utils/app_colors.dart';
 import '../../widgets/not_logged_in_widget.dart';
 import '../../widgets/custom_bottom_nav_bar.dart';
 import '../welcome_screen.dart';
