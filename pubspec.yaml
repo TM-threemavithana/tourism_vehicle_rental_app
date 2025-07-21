@@ -48,6 +48,7 @@ dependencies:
   onesignal_flutter: ^5.3.3
   http: ^1.4.0  # Add this line
   share_plus: ^7.2.1
+  intl_phone_field: ^3.2.0
 
 dev_dependencies:
   flutter_test:

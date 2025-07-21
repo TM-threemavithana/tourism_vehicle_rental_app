@@ -6,6 +6,8 @@ import '../services/auth_service.dart';
 import 'auth/login_screen.dart';
 import 'package:flutter/services.dart';
 import '../utils/app_colors.dart';
+import 'package:intl_phone_field/intl_phone_field.dart';
+import 'welcome_screen.dart';
 
 class RequestVehicleScreen extends StatefulWidget {
   const RequestVehicleScreen({super.key});
@@ -18,10 +20,11 @@ class _RequestVehicleScreenState extends State<RequestVehicleScreen> {
   final _formKey = GlobalKey<FormState>();
   String? _selectedVehicleType;
   DateTime? _selectedDateTime;
+  final TextEditingController _dateTimeController = TextEditingController();
   final TextEditingController _locationController = TextEditingController();
   final TextEditingController _detailsController = TextEditingController();
-  final TextEditingController _contactController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
+  String? _contactNumber;
   bool _isSubmitting = false;
   final AuthService _authService = AuthService();
 
@@ -52,6 +55,8 @@ class _RequestVehicleScreenState extends State<RequestVehicleScreen> {
             time.hour,
             time.minute,
           );
+          _dateTimeController.text =
+              DateFormat('yyyy-MM-dd – HH:mm').format(_selectedDateTime!);
         });
       }
     }
@@ -98,7 +103,7 @@ class _RequestVehicleScreenState extends State<RequestVehicleScreen> {
         'dateTime': _selectedDateTime,
         'location': _locationController.text,
         'details': _detailsController.text,
-        'contactNumber': _contactController.text,
+        'contactNumber': _contactNumber,
         'email': _emailController.text,
         'userId': currentUser.uid,
         'name': name,
@@ -107,23 +112,11 @@ class _RequestVehicleScreenState extends State<RequestVehicleScreen> {
 
       setState(() => _isSubmitting = false);
       if (!mounted) return;
-      await showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: const Text('Request Sent'),
-          content: const Text(
-              'Your inquiry has been submitted successfully! Our team will get back to you shortly.'),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop(); // Close dialog
-              },
-              child: const Text('OK'),
-            ),
-          ],
-        ),
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => const WelcomeScreen()),
+        (route) => false,
       );
-      if (mounted) Navigator.pop(context);
     } catch (e) {
       setState(() => _isSubmitting = false);
       ScaffoldMessenger.of(context).showSnackBar(
@@ -143,6 +136,7 @@ class _RequestVehicleScreenState extends State<RequestVehicleScreen> {
 
   @override
   void dispose() {
+    _dateTimeController.dispose();
     // Reset to default (transparent) when leaving the page
     SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
@@ -172,7 +166,7 @@ class _RequestVehicleScreenState extends State<RequestVehicleScreen> {
         ),
         centerTitle: true,
       ),
-      backgroundColor: const Color(0xFFF7FBEF),
+      backgroundColor: Colors.white,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(16),
@@ -214,39 +208,33 @@ class _RequestVehicleScreenState extends State<RequestVehicleScreen> {
                 ),
                 const SizedBox(height: 16),
                 // Date & Time Picker
-                GestureDetector(
+                TextFormField(
+                  controller: _dateTimeController,
+                  readOnly: true,
                   onTap: _pickDateTime,
-                  child: AbsorbPointer(
-                    child: TextFormField(
-                      decoration: InputDecoration(
-                        filled: true,
-                        fillColor: const Color(0xFFF6F9E7),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                          borderSide: BorderSide.none,
-                        ),
-                        hintText: 'Select Date&Time',
-                        hintStyle: const TextStyle(color: Colors.black54),
-                        prefixIcon: const Icon(Icons.calendar_today,
-                            color: Color(0xFFB6E23A)),
-                      ),
-                      controller: TextEditingController(
-                        text: _selectedDateTime == null
-                            ? ''
-                            : DateFormat('yyyy-MM-dd – HH:mm')
-                                .format(_selectedDateTime!),
-                      ),
-                      validator: (value) => _selectedDateTime == null
-                          ? 'Please select date & time'
-                          : null,
+                  decoration: InputDecoration(
+                    labelText: 'Select Date & Time',
+                    filled: true,
+                    fillColor: const Color(0xFFF6F9E7),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: BorderSide.none,
                     ),
+                    hintText: 'Tap to select date and time',
+                    hintStyle: const TextStyle(color: Colors.black54),
+                    prefixIcon: const Icon(Icons.calendar_today,
+                        color: Color(0xFFB6E23A)),
                   ),
+                  validator: (value) => _selectedDateTime == null
+                      ? 'Please select date & time'
+                      : null,
                 ),
                 const SizedBox(height: 16),
                 // Location Input
                 TextFormField(
                   controller: _locationController,
                   decoration: InputDecoration(
+                    labelText: 'Location',
                     filled: true,
                     fillColor: const Color(0xFFF6F9E7),
                     border: OutlineInputBorder(
@@ -262,10 +250,9 @@ class _RequestVehicleScreenState extends State<RequestVehicleScreen> {
                 ),
                 const SizedBox(height: 16),
                 // Contact Number Input (Mandatory)
-                TextFormField(
-                  controller: _contactController,
-                  keyboardType: TextInputType.phone,
+                IntlPhoneField(
                   decoration: InputDecoration(
+                    labelText: 'Contact Number',
                     filled: true,
                     fillColor: const Color(0xFFF6F9E7),
                     border: OutlineInputBorder(
@@ -275,13 +262,16 @@ class _RequestVehicleScreenState extends State<RequestVehicleScreen> {
                     hintText: 'Enter Contact Number',
                     hintStyle: const TextStyle(color: Colors.black54),
                   ),
+                  initialCountryCode: 'LK', // Sri Lanka by default
+                  onChanged: (phone) {
+                    _contactNumber = phone.completeNumber;
+                  },
+                  onSaved: (phone) {
+                    _contactNumber = phone?.completeNumber;
+                  },
                   validator: (value) {
-                    if (value == null || value.isEmpty) {
+                    if (value == null || value.number.isEmpty) {
                       return 'Please enter your contact number';
-                    }
-                    final phoneRegExp = RegExp(r'^[0-9+\-]{7,15}\$');
-                    if (!phoneRegExp.hasMatch(value)) {
-                      return 'Enter a valid contact number';
                     }
                     return null;
                   },
@@ -292,6 +282,7 @@ class _RequestVehicleScreenState extends State<RequestVehicleScreen> {
                   controller: _emailController,
                   keyboardType: TextInputType.emailAddress,
                   decoration: InputDecoration(
+                    labelText: 'Email (optional)',
                     filled: true,
                     fillColor: const Color(0xFFF6F9E7),
                     border: OutlineInputBorder(
@@ -319,6 +310,7 @@ class _RequestVehicleScreenState extends State<RequestVehicleScreen> {
                   minLines: 4,
                   maxLines: 6,
                   decoration: InputDecoration(
+                    labelText: 'Details',
                     filled: true,
                     fillColor: const Color(0xFFF6F9E7),
                     border: OutlineInputBorder(

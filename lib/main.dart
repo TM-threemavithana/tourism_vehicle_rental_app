@@ -52,15 +52,28 @@ class _MyAppState extends State<MyApp> {
       title: 'Wayz.lk',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF033754),
-          primary: const Color(0xFF033754), // #033754
-          background: const Color(0xFFFFFFFF), // #ffffff
-          secondary: const Color(0xFF10B6D7), // #10b6d7
-          tertiary: const Color(0xFF89D900), // #89d900
+        primaryColor: Colors.black,
+        colorScheme: ColorScheme.fromSwatch().copyWith(
+          primary: Colors.black,
+          secondary: const Color(0xFFFFC107),
         ),
-        useMaterial3: true,
-        fontFamily: 'Montserrat',
+        appBarTheme: const AppBarTheme(
+          backgroundColor: Colors.black,
+          foregroundColor: Colors.white,
+          iconTheme: IconThemeData(color: Colors.white),
+          titleTextStyle: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+            fontSize: 18,
+          ),
+        ),
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: const Color(0xFFFFC107),
+            foregroundColor: Colors.black,
+            textStyle: const TextStyle(fontWeight: FontWeight.bold),
+          ),
+        ),
       ),
       initialRoute: '/',
       routes: {
