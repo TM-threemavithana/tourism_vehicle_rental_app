@@ -112,6 +112,14 @@ class _RequestVehicleScreenState extends State<RequestVehicleScreen> {
 
       setState(() => _isSubmitting = false);
       if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Your inquiry has been submitted successfully!'),
+          duration: Duration(seconds: 1),
+        ),
+      );
+      await Future.delayed(const Duration(seconds: 1));
+      if (!mounted) return;
       Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(builder: (context) => const WelcomeScreen()),
