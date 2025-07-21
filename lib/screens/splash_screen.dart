@@ -18,6 +18,10 @@ class _SplashScreenState extends State<SplashScreen>
   @override
   void initState() {
     super.initState();
+    // Precache the logo image
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      precacheImage(const AssetImage('assets/images/logo.png'), context);
+    });
     _controller = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 1800),
