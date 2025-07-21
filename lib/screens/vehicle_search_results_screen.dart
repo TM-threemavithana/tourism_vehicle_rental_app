@@ -5,6 +5,7 @@ import '../utils/app_colors.dart';
 import 'filter_results.dart';
 import 'vehicle_detail_page.dart';
 import '../helpers/car_logo_helper.dart'; // Add this import at the top
+import 'package:cached_network_image/cached_network_image.dart';
 
 class VehicleSearchResultsScreen extends StatefulWidget {
   final Set<String> selectedVehicleTypes;
@@ -409,13 +410,20 @@ class _VehicleSearchResultsScreenState
                       topLeft: Radius.circular(8),
                       bottomLeft: Radius.circular(8),
                     ),
-                    child: Image.network(
-                      vehicle['images']?['primaryImageUrl'] ??
+                    child: CachedNetworkImage(
+                      imageUrl: vehicle['images']?['primaryImageUrl'] ??
                           'https://via.placeholder.com/120x120?text=No+Image',
                       width: 120,
                       height: 120,
                       fit: BoxFit.cover,
-                      errorBuilder: (_, __, ___) => Container(
+                      placeholder: (context, url) => Container(
+                        width: 120,
+                        height: 120,
+                        color: Colors.grey[300],
+                        child: const Center(
+                            child: CircularProgressIndicator(strokeWidth: 2)),
+                      ),
+                      errorWidget: (context, url, error) => Container(
                         width: 120,
                         height: 120,
                         color: isDarkMode ? Colors.grey[800] : Colors.grey[300],

@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:intl/intl.dart';
 import '../../utils/app_colors.dart';
 import '../../services/onesignal_service.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 class BookingRequestsScreen extends StatelessWidget {
   const BookingRequestsScreen({super.key});
@@ -161,13 +162,20 @@ class BookingRequestsScreen extends StatelessWidget {
                 // Vehicle image
                 ClipRRect(
                   borderRadius: BorderRadius.circular(8),
-                  child: Image.network(
-                    vehicleInfo['primaryImage'] ??
+                  child: CachedNetworkImage(
+                    imageUrl: vehicleInfo['primaryImage'] ??
                         'https://via.placeholder.com/60?text=No+Image',
                     width: 60,
                     height: 60,
                     fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) => Container(
+                    placeholder: (context, url) => Container(
+                      width: 60,
+                      height: 60,
+                      color: Colors.grey.shade300,
+                      child: const Center(
+                          child: CircularProgressIndicator(strokeWidth: 2)),
+                    ),
+                    errorWidget: (context, url, error) => Container(
                       width: 60,
                       height: 60,
                       color: Colors.grey.shade300,
@@ -413,7 +421,7 @@ class BookingRequestsScreen extends StatelessWidget {
       BuildContext context, String docId, String status) async {
     try {
       debugPrint("Responding to request $docId with status: $status");
-      
+
       // Get the request document to access user information
       final requestDoc = await FirebaseFirestore.instance
           .collection('bookingRequests')
@@ -439,7 +447,8 @@ class BookingRequestsScreen extends StatelessWidget {
           .update({
         'status': status,
         'respondedAt': FieldValue.serverTimestamp(),
-        'notified': false, // Reset notified flag to trigger notification to renter
+        'notified':
+            false, // Reset notified flag to trigger notification to renter
       });
 
       debugPrint("Request status updated to $status");
@@ -457,7 +466,7 @@ class BookingRequestsScreen extends StatelessWidget {
 
       final renterData = renterDoc.data();
       final renterOneSignalId = renterData?['oneSignalPlayerId'];
-      
+
       debugPrint("Renter OneSignal ID: $renterOneSignalId");
 
       if (renterOneSignalId != null) {
@@ -465,7 +474,7 @@ class BookingRequestsScreen extends StatelessWidget {
         final oneSignalService = OneSignalService();
         final vehicleName = '${vehicleInfo['make']} ${vehicleInfo['model']}';
         debugPrint("Sending notification to renter...");
-        
+
         await oneSignalService.sendNotificationToUser(
           playerId: renterOneSignalId,
           title: status == 'approved' ? 'Booking Approved' : 'Booking Declined',

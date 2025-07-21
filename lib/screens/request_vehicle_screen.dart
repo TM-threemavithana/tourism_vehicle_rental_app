@@ -4,6 +4,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../services/auth_service.dart';
 import 'auth/login_screen.dart';
+import 'package:flutter/services.dart';
+import '../utils/app_colors.dart';
 
 class RequestVehicleScreen extends StatefulWidget {
   const RequestVehicleScreen({super.key});
@@ -18,6 +20,8 @@ class _RequestVehicleScreenState extends State<RequestVehicleScreen> {
   DateTime? _selectedDateTime;
   final TextEditingController _locationController = TextEditingController();
   final TextEditingController _detailsController = TextEditingController();
+  final TextEditingController _contactController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
   bool _isSubmitting = false;
   final AuthService _authService = AuthService();
 
@@ -94,10 +98,10 @@ class _RequestVehicleScreenState extends State<RequestVehicleScreen> {
         'dateTime': _selectedDateTime,
         'location': _locationController.text,
         'details': _detailsController.text,
+        'contactNumber': _contactController.text,
+        'email': _emailController.text,
         'userId': currentUser.uid,
         'name': name,
-        'email': email,
-        'phone': phone,
         'createdAt': FieldValue.serverTimestamp(),
       });
 
@@ -129,11 +133,30 @@ class _RequestVehicleScreenState extends State<RequestVehicleScreen> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+      statusBarColor: Color(0xFFFFFF00),
+      statusBarIconBrightness: Brightness.dark,
+    ));
+  }
+
+  @override
+  void dispose() {
+    // Reset to default (transparent) when leaving the page
+    SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+      statusBarIconBrightness: Brightness.dark,
+    ));
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: const Color(0xFFFFC107),
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.black),
@@ -171,7 +194,7 @@ class _RequestVehicleScreenState extends State<RequestVehicleScreen> {
                       border: InputBorder.none,
                       contentPadding:
                           EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                      hintText: 'Select',
+                      hintText: 'Select Vehicle Type',
                       hintStyle: TextStyle(color: Colors.black54),
                     ),
                     items: _vehicleTypes
@@ -236,6 +259,58 @@ class _RequestVehicleScreenState extends State<RequestVehicleScreen> {
                   validator: (value) => value == null || value.isEmpty
                       ? 'Please enter a location'
                       : null,
+                ),
+                const SizedBox(height: 16),
+                // Contact Number Input (Mandatory)
+                TextFormField(
+                  controller: _contactController,
+                  keyboardType: TextInputType.phone,
+                  decoration: InputDecoration(
+                    filled: true,
+                    fillColor: const Color(0xFFF6F9E7),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: BorderSide.none,
+                    ),
+                    hintText: 'Enter Contact Number',
+                    hintStyle: const TextStyle(color: Colors.black54),
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter your contact number';
+                    }
+                    final phoneRegExp = RegExp(r'^[0-9+\-]{7,15}\$');
+                    if (!phoneRegExp.hasMatch(value)) {
+                      return 'Enter a valid contact number';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 16),
+                // Email Input (Optional)
+                TextFormField(
+                  controller: _emailController,
+                  keyboardType: TextInputType.emailAddress,
+                  decoration: InputDecoration(
+                    filled: true,
+                    fillColor: const Color(0xFFF6F9E7),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: BorderSide.none,
+                    ),
+                    hintText: 'Enter Email (optional)',
+                    hintStyle: const TextStyle(color: Colors.black54),
+                  ),
+                  validator: (value) {
+                    if (value != null && value.isNotEmpty) {
+                      final emailRegExp =
+                          RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+ *');
+                      if (!emailRegExp.hasMatch(value)) {
+                        return 'Enter a valid email address';
+                      }
+                    }
+                    return null;
+                  },
                 ),
                 const SizedBox(height: 16),
                 // Details Text Area

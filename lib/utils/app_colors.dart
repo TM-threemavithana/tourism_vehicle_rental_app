@@ -4,7 +4,7 @@ class AppColors {
   // Main theme colors
   static const Color primary = Color(0xFF1E88E5);
   static const Color primaryDark = Color(0xFF1565C0);
-  static const Color secondary = Color(0xFFFF9800);
+  static const Color secondary = Color(0xFFFFFF00);
   static const Color tertiary = Color(0xFF26A69A);
 
   // Gradients and accent colors

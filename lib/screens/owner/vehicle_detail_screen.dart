@@ -330,7 +330,7 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
       ),
       errorWidget: (context, url, error) => Container(
         color: Colors.grey[300],
-        child: const Icon(Icons.error, size: 50, color: Colors.grey),
+        child: const Icon(Icons.car_rental, size: 80, color: Colors.grey),
       ),
     );
   }

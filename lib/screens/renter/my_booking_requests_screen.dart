@@ -6,6 +6,7 @@ import '../../widgets/not_logged_in_widget.dart';
 import '../../widgets/custom_bottom_nav_bar.dart';
 import '../welcome_screen.dart';
 import '../profile_screen.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 class MyBookingRequestsScreen extends StatelessWidget {
   const MyBookingRequestsScreen({super.key});
@@ -208,13 +209,20 @@ class MyBookingRequestsScreen extends StatelessWidget {
               children: [
                 ClipRRect(
                   borderRadius: BorderRadius.circular(8),
-                  child: Image.network(
-                    vehicleInfo['primaryImage'] ??
+                  child: CachedNetworkImage(
+                    imageUrl: vehicleInfo['primaryImage'] ??
                         'https://via.placeholder.com/60?text=No+Image',
                     width: 60,
                     height: 60,
                     fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) => Container(
+                    placeholder: (context, url) => Container(
+                      width: 60,
+                      height: 60,
+                      color: Colors.grey.shade300,
+                      child: const Center(
+                          child: CircularProgressIndicator(strokeWidth: 2)),
+                    ),
+                    errorWidget: (context, url, error) => Container(
                       width: 60,
                       height: 60,
                       color: Colors.grey.shade300,
