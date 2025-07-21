@@ -360,7 +360,7 @@ class _FilterResultsDrawerState extends State<FilterResultsDrawer> {
     final isDarkMode = theme.brightness == Brightness.dark;
     final screenSize = MediaQuery.of(context).size;
 
-    return SizedBox(
+    return Container(
       width: screenSize.width * 0.85,
       height: screenSize.height - MediaQuery.of(context).padding.top,
       child: Column(
@@ -406,13 +406,13 @@ class _FilterResultsDrawerState extends State<FilterResultsDrawer> {
             // Main filter content in a white card with rounded top corners
             Expanded(
               child: Container(
-                decoration: const BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.only(
+                decoration: BoxDecoration(
+                  color: isDarkMode ? Colors.grey[900] : Colors.white,
+                  borderRadius: const BorderRadius.only(
                     topLeft: Radius.circular(24),
                     topRight: Radius.circular(24),
                   ),
-                  boxShadow: [
+                  boxShadow: const [
                     BoxShadow(
                       color: Color(0x11000000),
                       blurRadius: 12,
@@ -421,7 +421,7 @@ class _FilterResultsDrawerState extends State<FilterResultsDrawer> {
                   ],
                 ),
                 child: SingleChildScrollView(
-                  padding: const EdgeInsets.all(16),
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -583,8 +583,7 @@ class _FilterResultsDrawerState extends State<FilterResultsDrawer> {
             ),
           ],
         ),
-    );
-  
+      );
   }
 
   // Add helper method for section headers to match Refine Search
@@ -654,26 +653,18 @@ class _FilterResultsDrawerState extends State<FilterResultsDrawer> {
         style: TextStyle(
           color: isSelected
               ? AppColors.primary
-              : isDarkMode
-                  ? Colors.white
-                  : Colors.black87,
+              : Colors.black87,
           fontWeight: isSelected ? FontWeight.w500 : FontWeight.normal,
         ),
       ),
       onSelected: (_) => onToggle(label),
       selectedColor: AppColors.primary.withOpacity(0.1),
       checkmarkColor: AppColors.primary,
-      backgroundColor: isDarkMode
-          ? AppColors.neutralDark.withOpacity(0.7)
-          : Colors.grey[100],
+      backgroundColor: isDarkMode ? Colors.grey[900] : Colors.grey[100],
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(8),
         side: BorderSide(
-          color: isSelected
-              ? AppColors.primary
-              : isDarkMode
-                  ? Colors.grey[700]!
-                  : Colors.grey[300]!,
+          color: isSelected ? AppColors.primary : Colors.grey[300]!,
           width: 1.5,
         ),
       ),

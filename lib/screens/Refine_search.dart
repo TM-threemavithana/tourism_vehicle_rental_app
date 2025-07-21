@@ -194,7 +194,7 @@ class _RefineSearchState extends State<RefineSearch> {
 
     return Drawer(
       width: drawerWidth,
-      child: SizedBox(
+      child: Container(
         height: MediaQuery.of(context).size.height -
             MediaQuery.of(context).padding.top,
         child: Column(
