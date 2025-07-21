@@ -5,6 +5,7 @@ import '../widgets/custom_bottom_nav_bar.dart';
 import 'renter/my_booking_requests_screen.dart';
 import 'profile_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'vehicle_search_results_screen.dart';
 
 class WelcomeScreen extends StatefulWidget {
   const WelcomeScreen({super.key});
@@ -25,18 +26,25 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
         const AssetImage('assets/images/road_background.jpg'), context);
   }
 
-  Future<void> _navigateToHome(BuildContext context) async {
+  Future<void> _navigateToBrowse(BuildContext context) async {
     setState(() => _isLoading = true);
-    // Ensure images are precached before navigating
     await precacheImage(const AssetImage('assets/images/logo.png'), context);
-    await precacheImage(
-        const AssetImage('assets/images/road_background.jpg'), context);
     setState(() => _isLoading = false);
     if (!mounted) return;
     Navigator.of(context).push(
       PageRouteBuilder(
         transitionDuration: const Duration(milliseconds: 400),
-        pageBuilder: (_, __, ___) => const HomeScreen(),
+        pageBuilder: (_, __, ___) => VehicleSearchResultsScreen(
+          selectedVehicleTypes: {},
+          location: '',
+          pickupDate: DateTime.now(),
+          pickupTime: const TimeOfDay(hour: 10, minute: 0),
+          returnDate: DateTime.now().add(const Duration(days: 1)),
+          returnTime: const TimeOfDay(hour: 10, minute: 0),
+          flexibleDates: false,
+          make: null,
+          model: null,
+        ),
         transitionsBuilder: (_, animation, __, child) {
           return FadeTransition(
             opacity: animation,
@@ -84,7 +92,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                         "Explore our diverse fleet of vehicles, from scooters to luxury cars, perfect for your Sri Lankan adventure.",
                     buttonText: 'Browse',
                     onPressed:
-                        _isLoading ? null : () => _navigateToHome(context),
+                        _isLoading ? null : () => _navigateToBrowse(context),
                     isLoading: _isLoading,
                   ),
                   const SizedBox(height: 20),

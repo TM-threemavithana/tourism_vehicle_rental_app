@@ -3,7 +3,6 @@ import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'services/onesignal_service.dart';
 import 'screens/splash_screen.dart';
-import 'screens/home_screen.dart';
 import 'screens/auth/auth_wrapper.dart';
 import 'screens/favorites_screen.dart';
 import 'screens/vehicle_detail_page.dart'; // Add this import
@@ -66,7 +65,6 @@ class _MyAppState extends State<MyApp> {
       initialRoute: '/',
       routes: {
         '/': (context) => const SplashScreen(),
-        '/home': (context) => const HomeScreen(),
         '/auth': (context) => const AuthWrapper(),
         '/favorites': (context) => const FavoritesScreen(),
         '/vehicle-detail': (context) {
