@@ -20,9 +20,9 @@ class _SplashScreenState extends State<SplashScreen>
     super.initState();
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 1200),
+      duration: const Duration(milliseconds: 1800),
     )..repeat(reverse: true);
-    _scaleAnimation = Tween<double>(begin: 1.0, end: 1.18).animate(
+    _scaleAnimation = Tween<double>(begin: 1.0, end: 1.12).animate(
       CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
     );
     _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
@@ -122,10 +122,19 @@ class _SplashScreenState extends State<SplashScreen>
               // Animated app name
               FadeTransition(
                 opacity: _fadeAnimation,
-                child: ScaleTransition(
-                  scale: _scaleAnimation,
+                child: AnimatedBuilder(
+                  animation: _scaleAnimation,
+                  builder: (context, child) {
+                    return Transform.scale(
+                      scale: _scaleAnimation.value,
+                      filterQuality: FilterQuality.high,
+                      alignment: Alignment.center,
+                      child: child,
+                    );
+                  },
                   child: Text(
                     'Wayz',
+                    textAlign: TextAlign.center,
                     style: const TextStyle(
                       fontSize: 48,
                       fontWeight: FontWeight.bold,
