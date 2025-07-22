@@ -88,9 +88,11 @@ class _RentalConditionsSectionState extends State<RentalConditionsSection> {
               flex: 2,
               child: TextFormField(
                 controller: _minRentalPeriodController,
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   labelText: 'Minimum Rental Period *',
                   border: OutlineInputBorder(),
+                  fillColor: Colors.white,
+                  filled: true,
                 ),
                 keyboardType: TextInputType.number,
                 validator: (value) =>
@@ -151,9 +153,11 @@ class _RentalConditionsSectionState extends State<RentalConditionsSection> {
               flex: 2,
               child: TextFormField(
                 controller: _maxRentalPeriodController,
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   labelText: 'Maximum Rental Period *',
                   border: OutlineInputBorder(),
+                  fillColor: Colors.white,
+                  filled: true,
                 ),
                 keyboardType: TextInputType.number,
                 validator: (value) =>
@@ -214,9 +218,11 @@ class _RentalConditionsSectionState extends State<RentalConditionsSection> {
               flex: 2,
               child: TextFormField(
                 controller: _advanceRentalPeriodController,
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   labelText: 'Advance Notice Period *',
                   border: OutlineInputBorder(),
+                  fillColor: Colors.white,
+                  filled: true,
                 ),
                 keyboardType: TextInputType.number,
                 validator: (value) =>

@@ -117,6 +117,14 @@ class _SplashScreenState extends State<SplashScreen>
                         width: 120,
                         height: 120,
                         fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          return Image.asset(
+                            'assets/images/fallback_logo.png',
+                            width: 120,
+                            height: 120,
+                            fit: BoxFit.cover,
+                          );
+                        },
                       ),
                     ),
                   ),

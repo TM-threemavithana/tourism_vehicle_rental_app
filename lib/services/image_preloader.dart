@@ -12,13 +12,11 @@ class ImagePreloader {
 
   // List of all critical images - onboarding images removed
   final List<String> _criticalImages = [
-    'assets/images/splash_background.png',
-    'assets/images/road_background.jpg', 
     'assets/images/logo.png',
-    'assets/images/login_background.jpg',
-    'assets/images/signup_background.jpg',
     'assets/images/browse_vehicle.png',
     'assets/images/request_vehicle.png',
+    'assets/images/login_background.jpg',
+    'assets/images/signup_background.jpg',
     'assets/images/main_sample.jpg',
     'assets/images/front_sample.jpg',
     'assets/images/rear_sample.jpg',

@@ -6,6 +6,8 @@ import 'filter_results.dart';
 import 'vehicle_detail_page.dart';
 import '../helpers/car_logo_helper.dart'; // Add this import at the top
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class VehicleSearchResultsScreen extends StatefulWidget {
   final Set<String> selectedVehicleTypes;
@@ -366,8 +368,8 @@ class _VehicleSearchResultsScreenState
   // Update the vehicle card in the search results
   Widget _buildVehicleCard(
       BuildContext context, Map<String, dynamic> vehicle, bool isDarkMode) {
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     final String make = vehicle['make'] ?? 'Unknown';
+    final String? contactNumber = vehicle['contactNumber'];
 
     return GestureDetector(
       onTap: () {
@@ -392,194 +394,243 @@ class _VehicleSearchResultsScreenState
             ),
           ],
         ),
-        child: Row(
+        child: Column(
           children: [
-            Container(
-              width: 120,
-              height: 120,
-              decoration: const BoxDecoration(
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(8),
-                  bottomLeft: Radius.circular(8),
-                ),
-              ),
-              child: Stack(
-                children: [
-                  ClipRRect(
-                    borderRadius: const BorderRadius.only(
+            Row(
+              children: [
+                Container(
+                  width: 120,
+                  height: 120,
+                  decoration: const BoxDecoration(
+                    borderRadius: BorderRadius.only(
                       topLeft: Radius.circular(8),
                       bottomLeft: Radius.circular(8),
                     ),
-                    child: CachedNetworkImage(
-                      imageUrl: vehicle['images']?['primaryImageUrl'] ??
-                          'https://via.placeholder.com/120x120?text=No+Image',
-                      width: 120,
-                      height: 120,
-                      fit: BoxFit.cover,
-                      placeholder: (context, url) => Container(
-                        width: 120,
-                        height: 120,
-                        color: Colors.grey[300],
-                        child: const Center(
-                            child: CircularProgressIndicator(strokeWidth: 2)),
-                      ),
-                      errorWidget: (context, url, error) => Container(
-                        width: 120,
-                        height: 120,
-                        color: isDarkMode ? Colors.grey[800] : Colors.grey[300],
-                        child: Icon(
-                          Icons.car_rental,
-                          size: 40,
-                          color: isDarkMode ? Colors.grey[700] : Colors.grey,
-                        ),
-                      ),
-                    ),
                   ),
-                  Positioned(
-                    bottom: 0,
-                    left: 0,
-                    right: 0,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(vertical: 4),
-                      decoration: BoxDecoration(
-                        color: AppColors.secondary,
+                  child: Stack(
+                    children: [
+                      ClipRRect(
                         borderRadius: const BorderRadius.only(
+                          topLeft: Radius.circular(8),
                           bottomLeft: Radius.circular(8),
                         ),
-                      ),
-                      child: Text(
-                        'Rs. ${vehicle['pricing']?['daily']?['vehicleOnly']?['price'] ?? 'N/A'}.00 / Day',
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(
-                          color: Colors.black,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 12,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.all(12),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        // Replace the generic car icon container with car logo
-                        Container(
-                          width: 24,
-                          height: 24,
-                          decoration: BoxDecoration(
+                        child: CachedNetworkImage(
+                          imageUrl: vehicle['images']?['primaryImageUrl'] ??
+                              'https://via.placeholder.com/120x120?text=No+Image',
+                          width: 120,
+                          height: 120,
+                          fit: BoxFit.cover,
+                          placeholder: (context, url) => Container(
+                            width: 120,
+                            height: 120,
+                            color: Colors.grey[300],
+                            child: const Center(
+                                child:
+                                    CircularProgressIndicator(strokeWidth: 2)),
+                          ),
+                          errorWidget: (context, url, error) => Container(
+                            width: 120,
+                            height: 120,
                             color: isDarkMode
                                 ? Colors.grey[800]
-                                : Colors.grey[100],
-                            borderRadius: BorderRadius.circular(4),
-                          ),
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(4),
-                            child: CarLogoHelper.getCarLogo(make),
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: Text(
-                            '${vehicle['make'] ?? 'Unknown'} ${vehicle['model'] ?? ''}',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: isDarkMode ? Colors.white : Colors.black,
-                            ),
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 4),
-                    Row(
-                      children: [
-                        Row(
-                          children: List.generate(
-                            5,
-                            (index) => Icon(
-                              (vehicle['rating'] != null &&
-                                      index <
-                                          (vehicle['rating'] as num).floor())
-                                  ? Icons.star
-                                  : Icons.star_border,
-                              size: 14,
-                              color: AppColors.warning,
+                                : Colors.grey[300],
+                            child: Icon(
+                              Icons.car_rental,
+                              size: 40,
+                              color:
+                                  isDarkMode ? Colors.grey[700] : Colors.grey,
                             ),
                           ),
-                        ),
-                        const SizedBox(width: 4),
-                        Text(
-                          '${vehicle['rating'] ?? 0} (${vehicle['reviewsCount'] ?? 0})',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: isDarkMode ? Colors.grey[400] : Colors.grey,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 8),
-                    Row(
-                      children: [
-                        Icon(
-                          Icons.location_on,
-                          size: 14,
-                          color: isDarkMode ? Colors.grey[400] : Colors.grey,
-                        ),
-                        const SizedBox(width: 4),
-                        Text(
-                          '${vehicle['collectionPoint']?['city'] ?? ''} ${vehicle['collectionPoint']?['district'] ?? ''}',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: isDarkMode ? Colors.grey[400] : Colors.grey,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 4),
-                    Row(
-                      children: [
-                        Icon(
-                          Icons.person,
-                          size: 14,
-                          color: isDarkMode ? Colors.grey[400] : Colors.grey,
-                        ),
-                        const SizedBox(width: 4),
-                        Text(
-                          vehicle['rentalConditions']?['rentMode'] ??
-                              'Vehicle Only',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: isDarkMode ? Colors.grey[400] : Colors.grey,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 8),
-                    Align(
-                      alignment: Alignment.centerRight,
-                      child: Text(
-                        vehicle['status'] == 'available'
-                            ? 'Available'
-                            : 'Not Available',
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: AppColors.success,
-                          fontWeight: FontWeight.w500,
                         ),
                       ),
+                      Positioned(
+                        bottom: 0,
+                        left: 0,
+                        right: 0,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(vertical: 4),
+                          decoration: BoxDecoration(
+                            color: AppColors.secondary,
+                            borderRadius: const BorderRadius.only(
+                              bottomLeft: Radius.circular(8),
+                            ),
+                          ),
+                          child: Text(
+                            'Rs. ${vehicle['pricing']?['daily']?['vehicleOnly']?['price'] ?? 'N/A'}.00 / Day',
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(
+                              color: Colors.black,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.all(12),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            // Replace the generic car icon container with car logo
+                            Container(
+                              width: 24,
+                              height: 24,
+                              decoration: BoxDecoration(
+                                color: isDarkMode
+                                    ? Colors.grey[800]
+                                    : Colors.grey[100],
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(4),
+                                child: CarLogoHelper.getCarLogo(make),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                '${vehicle['make'] ?? 'Unknown'} ${vehicle['model'] ?? ''}',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  color:
+                                      isDarkMode ? Colors.white : Colors.black,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 4),
+                        Row(
+                          children: [
+                            Row(
+                              children: List.generate(
+                                5,
+                                (index) => Icon(
+                                  (vehicle['rating'] != null &&
+                                          index <
+                                              (vehicle['rating'] as num)
+                                                  .floor())
+                                      ? Icons.star
+                                      : Icons.star_border,
+                                  size: 14,
+                                  color: AppColors.warning,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              '${vehicle['rating'] ?? 0} (${vehicle['reviewsCount'] ?? 0})',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color:
+                                    isDarkMode ? Colors.grey[400] : Colors.grey,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.location_on,
+                              size: 14,
+                              color:
+                                  isDarkMode ? Colors.grey[400] : Colors.grey,
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              '${vehicle['collectionPoint']?['city'] ?? ''} ${vehicle['collectionPoint']?['district'] ?? ''}',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color:
+                                    isDarkMode ? Colors.grey[400] : Colors.grey,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 4),
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.person,
+                              size: 14,
+                              color:
+                                  isDarkMode ? Colors.grey[400] : Colors.grey,
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              vehicle['rentalConditions']?['rentMode'] ??
+                                  'Vehicle Only',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color:
+                                    isDarkMode ? Colors.grey[400] : Colors.grey,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        Align(
+                          alignment: Alignment.centerRight,
+                          child: Text(
+                            vehicle['status'] == 'available'
+                                ? 'Available'
+                                : 'Not Available',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: AppColors.success,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            // Add call and WhatsApp buttons
+            if (contactNumber != null && contactNumber.isNotEmpty)
+              Padding(
+                padding: const EdgeInsets.only(right: 12, bottom: 8, top: 4),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.phone, color: Colors.green),
+                      tooltip: 'Call',
+                      onPressed: () async {
+                        final uri = Uri(scheme: 'tel', path: contactNumber);
+                        if (await canLaunchUrl(uri)) {
+                          await launchUrl(uri);
+                        }
+                      },
+                    ),
+                    const SizedBox(width: 8),
+                    IconButton(
+                      icon: const FaIcon(FontAwesomeIcons.whatsapp,
+                          color: Colors.green),
+                      tooltip: 'WhatsApp',
+                      onPressed: () async {
+                        final whatsappUrl =
+                            Uri.parse('https://wa.me/$contactNumber');
+                        if (await canLaunchUrl(whatsappUrl)) {
+                          await launchUrl(whatsappUrl,
+                              mode: LaunchMode.externalApplication);
+                        }
+                      },
                     ),
                   ],
                 ),
               ),
-            ),
           ],
         ),
       ),

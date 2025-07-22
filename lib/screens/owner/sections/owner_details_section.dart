@@ -78,9 +78,11 @@ class _OwnerDetailsSectionState extends State<OwnerDetailsSection> {
         // Owner name field
         TextFormField(
           controller: _nameController,
-          decoration: const InputDecoration(
+          decoration: InputDecoration(
             labelText: 'Full Name *',
             border: OutlineInputBorder(),
+            fillColor: Colors.white,
+            filled: true,
           ),
           validator: (value) => value == null || value.isEmpty
               ? 'Please enter owner\'s full name'
@@ -91,10 +93,12 @@ class _OwnerDetailsSectionState extends State<OwnerDetailsSection> {
         // Address field
         TextFormField(
           controller: _addressController,
-          decoration: const InputDecoration(
+          decoration: InputDecoration(
             labelText: 'Address *',
             border: OutlineInputBorder(),
             alignLabelWithHint: true,
+            fillColor: Colors.white,
+            filled: true,
           ),
           maxLines: 3,
           validator: (value) => value == null || value.isEmpty
@@ -106,9 +110,11 @@ class _OwnerDetailsSectionState extends State<OwnerDetailsSection> {
         // Contact No. field
         TextFormField(
           controller: _contactNoController,
-          decoration: const InputDecoration(
+          decoration: InputDecoration(
             labelText: 'Contact No. *',
             border: OutlineInputBorder(),
+            fillColor: Colors.white,
+            filled: true,
           ),
           keyboardType: TextInputType.phone,
           validator: (value) => value == null || value.isEmpty
@@ -120,9 +126,11 @@ class _OwnerDetailsSectionState extends State<OwnerDetailsSection> {
         // Email field
         TextFormField(
           controller: _emailController,
-          decoration: const InputDecoration(
+          decoration: InputDecoration(
             labelText: 'Email *',
             border: OutlineInputBorder(),
+            fillColor: Colors.white,
+            filled: true,
           ),
           keyboardType: TextInputType.emailAddress,
           validator: (value) {
@@ -142,10 +150,12 @@ class _OwnerDetailsSectionState extends State<OwnerDetailsSection> {
         // NIC No. field
         TextFormField(
           controller: _nicNoController,
-          decoration: const InputDecoration(
+          decoration: InputDecoration(
             labelText: 'NIC No. *',
             border: OutlineInputBorder(),
             hintText: 'National Identity Card Number',
+            fillColor: Colors.white,
+            filled: true,
           ),
           validator: (value) => value == null || value.isEmpty
               ? 'Please enter owner\'s NIC number'

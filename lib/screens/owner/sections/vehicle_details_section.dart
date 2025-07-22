@@ -25,18 +25,24 @@ class _VehicleDetailsSectionState extends State<VehicleDetailsSection> {
   late TextEditingController _engineCapacityController;
   late TextEditingController _seatingCapacityController;
   late TextEditingController _doorsController;
-  
+
   List<String> _yearOptions = [];
 
   @override
   void initState() {
     super.initState();
-    _gradeController = TextEditingController(text: widget.vehicleDetails.grade ?? '');
-    _vehicleNoController = TextEditingController(text: widget.vehicleDetails.vehicleNo);
-    _chassisNoController = TextEditingController(text: widget.vehicleDetails.chassisNo);
-    _engineNoController = TextEditingController(text: widget.vehicleDetails.engineNo);
-    _engineCapacityController = TextEditingController(text: widget.vehicleDetails.engineCapacity);
-    _seatingCapacityController = TextEditingController(text: widget.vehicleDetails.seatingCapacity);
+    _gradeController =
+        TextEditingController(text: widget.vehicleDetails.grade ?? '');
+    _vehicleNoController =
+        TextEditingController(text: widget.vehicleDetails.vehicleNo);
+    _chassisNoController =
+        TextEditingController(text: widget.vehicleDetails.chassisNo);
+    _engineNoController =
+        TextEditingController(text: widget.vehicleDetails.engineNo);
+    _engineCapacityController =
+        TextEditingController(text: widget.vehicleDetails.engineCapacity);
+    _seatingCapacityController =
+        TextEditingController(text: widget.vehicleDetails.seatingCapacity);
     _doorsController = TextEditingController(text: widget.vehicleDetails.doors);
 
     // Generate year options from current year down to 1990
@@ -69,7 +75,7 @@ class _VehicleDetailsSectionState extends State<VehicleDetailsSection> {
       transmission: widget.vehicleDetails.transmission,
       fuelType: widget.vehicleDetails.fuelType,
       color: widget.vehicleDetails.color,
-      
+
       // Updated values from controllers
       grade: _gradeController.text,
       vehicleNo: _vehicleNoController.text,
@@ -79,7 +85,7 @@ class _VehicleDetailsSectionState extends State<VehicleDetailsSection> {
       seatingCapacity: _seatingCapacityController.text,
       doors: _doorsController.text,
     );
-    
+
     widget.onVehicleDetailsChanged(updatedDetails);
   }
 
@@ -87,7 +93,7 @@ class _VehicleDetailsSectionState extends State<VehicleDetailsSection> {
     final updatedDetails = VehicleBasicDetails(
       vehicleType: widget.vehicleDetails.vehicleType,
       make: widget.vehicleDetails.make,
-      model: null,  // Reset model when make changes
+      model: null, // Reset model when make changes
       category: widget.vehicleDetails.category,
       grade: _gradeController.text,
       year: widget.vehicleDetails.year,
@@ -101,16 +107,16 @@ class _VehicleDetailsSectionState extends State<VehicleDetailsSection> {
       seatingCapacity: _seatingCapacityController.text,
       doors: _doorsController.text,
     );
-    
+
     widget.onVehicleDetailsChanged(updatedDetails);
   }
 
   void _updateMakeOptions() {
     final updatedDetails = VehicleBasicDetails(
       vehicleType: widget.vehicleDetails.vehicleType,
-      make: null,  // Reset make when vehicle type changes
-      model: null,  // Reset model when vehicle type changes
-      category: null,  // Reset category when vehicle type changes
+      make: null, // Reset make when vehicle type changes
+      model: null, // Reset model when vehicle type changes
+      category: null, // Reset category when vehicle type changes
       grade: _gradeController.text,
       year: widget.vehicleDetails.year,
       vehicleNo: _vehicleNoController.text,
@@ -123,7 +129,7 @@ class _VehicleDetailsSectionState extends State<VehicleDetailsSection> {
       seatingCapacity: _seatingCapacityController.text,
       doors: _doorsController.text,
     );
-    
+
     widget.onVehicleDetailsChanged(updatedDetails);
   }
 
@@ -205,7 +211,7 @@ class _VehicleDetailsSectionState extends State<VehicleDetailsSection> {
             final updatedDetails = VehicleBasicDetails(
               vehicleType: widget.vehicleDetails.vehicleType,
               make: value,
-              model: null,  // Reset model when make changes
+              model: null, // Reset model when make changes
               category: widget.vehicleDetails.category,
               grade: _gradeController.text,
               year: widget.vehicleDetails.year,
@@ -228,8 +234,12 @@ class _VehicleDetailsSectionState extends State<VehicleDetailsSection> {
           value: widget.vehicleDetails.model,
           items: (widget.vehicleDetails.vehicleType != null &&
                   widget.vehicleDetails.make != null &&
-                  VehicleFormConstants.modelsMap[widget.vehicleDetails.vehicleType]?[widget.vehicleDetails.make] != null)
-              ? VehicleFormConstants.modelsMap[widget.vehicleDetails.vehicleType]![widget.vehicleDetails.make]!
+                  VehicleFormConstants
+                              .modelsMap[widget.vehicleDetails.vehicleType]
+                          ?[widget.vehicleDetails.make] !=
+                      null)
+              ? VehicleFormConstants.modelsMap[widget
+                      .vehicleDetails.vehicleType]![widget.vehicleDetails.make]!
                   .map((model) => DropdownMenuItem<String>(
                         value: model,
                         child: Text(model),
@@ -262,7 +272,8 @@ class _VehicleDetailsSectionState extends State<VehicleDetailsSection> {
         FormWidgets.buildDropdown(
           value: widget.vehicleDetails.category,
           items: widget.vehicleDetails.vehicleType != null
-              ? VehicleFormConstants.categoriesMap[widget.vehicleDetails.vehicleType]
+              ? VehicleFormConstants
+                      .categoriesMap[widget.vehicleDetails.vehicleType]
                       ?.map((category) => DropdownMenuItem<String>(
                             value: category,
                             child: Text(category),
@@ -295,9 +306,11 @@ class _VehicleDetailsSectionState extends State<VehicleDetailsSection> {
         const SizedBox(height: 16),
         TextFormField(
           controller: _gradeController,
-          decoration: const InputDecoration(
+          decoration: InputDecoration(
             labelText: 'Grade',
             border: OutlineInputBorder(),
+            fillColor: Colors.white,
+            filled: true,
           ),
         ),
         const SizedBox(height: 16),
@@ -334,9 +347,11 @@ class _VehicleDetailsSectionState extends State<VehicleDetailsSection> {
         const SizedBox(height: 16),
         TextFormField(
           controller: _vehicleNoController,
-          decoration: const InputDecoration(
+          decoration: InputDecoration(
             labelText: 'Vehicle Number *',
             border: OutlineInputBorder(),
+            fillColor: Colors.white,
+            filled: true,
           ),
           validator: (value) => value == null || value.isEmpty
               ? 'Please enter vehicle number'
@@ -345,9 +360,11 @@ class _VehicleDetailsSectionState extends State<VehicleDetailsSection> {
         const SizedBox(height: 16),
         TextFormField(
           controller: _chassisNoController,
-          decoration: const InputDecoration(
+          decoration: InputDecoration(
             labelText: 'Chassis Number *',
             border: OutlineInputBorder(),
+            fillColor: Colors.white,
+            filled: true,
           ),
           validator: (value) => value == null || value.isEmpty
               ? 'Please enter chassis number'
@@ -356,9 +373,11 @@ class _VehicleDetailsSectionState extends State<VehicleDetailsSection> {
         const SizedBox(height: 16),
         TextFormField(
           controller: _engineNoController,
-          decoration: const InputDecoration(
+          decoration: InputDecoration(
             labelText: 'Engine Number *',
             border: OutlineInputBorder(),
+            fillColor: Colors.white,
+            filled: true,
           ),
           validator: (value) => value == null || value.isEmpty
               ? 'Please enter engine number'
@@ -367,17 +386,18 @@ class _VehicleDetailsSectionState extends State<VehicleDetailsSection> {
         const SizedBox(height: 16),
         TextFormField(
           controller: _engineCapacityController,
-          decoration: const InputDecoration(
+          decoration: InputDecoration(
             labelText: 'Engine Capacity (cc) *',
             border: OutlineInputBorder(),
+            fillColor: Colors.white,
+            filled: true,
           ),
           keyboardType: TextInputType.number,
           validator: (value) {
             if (value == null || value.isEmpty) {
               return 'Please enter engine capacity';
             }
-            if (int.tryParse(value) == null ||
-                int.parse(value) <= 0) {
+            if (int.tryParse(value) == null || int.parse(value) <= 0) {
               return 'Please enter a valid positive number';
             }
             return null;
@@ -498,17 +518,18 @@ class _VehicleDetailsSectionState extends State<VehicleDetailsSection> {
         const SizedBox(height: 16),
         TextFormField(
           controller: _seatingCapacityController,
-          decoration: const InputDecoration(
+          decoration: InputDecoration(
             labelText: 'Seating Capacity *',
             border: OutlineInputBorder(),
+            fillColor: Colors.white,
+            filled: true,
           ),
           keyboardType: TextInputType.number,
           validator: (value) {
             if (value == null || value.isEmpty) {
               return 'Please enter seating capacity';
             }
-            if (int.tryParse(value) == null ||
-                int.parse(value) < 0) {
+            if (int.tryParse(value) == null || int.parse(value) < 0) {
               return 'Please enter a valid non-negative number';
             }
             return null;
@@ -517,17 +538,18 @@ class _VehicleDetailsSectionState extends State<VehicleDetailsSection> {
         const SizedBox(height: 16),
         TextFormField(
           controller: _doorsController,
-          decoration: const InputDecoration(
+          decoration: InputDecoration(
             labelText: 'Number of Doors *',
             border: OutlineInputBorder(),
+            fillColor: Colors.white,
+            filled: true,
           ),
           keyboardType: TextInputType.number,
           validator: (value) {
             if (value == null || value.isEmpty) {
               return 'Please enter number of doors';
             }
-            if (int.tryParse(value) == null ||
-                int.parse(value) < 0) {
+            if (int.tryParse(value) == null || int.parse(value) < 0) {
               return 'Please enter a valid non-negative number';
             }
             return null;

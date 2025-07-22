@@ -40,6 +40,8 @@ class FormWidgets {
           labelText: labelText,
           border: InputBorder.none,
           contentPadding: EdgeInsets.zero,
+          fillColor: Colors.white,
+          filled: true,
         ),
         value: value,
         items: items,
@@ -78,6 +80,8 @@ class FormWidgets {
         labelText: label + (isRequired ? ' *' : ''),
         border: const OutlineInputBorder(),
         prefixText: 'Rs. ',
+        fillColor: Colors.white,
+        filled: true,
       ),
       keyboardType: TextInputType.number,
       validator: (value) => validator(value),
@@ -96,12 +100,14 @@ class FormWidgets {
         labelText: label + (isRequired ? ' *' : ''),
         border: const OutlineInputBorder(),
         hintText: 'Enter 0 for unlimited',
+        fillColor: Colors.white,
+        filled: true,
       ),
       keyboardType: TextInputType.number,
       validator: (value) => validator(value),
     );
   }
-  
+
   static Widget buildNoteContainer(String text, {Color color = Colors.blue}) {
     return Container(
       padding: const EdgeInsets.all(12),

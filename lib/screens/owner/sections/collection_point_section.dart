@@ -25,7 +25,8 @@ class _CollectionPointSectionState extends State<CollectionPointSection> {
   void initState() {
     super.initState();
     _cityController = TextEditingController(text: widget.collectionPoint.city);
-    _addressController = TextEditingController(text: widget.collectionPoint.address);
+    _addressController =
+        TextEditingController(text: widget.collectionPoint.address);
 
     _setupControllerListeners();
   }
@@ -41,7 +42,7 @@ class _CollectionPointSectionState extends State<CollectionPointSection> {
       city: _cityController.text,
       address: _addressController.text,
     );
-    
+
     widget.onCollectionPointChanged(updatedPoint);
   }
 
@@ -84,23 +85,26 @@ class _CollectionPointSectionState extends State<CollectionPointSection> {
         // City field
         TextFormField(
           controller: _cityController,
-          decoration: const InputDecoration(
+          decoration: InputDecoration(
             labelText: 'City *',
             border: OutlineInputBorder(),
+            fillColor: Colors.white,
+            filled: true,
           ),
-          validator: (value) => value == null || value.isEmpty
-              ? 'Please enter the city'
-              : null,
+          validator: (value) =>
+              value == null || value.isEmpty ? 'Please enter the city' : null,
         ),
         const SizedBox(height: 16),
 
         // Address field
         TextFormField(
           controller: _addressController,
-          decoration: const InputDecoration(
+          decoration: InputDecoration(
             labelText: 'Address *',
             border: OutlineInputBorder(),
             alignLabelWithHint: true,
+            fillColor: Colors.white,
+            filled: true,
           ),
           maxLines: 3,
           validator: (value) => value == null || value.isEmpty

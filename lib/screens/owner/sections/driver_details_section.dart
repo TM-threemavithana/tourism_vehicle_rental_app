@@ -23,8 +23,10 @@ class _DriverDetailsSectionState extends State<DriverDetailsSection> {
   @override
   void initState() {
     super.initState();
-    _driverNameController = TextEditingController(text: widget.driverDetails.name);
-    _driverLicenseController = TextEditingController(text: widget.driverDetails.licenseNo);
+    _driverNameController =
+        TextEditingController(text: widget.driverDetails.name);
+    _driverLicenseController =
+        TextEditingController(text: widget.driverDetails.licenseNo);
 
     _setupControllerListeners();
   }
@@ -39,7 +41,7 @@ class _DriverDetailsSectionState extends State<DriverDetailsSection> {
       name: _driverNameController.text,
       licenseNo: _driverLicenseController.text,
     );
-    
+
     widget.onDriverDetailsChanged(updatedDetails);
   }
 
@@ -59,9 +61,11 @@ class _DriverDetailsSectionState extends State<DriverDetailsSection> {
         const SizedBox(height: 16),
         TextFormField(
           controller: _driverNameController,
-          decoration: const InputDecoration(
+          decoration: InputDecoration(
             labelText: 'Driver Name *',
             border: OutlineInputBorder(),
+            fillColor: Colors.white,
+            filled: true,
           ),
           validator: (value) => value == null || value.isEmpty
               ? 'Please enter driver name'
@@ -70,9 +74,11 @@ class _DriverDetailsSectionState extends State<DriverDetailsSection> {
         const SizedBox(height: 16),
         TextFormField(
           controller: _driverLicenseController,
-          decoration: const InputDecoration(
+          decoration: InputDecoration(
             labelText: 'Driver License Number *',
             border: OutlineInputBorder(),
+            fillColor: Colors.white,
+            filled: true,
           ),
           validator: (value) => value == null || value.isEmpty
               ? 'Please enter driver license number'

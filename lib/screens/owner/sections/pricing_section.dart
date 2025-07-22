@@ -115,11 +115,13 @@ class _PricingSectionState extends State<PricingSection> {
           // Vehicle Value field - always shown if rent mode is selected
           TextFormField(
             controller: _vehicleValueController,
-            decoration: const InputDecoration(
+            decoration: InputDecoration(
               labelText: 'Vehicle Value (LKR) *',
               border: OutlineInputBorder(),
               hintText: 'Current market value of the vehicle',
               prefixText: 'Rs. ',
+              fillColor: Colors.white,
+              filled: true,
             ),
             keyboardType: TextInputType.number,
             validator: (value) {
