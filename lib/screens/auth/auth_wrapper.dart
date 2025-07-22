@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'login_screen.dart';
-import '../home_screen.dart';
+import '../welcome_screen.dart';
 import '../owner/owner_dashboard_screen.dart';
 import '../../services/auth_service.dart';
 import 'user_type_selection_screen.dart';
@@ -59,7 +59,7 @@ class _AuthWrapperState extends State<AuthWrapper> {
                 if (userType == 'owner') {
                   return const OwnerDashboardScreen();
                 } else {
-                  return const HomeScreen();
+                  return const WelcomeScreen();
                 }
               },
             );

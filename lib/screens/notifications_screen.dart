@@ -65,7 +65,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
       case 'Search Vehicles':
       case 'Dashboard':
         Navigator.pushReplacementNamed(
-            context, _userType == 'owner' ? '/owner-dashboard' : '/home');
+            context, _userType == 'owner' ? '/owner-dashboard' : '/');
         break;
       // Add other navigation options as needed
     }

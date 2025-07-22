@@ -411,7 +411,7 @@ class _SideMenuState extends State<SideMenu> {
             Navigator.pushReplacementNamed(context, '/favorites');
             break;
           case 'Search Vehicles':
-            Navigator.pushReplacementNamed(context, '/home');
+            Navigator.pushReplacementNamed(context, '/');
             break;
           case 'Notifications':
             Navigator.pushReplacementNamed(context, '/notifications');

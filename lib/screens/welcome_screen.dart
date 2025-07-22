@@ -72,6 +72,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  // Removed side menu button
                   Center(
                     child: Padding(
                       padding: const EdgeInsets.only(top: 8, bottom: 16),

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
-import '../home_screen.dart';
+import '../welcome_screen.dart';
 import 'login_screen.dart';
 import '../../services/auth_service.dart';
 import '../../widgets/google_sign_in_button.dart'; // Add this import if it's not already there
@@ -79,7 +79,7 @@ class _SignupScreenState extends State<SignupScreen>
         Navigator.of(context).pushAndRemoveUntil(
           PageRouteBuilder(
             transitionDuration: const Duration(milliseconds: 800),
-            pageBuilder: (_, __, ___) => const HomeScreen(),
+            pageBuilder: (_, __, ___) => const WelcomeScreen(),
             transitionsBuilder: (_, animation, __, child) {
               return FadeTransition(
                 opacity: animation,
@@ -585,7 +585,7 @@ class _SignupScreenState extends State<SignupScreen>
                                         transitionDuration:
                                             const Duration(milliseconds: 800),
                                         pageBuilder: (_, __, ___) =>
-                                            const HomeScreen(),
+                                            const WelcomeScreen(),
                                         transitionsBuilder:
                                             (_, animation, __, child) {
                                           return FadeTransition(

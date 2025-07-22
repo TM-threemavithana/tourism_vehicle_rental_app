@@ -8,11 +8,10 @@ import '../services/auth_service.dart';
 import '../screens/auth/auth_wrapper.dart';
 import '../widgets/side_menu.dart';
 import '../utils/app_colors.dart';
-import '../screens/home_screen.dart';
+import 'welcome_screen.dart';
 import 'owner/owner_dashboard_screen.dart';
 import '../widgets/not_logged_in_widget.dart';
 import '../widgets/custom_bottom_nav_bar.dart';
-import 'welcome_screen.dart';
 import 'renter/my_booking_requests_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -124,7 +123,7 @@ class _ProfileScreenState extends State<ProfileScreen>
       case 'Search':
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => const HomeScreen()),
+          MaterialPageRoute(builder: (context) => const WelcomeScreen()),
         );
         break;
       case 'Vehicle Bookings':
@@ -467,7 +466,7 @@ class _ProfileScreenState extends State<ProfileScreen>
         MaterialPageRoute(
           builder: (context) => newUserType == 'owner'
               ? const OwnerDashboardScreen()
-              : const HomeScreen(),
+              : const WelcomeScreen(),
         ),
         (route) => false,
       );
