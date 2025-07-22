@@ -287,10 +287,12 @@ class RentalConditions {
 class DriverDetails {
   String name;
   String licenseNo;
+  String? whatsappNumber;
 
   DriverDetails({
     this.name = '',
     this.licenseNo = '',
+    this.whatsappNumber,
   });
 }
 

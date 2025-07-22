@@ -501,18 +501,17 @@ class _NonOwnerVehicleFormState extends State<NonOwnerVehicleForm> {
                     ),
                     const SizedBox(height: 24),
 
-                    // Driver Details Section (conditional)
-                    if (_shouldShowDriverDetails()) ...[
-                      DriverDetailsSection(
-                        driverDetails: _driverDetails,
-                        onDriverDetailsChanged: (updatedDetails) {
-                          setState(() {
-                            _driverDetails = updatedDetails;
-                          });
-                        },
-                      ),
-                      const SizedBox(height: 24),
-                    ],
+                    // Driver Details Section (always shown)
+                    DriverDetailsSection(
+                      driverDetails: _driverDetails,
+                      onDriverDetailsChanged: (updatedDetails) {
+                        setState(() {
+                          _driverDetails = updatedDetails;
+                        });
+                      },
+                      rentMode: _rentalConditions.rentMode,
+                    ),
+                    const SizedBox(height: 24),
 
                     // Pricing Section
                     PricingSection(
