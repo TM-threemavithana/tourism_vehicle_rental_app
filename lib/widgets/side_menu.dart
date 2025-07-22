@@ -376,8 +376,6 @@ class _SideMenuState extends State<SideMenu> {
       ];
     } else {
       return [
-        _buildMenuItem(context, Icons.search, 'Search Vehicles',
-            isActive: widget.currentTab == 'Search'),
         _buildMenuItem(context, Icons.history_outlined, 'My Rentals',
             isActive: widget.currentTab == 'My Rentals'),
         _buildMenuItem(context, Icons.favorite_outline, 'Favorites',
@@ -409,9 +407,6 @@ class _SideMenuState extends State<SideMenu> {
         switch (title) {
           case 'Favorites':
             Navigator.pushReplacementNamed(context, '/favorites');
-            break;
-          case 'Search Vehicles':
-            Navigator.pushReplacementNamed(context, '/');
             break;
           case 'Notifications':
             Navigator.pushReplacementNamed(context, '/notifications');

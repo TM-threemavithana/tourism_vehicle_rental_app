@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'home_screen.dart';
 import 'request_vehicle_screen.dart';
 import '../widgets/custom_bottom_nav_bar.dart';
 import 'renter/my_booking_requests_screen.dart';
 import 'profile_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'vehicle_search_results_screen.dart';
+import '../widgets/side_menu.dart';
 
 class WelcomeScreen extends StatefulWidget {
   const WelcomeScreen({super.key});
@@ -16,6 +16,7 @@ class WelcomeScreen extends StatefulWidget {
 
 class _WelcomeScreenState extends State<WelcomeScreen> {
   bool _isLoading = false;
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
   void didChangeDependencies() {
@@ -58,7 +59,17 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
       backgroundColor: const Color(0xFFF7FBEF),
+      drawer: SideMenu(
+        onClose: () => Navigator.of(context).pop(),
+        onSignOut: () async {
+          await FirebaseAuth.instance.signOut();
+          if (mounted) Navigator.pushReplacementNamed(context, '/auth');
+        },
+        user: FirebaseAuth.instance.currentUser,
+        currentTab: '',
+      ),
       body: Stack(
         children: [
           // Yellow status bar overlay
@@ -72,19 +83,30 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Removed side menu button
-                  Center(
-                    child: Padding(
-                      padding: const EdgeInsets.only(top: 8, bottom: 16),
-                      child: Text(
-                        'Wayz',
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black.withOpacity(0.8),
+                  // Side menu button and centered title in a row
+                  Row(
+                    children: [
+                      IconButton(
+                        icon: const Icon(Icons.menu,
+                            color: Colors.black, size: 28),
+                        onPressed: () =>
+                            _scaffoldKey.currentState?.openDrawer(),
+                      ),
+                      Expanded(
+                        child: Center(
+                          child: Text(
+                            'Wayz',
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black.withOpacity(0.8),
+                            ),
+                          ),
                         ),
                       ),
-                    ),
+                      SizedBox(
+                          width: 48), // Spacer to balance the IconButton width
+                    ],
                   ),
                   _FeatureCard(
                     image: 'assets/images/browse_vehicle.png',

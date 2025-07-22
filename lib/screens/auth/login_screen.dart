@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
-import '../home_screen.dart';
 import 'signup_screen.dart';
 import 'forgot_password_screen.dart';
 import '../../services/auth_service.dart';
 import '../../widgets/google_sign_in_button.dart';
+import '../welcome_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -76,7 +76,7 @@ class _LoginScreenState extends State<LoginScreen>
           PageRouteBuilder(
             transitionDuration:
                 const Duration(milliseconds: 500), // Reduced from 800
-            pageBuilder: (_, __, ___) => const HomeScreen(),
+            pageBuilder: (_, __, ___) => const WelcomeScreen(),
             transitionsBuilder: (_, animation, __, child) {
               final curvedAnimation = CurvedAnimation(
                 parent: animation,
@@ -491,7 +491,7 @@ class _LoginScreenState extends State<LoginScreen>
                                           transitionDuration:
                                               const Duration(milliseconds: 800),
                                           pageBuilder: (_, __, ___) =>
-                                              const HomeScreen(),
+                                              const WelcomeScreen(),
                                           transitionsBuilder:
                                               (_, animation, __, child) {
                                             return FadeTransition(
