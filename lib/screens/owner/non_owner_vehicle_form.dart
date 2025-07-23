@@ -274,13 +274,11 @@ class _NonOwnerVehicleFormState extends State<NonOwnerVehicleForm> {
       };
 
       // Add driver details if applicable
-      if (_rentalConditions.rentMode == 'With Driver' ||
-          _rentalConditions.rentMode == 'With or Without Driver') {
-        vehicleData['driverDetails'] = {
-          'name': _driverDetails.name,
-          'licenseNo': _driverDetails.licenseNo,
-        };
-      }
+      vehicleData['driverDetails'] = {
+        'name': _driverDetails.name,
+        'licenseNo': _driverDetails.licenseNo,
+        'whatsappNumber': _driverDetails.whatsappNumber,
+      };
 
       // TODO: Save vehicle data to Firebase/Firestore
       // For now, just show a success message

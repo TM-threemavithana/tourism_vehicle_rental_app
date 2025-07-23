@@ -76,16 +76,16 @@ class _DriverDetailsSectionState extends State<DriverDetailsSection> {
             border: OutlineInputBorder(),
             fillColor: Colors.white,
             filled: true,
-            hintText: 'e.g. +94771234567',
+            hintText: 'e.g. +94771234567 (include country code)',
           ),
           keyboardType: TextInputType.phone,
           validator: (value) {
             if (value == null || value.isEmpty) {
               return 'Please enter a WhatsApp number for this vehicle';
             }
-            final phoneRegex = RegExp(r'^\+?\d{9,15}\$');
+            final phoneRegex = RegExp(r'^\+\d{9,15} ?$');
             if (!phoneRegex.hasMatch(value)) {
-              return 'Enter a valid WhatsApp number';
+              return 'Enter a valid WhatsApp number with country code (e.g. +94771234567)';
             }
             return null;
           },
