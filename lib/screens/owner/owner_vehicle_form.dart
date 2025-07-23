@@ -124,32 +124,42 @@ class _OwnerVehicleFormState extends State<OwnerVehicleForm> {
     setState(() => _isLoading = true);
 
     try {
-      // Upload all images to your storage service (Cloudinary or Firebase Storage)
-      // This part depends on your implementation, but typically:
-      List<String> uploadedImageUrls = [];
-      String primaryImageUrl = '';
-
-      for (String localPath in _vehicleImages.imageUrls) {
-        // Upload image and get URL
-        // For example:
-        final response = await _cloudinaryService.uploadImage(
+      // Upload all vehicle images in parallel
+      final imageUploadFutures = _vehicleImages.imageUrls.map((localPath) {
+        return _cloudinaryService.uploadImage(
           File(localPath),
           FirebaseAuth.instance.currentUser?.uid ?? 'unknown',
         );
-
+      }).toList();
+      final imageUploadResponses = await Future.wait(imageUploadFutures);
+      List<String> uploadedImageUrls = [];
+      String primaryImageUrl = '';
+      for (int i = 0; i < imageUploadResponses.length; i++) {
+        final response = imageUploadResponses[i];
         if (response != null) {
           uploadedImageUrls.add(response.secureUrl);
-
-          // Set primary image URL
-          if (localPath == _vehicleImages.primaryImageUrl) {
+          if (_vehicleImages.imageUrls[i] == _vehicleImages.primaryImageUrl) {
             primaryImageUrl = response.secureUrl;
           }
         }
       }
-
-      // If primary image not set but we have images, use the first one
       if (primaryImageUrl.isEmpty && uploadedImageUrls.isNotEmpty) {
         primaryImageUrl = uploadedImageUrls[0];
+      }
+
+      // Upload registration documents in parallel
+      final regDocUploadFutures = _registrationDocImages.map((image) {
+        return _cloudinaryService.uploadImage(
+          File(image.path),
+          FirebaseAuth.instance.currentUser?.uid ?? 'unknown',
+        );
+      }).toList();
+      final regDocUploadResponses = await Future.wait(regDocUploadFutures);
+      List<String> registrationDocUrls = [];
+      for (final response in regDocUploadResponses) {
+        if (response != null) {
+          registrationDocUrls.add(response.secureUrl);
+        }
       }
 
       // First create the pricing map with the correct types
@@ -174,18 +184,6 @@ class _OwnerVehicleFormState extends State<OwnerVehicleForm> {
       if (_pricing.rentalPeriods['Monthly'] == true &&
           _pricing.monthly != null) {
         pricingMap['monthly'] = _pricing.monthly!.toMap();
-      }
-
-      // Upload registration documents
-      List<String> registrationDocUrls = [];
-      for (var image in _registrationDocImages) {
-        final response = await _cloudinaryService.uploadImage(
-          File(image.path),
-          FirebaseAuth.instance.currentUser?.uid ?? 'unknown',
-        );
-        if (response != null) {
-          registrationDocUrls.add(response.secureUrl);
-        }
       }
 
       // Convert all form data to a map that can be saved to Firebase

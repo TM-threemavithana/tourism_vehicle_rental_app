@@ -152,6 +152,20 @@ class _VehicleSearchResultsScreenState
     _filterDrawerKey.currentState?.openEndDrawer();
   }
 
+  // Helper to clean phone number for WhatsApp
+  String cleanPhoneNumber(String number) {
+    // Remove all non-digit characters except leading +
+    String cleaned = number.replaceAll(RegExp(r'[^0-9+]'), '');
+    // Remove leading zeros after country code
+    if (cleaned.startsWith('00')) {
+      cleaned = cleaned.replaceFirst('00', '');
+    }
+    if (cleaned.startsWith('+')) {
+      cleaned = cleaned.substring(1);
+    }
+    return cleaned;
+  }
+
   @override
   Widget build(BuildContext context) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
@@ -369,7 +383,11 @@ class _VehicleSearchResultsScreenState
   Widget _buildVehicleCard(
       BuildContext context, Map<String, dynamic> vehicle, bool isDarkMode) {
     final String make = vehicle['make'] ?? 'Unknown';
-    final String? contactNumber = vehicle['contactNumber'];
+    final String? whatsappNumber = vehicle['driverDetails']?['whatsappNumber'];
+    final String? contactNumber =
+        (whatsappNumber != null && whatsappNumber.isNotEmpty)
+            ? whatsappNumber
+            : vehicle['contactNumber'];
 
     return GestureDetector(
       onTap: () {
@@ -598,7 +616,7 @@ class _VehicleSearchResultsScreenState
               ],
             ),
             // Add call and WhatsApp buttons
-            if (contactNumber != null && contactNumber.isNotEmpty)
+            if ((contactNumber != null && contactNumber.isNotEmpty))
               Padding(
                 padding: const EdgeInsets.only(right: 12, bottom: 8, top: 4),
                 child: Row(
@@ -611,6 +629,12 @@ class _VehicleSearchResultsScreenState
                         final uri = Uri(scheme: 'tel', path: contactNumber);
                         if (await canLaunchUrl(uri)) {
                           await launchUrl(uri);
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                                content: Text(
+                                    'Cannot make a call from this device.')),
+                          );
                         }
                       },
                     ),
@@ -620,11 +644,42 @@ class _VehicleSearchResultsScreenState
                           color: Colors.green),
                       tooltip: 'WhatsApp',
                       onPressed: () async {
+                        final cleanedNumber = cleanPhoneNumber(contactNumber);
                         final whatsappUrl =
-                            Uri.parse('https://wa.me/$contactNumber');
+                            Uri.parse('https://wa.me/$cleanedNumber');
+                        // Try to launch WhatsApp
                         if (await canLaunchUrl(whatsappUrl)) {
-                          await launchUrl(whatsappUrl,
-                              mode: LaunchMode.externalApplication);
+                          final launched = await launchUrl(
+                            whatsappUrl,
+                            mode: LaunchMode.externalApplication,
+                          );
+                          if (!launched) {
+                            // Fallback: try to open in browser
+                            final browserLaunched = await launchUrl(
+                              whatsappUrl,
+                              mode: LaunchMode.platformDefault,
+                            );
+                            if (!browserLaunched) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                    content: Text(
+                                        'Could not open WhatsApp or browser. Please make sure WhatsApp is installed and the number is valid.')),
+                              );
+                            }
+                          }
+                        } else {
+                          // Fallback: try to open in browser
+                          final browserLaunched = await launchUrl(
+                            whatsappUrl,
+                            mode: LaunchMode.platformDefault,
+                          );
+                          if (!browserLaunched) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                  content: Text(
+                                      'Could not open WhatsApp or browser. Please make sure WhatsApp is installed and the number is valid.')),
+                            );
+                          }
                         }
                       },
                     ),
