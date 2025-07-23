@@ -383,13 +383,32 @@ class _VehicleSearchResultsScreenState
   Widget _buildVehicleCard(
       BuildContext context, Map<String, dynamic> vehicle, bool isDarkMode) {
     final String make = vehicle['make'] ?? 'Unknown';
+    final String model = vehicle['model'] ?? '';
+    final String? year = vehicle['year']?.toString();
+    final String? category = vehicle['category'];
     final String? whatsappNumber = vehicle['driverDetails']?['whatsappNumber'];
     final String? contactNumber =
         (whatsappNumber != null && whatsappNumber.isNotEmpty)
             ? whatsappNumber
             : vehicle['contactNumber'];
+    final String? imageUrl = vehicle['images']?['primaryImageUrl'];
+    final String? city = vehicle['collectionPoint']?['city'];
+    final String? district = vehicle['collectionPoint']?['district'];
+    final double? rating = (vehicle['rating'] is num)
+        ? (vehicle['rating'] as num).toDouble()
+        : null;
+    final int? trips = vehicle['trips'] is int ? vehicle['trips'] : null;
+    final String? price =
+        vehicle['pricing']?['daily']?['vehicleOnly']?['price']?.toString();
+    final String? rentMode =
+        vehicle['rentalConditions']?['rentMode'] ?? 'Vehicle Only';
+    final String locationString = [city, district]
+        .map((e) => e?.toString() ?? '')
+        .where((e) => e.isNotEmpty)
+        .join(', ');
 
-    return GestureDetector(
+    return InkWell(
+      borderRadius: BorderRadius.circular(18),
       onTap: () {
         Navigator.push(
           context,
@@ -398,296 +417,355 @@ class _VehicleSearchResultsScreenState
           ),
         );
       },
-      child: Container(
-        margin: const EdgeInsets.symmetric(vertical: 4),
-        decoration: BoxDecoration(
-          color: isDarkMode ? AppColors.neutralDark : Colors.white,
-          borderRadius: BorderRadius.circular(8),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.2),
-              spreadRadius: 1,
-              blurRadius: 3,
-              offset: const Offset(0, 1),
-            ),
-          ],
+      child: Card(
+        elevation: 5,
+        margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 0),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(18),
         ),
-        child: Column(
-          children: [
-            Row(
-              children: [
-                Container(
-                  width: 120,
-                  height: 120,
-                  decoration: const BoxDecoration(
-                    borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(8),
-                      bottomLeft: Radius.circular(8),
+        color: isDarkMode ? AppColors.neutralDark : Colors.white,
+        child: Padding(
+          padding: const EdgeInsets.all(10),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Image only
+              Stack(
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(14),
+                    child: imageUrl != null
+                        ? CachedNetworkImage(
+                            imageUrl: imageUrl,
+                            width: 140,
+                            height: 150,
+                            fit: BoxFit.cover,
+                            placeholder: (context, url) => Container(
+                              width: 140,
+                              height: 150,
+                              color: Colors.grey[300],
+                              child: const Center(
+                                  child: CircularProgressIndicator(
+                                      strokeWidth: 2)),
+                            ),
+                            errorWidget: (context, url, error) => Container(
+                              width: 140,
+                              height: 150,
+                              color: Colors.grey[200],
+                              child: const Icon(Icons.car_rental,
+                                  size: 40, color: Colors.grey),
+                            ),
+                          )
+                        : Container(
+                            width: 140,
+                            height: 150,
+                            color: Colors.grey[200],
+                            child: const Icon(Icons.car_rental,
+                                size: 40, color: Colors.grey),
+                          ),
+                  ),
+                  if ((price ?? '').isNotEmpty)
+                    Positioned(
+                      left: 0,
+                      right: 0,
+                      bottom: 0,
+                      child: Container(
+                        margin: const EdgeInsets.symmetric(
+                            horizontal: 8, vertical: 8),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: Color(0xFFFFC107).withOpacity(0.92),
+                          borderRadius: BorderRadius.circular(8),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.08),
+                              blurRadius: 4,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: Text(
+                          'Rs. ${price ?? ''} / Day',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 13,
+                          ),
+                          textAlign: TextAlign.center,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
                     ),
-                  ),
-                  child: Stack(
-                    children: [
-                      ClipRRect(
-                        borderRadius: const BorderRadius.only(
-                          topLeft: Radius.circular(8),
-                          bottomLeft: Radius.circular(8),
-                        ),
-                        child: CachedNetworkImage(
-                          imageUrl: vehicle['images']?['primaryImageUrl'] ??
-                              'https://via.placeholder.com/120x120?text=No+Image',
-                          width: 120,
-                          height: 120,
-                          fit: BoxFit.cover,
-                          placeholder: (context, url) => Container(
-                            width: 120,
-                            height: 120,
-                            color: Colors.grey[300],
-                            child: const Center(
-                                child:
-                                    CircularProgressIndicator(strokeWidth: 2)),
-                          ),
-                          errorWidget: (context, url, error) => Container(
-                            width: 120,
-                            height: 120,
-                            color: isDarkMode
-                                ? Colors.grey[800]
-                                : Colors.grey[300],
-                            child: Icon(
-                              Icons.car_rental,
-                              size: 40,
-                              color:
-                                  isDarkMode ? Colors.grey[700] : Colors.grey,
-                            ),
-                          ),
-                        ),
-                      ),
-                      Positioned(
-                        bottom: 0,
-                        left: 0,
-                        right: 0,
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(vertical: 4),
-                          decoration: BoxDecoration(
-                            color: AppColors.secondary,
-                            borderRadius: const BorderRadius.only(
-                              bottomLeft: Radius.circular(8),
-                            ),
-                          ),
-                          child: Text(
-                            'Rs. ${vehicle['pricing']?['daily']?['vehicleOnly']?['price'] ?? 'N/A'}.00 / Day',
-                            textAlign: TextAlign.center,
-                            style: const TextStyle(
-                              color: Colors.black,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 12,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.all(12),
-                    child: Column(
+                ],
+              ),
+              const SizedBox(width: 16),
+              // Info and actions
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Make/model/price
+                    Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Row(
-                          children: [
-                            // Replace the generic car icon container with car logo
-                            Container(
-                              width: 24,
-                              height: 24,
-                              decoration: BoxDecoration(
-                                color: isDarkMode
-                                    ? Colors.grey[800]
-                                    : Colors.grey[100],
-                                borderRadius: BorderRadius.circular(4),
+                        // Brand logo to the left of make/model
+                        Container(
+                          margin: const EdgeInsets.only(right: 8),
+                          width: 32,
+                          height: 32,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(20),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.08),
+                                blurRadius: 4,
+                                offset: const Offset(0, 2),
                               ),
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(4),
-                                child: CarLogoHelper.getCarLogo(make),
-                              ),
-                            ),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: Text(
-                                '${vehicle['make'] ?? 'Unknown'} ${vehicle['model'] ?? ''}',
+                            ],
+                          ),
+                          padding: const EdgeInsets.all(4),
+                          child: CarLogoHelper.getCarLogo(make),
+                        ),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                '$make $model',
                                 style: TextStyle(
-                                  fontSize: 16,
+                                  fontSize: 18,
                                   fontWeight: FontWeight.bold,
-                                  color:
-                                      isDarkMode ? Colors.white : Colors.black,
+                                  color: isDarkMode
+                                      ? Colors.white
+                                      : AppColors.neutralDark,
                                 ),
+                                maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                               ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 4),
-                        Row(
-                          children: [
-                            Row(
-                              children: List.generate(
-                                5,
-                                (index) => Icon(
-                                  (vehicle['rating'] != null &&
-                                          index <
-                                              (vehicle['rating'] as num)
-                                                  .floor())
-                                      ? Icons.star
-                                      : Icons.star_border,
-                                  size: 14,
-                                  color: AppColors.warning,
-                                ),
+                              const SizedBox(height: 2),
+                              Row(
+                                children: [
+                                  if (year != null && year.isNotEmpty)
+                                    Text(
+                                      year,
+                                      style: TextStyle(
+                                        fontSize: 13,
+                                        color: isDarkMode
+                                            ? Colors.grey[400]
+                                            : AppColors.neutralMedium,
+                                      ),
+                                    ),
+                                  if (category != null &&
+                                      category.isNotEmpty) ...[
+                                    if (year != null && year.isNotEmpty)
+                                      const SizedBox(width: 8),
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 8, vertical: 2),
+                                      decoration: BoxDecoration(
+                                        color:
+                                            AppColors.skyBlue.withOpacity(0.15),
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                      child: Text(
+                                        category,
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          color: AppColors.primary,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ],
                               ),
-                            ),
-                            const SizedBox(width: 4),
-                            Text(
-                              '${vehicle['rating'] ?? 0} (${vehicle['reviewsCount'] ?? 0})',
-                              style: TextStyle(
-                                fontSize: 12,
-                                color:
-                                    isDarkMode ? Colors.grey[400] : Colors.grey,
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 8),
-                        Row(
-                          children: [
-                            Icon(
-                              Icons.location_on,
-                              size: 14,
-                              color:
-                                  isDarkMode ? Colors.grey[400] : Colors.grey,
-                            ),
-                            const SizedBox(width: 4),
-                            Text(
-                              '${vehicle['collectionPoint']?['city'] ?? ''} ${vehicle['collectionPoint']?['district'] ?? ''}',
-                              style: TextStyle(
-                                fontSize: 12,
-                                color:
-                                    isDarkMode ? Colors.grey[400] : Colors.grey,
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 4),
-                        Row(
-                          children: [
-                            Icon(
-                              Icons.person,
-                              size: 14,
-                              color:
-                                  isDarkMode ? Colors.grey[400] : Colors.grey,
-                            ),
-                            const SizedBox(width: 4),
-                            Text(
-                              vehicle['rentalConditions']?['rentMode'] ??
-                                  'Vehicle Only',
-                              style: TextStyle(
-                                fontSize: 12,
-                                color:
-                                    isDarkMode ? Colors.grey[400] : Colors.grey,
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 8),
-                        Align(
-                          alignment: Alignment.centerRight,
-                          child: Text(
-                            vehicle['status'] == 'available'
-                                ? 'Available'
-                                : 'Not Available',
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: AppColors.success,
-                              fontWeight: FontWeight.w500,
-                            ),
+                            ],
                           ),
                         ),
                       ],
                     ),
-                  ),
-                ),
-              ],
-            ),
-            // Add call and WhatsApp buttons
-            if ((contactNumber != null && contactNumber.isNotEmpty))
-              Padding(
-                padding: const EdgeInsets.only(right: 12, bottom: 8, top: 4),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    IconButton(
-                      icon: const Icon(Icons.phone, color: Colors.green),
-                      tooltip: 'Call',
-                      onPressed: () async {
-                        final uri = Uri(scheme: 'tel', path: contactNumber);
-                        if (await canLaunchUrl(uri)) {
-                          await launchUrl(uri);
-                        } else {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                                content: Text(
-                                    'Cannot make a call from this device.')),
-                          );
-                        }
-                      },
+                    const SizedBox(height: 8),
+                    // Stats row
+                    Row(
+                      children: [
+                        // Rating
+                        Icon(Icons.star, color: AppColors.warning, size: 16),
+                        const SizedBox(width: 2),
+                        Text(
+                          rating != null ? rating.toStringAsFixed(1) : '0.0',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w600,
+                            color: isDarkMode
+                                ? Colors.white
+                                : AppColors.neutralDark,
+                            fontSize: 13,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        // Trips
+                        Icon(Icons.directions_car,
+                            color: AppColors.rentedColor, size: 16),
+                        const SizedBox(width: 2),
+                        Text(
+                          trips != null ? '$trips trips' : '0 trips',
+                          style: TextStyle(
+                            color: isDarkMode
+                                ? Colors.grey[300]
+                                : AppColors.neutralMedium,
+                            fontSize: 13,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        // Location
+                        Icon(Icons.location_on,
+                            color: AppColors.primary, size: 16),
+                        const SizedBox(width: 2),
+                        Text(
+                          locationString,
+                          style: TextStyle(
+                            color: isDarkMode
+                                ? Colors.grey[300]
+                                : AppColors.neutralMedium,
+                            fontSize: 13,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
                     ),
-                    const SizedBox(width: 8),
-                    IconButton(
-                      icon: const FaIcon(FontAwesomeIcons.whatsapp,
-                          color: Colors.green),
-                      tooltip: 'WhatsApp',
-                      onPressed: () async {
-                        final cleanedNumber = cleanPhoneNumber(contactNumber);
-                        final whatsappUrl =
-                            Uri.parse('https://wa.me/$cleanedNumber');
-                        // Try to launch WhatsApp
-                        if (await canLaunchUrl(whatsappUrl)) {
-                          final launched = await launchUrl(
-                            whatsappUrl,
-                            mode: LaunchMode.externalApplication,
-                          );
-                          if (!launched) {
-                            // Fallback: try to open in browser
-                            final browserLaunched = await launchUrl(
-                              whatsappUrl,
-                              mode: LaunchMode.platformDefault,
-                            );
-                            if (!browserLaunched) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                    content: Text(
-                                        'Could not open WhatsApp or browser. Please make sure WhatsApp is installed and the number is valid.')),
-                              );
-                            }
-                          }
-                        } else {
-                          // Fallback: try to open in browser
-                          final browserLaunched = await launchUrl(
-                            whatsappUrl,
-                            mode: LaunchMode.platformDefault,
-                          );
-                          if (!browserLaunched) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                  content: Text(
-                                      'Could not open WhatsApp or browser. Please make sure WhatsApp is installed and the number is valid.')),
-                            );
-                          }
-                        }
-                      },
+                    const SizedBox(height: 10),
+                    // Rent mode
+                    Row(
+                      children: [
+                        Icon(Icons.person, size: 16, color: AppColors.tertiary),
+                        const SizedBox(width: 4),
+                        Text(
+                          rentMode ?? '',
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: isDarkMode
+                                ? Colors.grey[200]
+                                : AppColors.tertiary,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    // Action row
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        if (contactNumber != null && contactNumber.isNotEmpty)
+                          _buildActionButton(
+                            context,
+                            icon: Icons.phone,
+                            label: 'Call',
+                            color: AppColors.success,
+                            onTap: () async {
+                              final uri =
+                                  Uri(scheme: 'tel', path: contactNumber);
+                              if (await canLaunchUrl(uri)) {
+                                await launchUrl(uri);
+                              } else {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                      content: Text(
+                                          'Cannot make a call from this device.')),
+                                );
+                              }
+                            },
+                          ),
+                        if (contactNumber != null && contactNumber.isNotEmpty)
+                          const SizedBox(width: 10),
+                        if (contactNumber != null && contactNumber.isNotEmpty)
+                          _buildActionButton(
+                            context,
+                            icon: FontAwesomeIcons.whatsapp,
+                            label: 'WhatsApp',
+                            color: AppColors.primary,
+                            isFaIcon: true,
+                            onTap: () async {
+                              final cleanedNumber =
+                                  cleanPhoneNumber(contactNumber);
+                              final whatsappUrl =
+                                  Uri.parse('https://wa.me/$cleanedNumber');
+                              // Try to launch WhatsApp
+                              if (await canLaunchUrl(whatsappUrl)) {
+                                final launched = await launchUrl(
+                                  whatsappUrl,
+                                  mode: LaunchMode.externalApplication,
+                                );
+                                if (!launched) {
+                                  // Fallback: try to open in browser
+                                  final browserLaunched = await launchUrl(
+                                    whatsappUrl,
+                                    mode: LaunchMode.platformDefault,
+                                  );
+                                  if (!browserLaunched) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                          content: Text(
+                                              'Could not open WhatsApp or browser. Please make sure WhatsApp is installed and the number is valid.')),
+                                    );
+                                  }
+                                }
+                              } else {
+                                // Fallback: try to open in browser
+                                final browserLaunched = await launchUrl(
+                                  whatsappUrl,
+                                  mode: LaunchMode.platformDefault,
+                                );
+                                if (!browserLaunched) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                        content: Text(
+                                            'Could not open WhatsApp or browser. Please make sure WhatsApp is installed and the number is valid.')),
+                                  );
+                                }
+                              }
+                            },
+                          ),
+                      ],
                     ),
                   ],
                 ),
               ),
-          ],
+            ],
+          ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildActionButton(BuildContext context,
+      {required dynamic icon,
+      required String label,
+      required Color color,
+      required VoidCallback onTap,
+      bool isFaIcon = false}) {
+    return ElevatedButton.icon(
+      onPressed: onTap,
+      icon: isFaIcon
+          ? FaIcon(icon as IconData, color: Colors.white, size: 18)
+          : Icon(icon as IconData, color: Colors.white, size: 18),
+      label: Text(
+        label,
+        style: const TextStyle(
+            fontWeight: FontWeight.bold, fontSize: 14, color: Colors.white),
+      ),
+      style: ElevatedButton.styleFrom(
+        backgroundColor: color,
+        foregroundColor: Colors.white,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(30),
+        ),
+        elevation: 2,
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        textStyle: const TextStyle(fontWeight: FontWeight.bold),
       ),
     );
   }
