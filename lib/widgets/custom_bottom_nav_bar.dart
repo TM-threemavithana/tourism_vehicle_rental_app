@@ -69,56 +69,65 @@ class CustomBottomNavBar extends StatelessWidget {
       child: GestureDetector(
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 250),
-          curve: Curves.easeInOut,
-          padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 0),
-          decoration: selected
-              ? BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [
-                      const Color(0xFFE6F0C2),
-                      const Color(0xFFD0E6A5),
-                    ],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
-                  borderRadius: BorderRadius.circular(18),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.06),
-                      blurRadius: 8,
-                      offset: const Offset(0, 2),
+        child: Container(
+          height: 60, // Fixed height for all tabs
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 250),
+            curve: Curves.easeInOut,
+            padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 0),
+            decoration: selected
+                ? BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        const Color(0xFFE6F0C2),
+                        const Color(0xFFD0E6A5),
+                      ],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
                     ),
-                  ],
-                )
-              : null,
-          margin: selected
-              ? const EdgeInsets.symmetric(horizontal: 8, vertical: 0)
-              : EdgeInsets.zero,
-          child: Padding(
-            padding: selected
-                ? const EdgeInsets.symmetric(horizontal: 14, vertical: 4)
-                : const EdgeInsets.symmetric(horizontal: 0, vertical: 0),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  icon,
-                  size: 22,
-                  color: selected ? selectedColor : unselectedColor,
-                ),
-                const SizedBox(height: 2),
-                AnimatedDefaultTextStyle(
-                  duration: const Duration(milliseconds: 200),
-                  style: TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w600,
+                    borderRadius: BorderRadius.circular(18),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.06),
+                        blurRadius: 8,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  )
+                : null,
+            margin: selected
+                ? const EdgeInsets.symmetric(horizontal: 4, vertical: 0)
+                : EdgeInsets.zero,
+            child: Padding(
+              padding: selected
+                  ? const EdgeInsets.symmetric(horizontal: 8, vertical: 4)
+                  : const EdgeInsets.symmetric(horizontal: 0, vertical: 0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    icon,
+                    size: 22,
                     color: selected ? selectedColor : unselectedColor,
                   ),
-                  child: Text(label),
-                ),
-              ],
+                  const SizedBox(height: 2),
+                  AnimatedDefaultTextStyle(
+                    duration: const Duration(milliseconds: 200),
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color: selected ? selectedColor : unselectedColor,
+                    ),
+                    child: Text(
+                      label,
+                      textAlign: TextAlign.center,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
