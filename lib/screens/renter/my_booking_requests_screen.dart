@@ -69,63 +69,123 @@ class MyBookingRequestsScreen extends StatelessWidget {
                               .where('userId', isEqualTo: currentUser.uid)
                               .orderBy('createdAt', descending: true)
                               .snapshots(),
-                          builder: (context, snapshot) {
-                            if (snapshot.connectionState ==
-                                ConnectionState.waiting) {
-                              return const Center(
-                                  child: CircularProgressIndicator());
-                            }
-                            if (snapshot.hasError) {
-                              return Center(
-                                child: Text('Error: ${snapshot.error}'),
-                              );
-                            }
-                            if (!snapshot.hasData ||
-                                snapshot.data!.docs.isEmpty) {
-                              return Center(
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Icon(
-                                      Icons.car_rental,
-                                      size: 80,
-                                      color: isDarkMode
-                                          ? Colors.grey.shade700
-                                          : Colors.grey.shade400,
+                          builder: (context, bookingSnapshot) {
+                            return StreamBuilder<QuerySnapshot>(
+                              stream: FirebaseFirestore.instance
+                                  .collection('inquiries')
+                                  .where('userId', isEqualTo: currentUser.uid)
+                                  .snapshots(),
+                              builder: (context, inquirySnapshot) {
+                                if (bookingSnapshot.connectionState ==
+                                        ConnectionState.waiting ||
+                                    inquirySnapshot.connectionState ==
+                                        ConnectionState.waiting) {
+                                  return const Center(
+                                      child: CircularProgressIndicator());
+                                }
+
+                                if (bookingSnapshot.hasError ||
+                                    inquirySnapshot.hasError) {
+                                  return Center(
+                                    child: Text(
+                                        'Error: ${bookingSnapshot.error ?? inquirySnapshot.error}'),
+                                  );
+                                }
+
+                                // Combine and sort all requests
+                                List<Map<String, dynamic>> allRequests = [];
+
+                                // Add booking requests
+                                if (bookingSnapshot.hasData) {
+                                  for (var doc in bookingSnapshot.data!.docs) {
+                                    final data =
+                                        doc.data() as Map<String, dynamic>;
+                                    allRequests.add({
+                                      ...data,
+                                      'id': doc.id,
+                                      'type': 'booking',
+                                      'timestamp': data['createdAt'],
+                                    });
+                                  }
+                                }
+
+                                // Add inquiries
+                                if (inquirySnapshot.hasData) {
+                                  for (var doc in inquirySnapshot.data!.docs) {
+                                    final data =
+                                        doc.data() as Map<String, dynamic>;
+                                    allRequests.add({
+                                      ...data,
+                                      'id': doc.id,
+                                      'type': 'inquiry',
+                                      'timestamp': data['createdAt'],
+                                    });
+                                  }
+                                }
+
+                                // Sort by timestamp (most recent first)
+                                allRequests.sort((a, b) {
+                                  final aTimestamp =
+                                      a['timestamp'] as Timestamp?;
+                                  final bTimestamp =
+                                      b['timestamp'] as Timestamp?;
+                                  if (aTimestamp == null && bTimestamp == null)
+                                    return 0;
+                                  if (aTimestamp == null) return 1;
+                                  if (bTimestamp == null) return -1;
+                                  return bTimestamp.compareTo(aTimestamp);
+                                });
+
+                                if (allRequests.isEmpty) {
+                                  return Center(
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Icon(
+                                          Icons.car_rental,
+                                          size: 80,
+                                          color: isDarkMode
+                                              ? Colors.grey.shade700
+                                              : Colors.grey.shade400,
+                                        ),
+                                        const SizedBox(height: 16),
+                                        Text(
+                                          'No requests yet',
+                                          style: TextStyle(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.bold,
+                                            color: isDarkMode
+                                                ? Colors.white
+                                                : Colors.black87,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 8),
+                                        Text(
+                                          'Your booking requests and inquiries will appear here',
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            color: isDarkMode
+                                                ? Colors.grey.shade400
+                                                : Colors.grey.shade600,
+                                          ),
+                                          textAlign: TextAlign.center,
+                                        ),
+                                      ],
                                     ),
-                                    const SizedBox(height: 16),
-                                    Text(
-                                      'No booking requests yet',
-                                      style: TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.bold,
-                                        color: isDarkMode
-                                            ? Colors.grey.shade400
-                                            : Colors.grey.shade700,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 8),
-                                    Text(
-                                      'Your booking requests will appear here',
-                                      textAlign: TextAlign.center,
-                                      style: TextStyle(
-                                        color: isDarkMode
-                                            ? Colors.grey.shade500
-                                            : Colors.grey.shade600,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              );
-                            }
-                            return ListView.builder(
-                              padding: const EdgeInsets.all(16),
-                              itemCount: snapshot.data!.docs.length,
-                              itemBuilder: (context, index) {
-                                final doc = snapshot.data!.docs[index];
-                                final data = doc.data() as Map<String, dynamic>;
-                                return _buildRequestCard(
-                                    context, data, isDarkMode);
+                                  );
+                                }
+
+                                return ListView.builder(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 16),
+                                  itemCount: allRequests.length,
+                                  itemBuilder: (context, index) {
+                                    final request = allRequests[index];
+                                    return _buildRequestCard(
+                                        context, request, isDarkMode);
+                                  },
+                                );
                               },
                             );
                           },
@@ -160,6 +220,17 @@ class MyBookingRequestsScreen extends StatelessWidget {
   }
 
   Widget _buildRequestCard(
+      BuildContext context, Map<String, dynamic> data, bool isDarkMode) {
+    final requestType = data['type'] as String;
+
+    if (requestType == 'booking') {
+      return _buildBookingRequestCard(context, data, isDarkMode);
+    } else {
+      return _buildInquiryCard(context, data, isDarkMode);
+    }
+  }
+
+  Widget _buildBookingRequestCard(
       BuildContext context, Map<String, dynamic> data, bool isDarkMode) {
     final currencyFormat = NumberFormat("#,##0.00", "en_US");
     final status = data['status'] as String;
@@ -338,31 +409,168 @@ class MyBookingRequestsScreen extends StatelessWidget {
                       ),
                     ),
                   ),
-                if (status == 'approved') ...[
-                  const SizedBox(height: 24),
-                  const Divider(),
-                  const SizedBox(height: 16),
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: () {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                              content: Text('Proceeding to payment...')),
-                        );
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.green,
-                        foregroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildInquiryCard(
+      BuildContext context, Map<String, dynamic> data, bool isDarkMode) {
+    final vehicleType = data['vehicleType'] as String? ?? 'Vehicle';
+    final dateTime = data['dateTime'] is Timestamp
+        ? (data['dateTime'] as Timestamp).toDate()
+        : data['dateTime'] as DateTime?;
+    final location = data['location'] as String? ?? '';
+    final details = data['details'] as String? ?? '';
+    final contactNumber = data['contactNumber'] as String? ?? '';
+    final email = data['email'] as String? ?? '';
+
+    return Card(
+      margin: const EdgeInsets.only(bottom: 16),
+      elevation: 2,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: BorderSide(color: Colors.blue.shade300, width: 1.5),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            decoration: BoxDecoration(
+              color: Colors.blue.shade50,
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(12),
+                topRight: Radius.circular(12),
+              ),
+            ),
+            child: Row(
+              children: [
+                Container(
+                  width: 60,
+                  height: 60,
+                  decoration: BoxDecoration(
+                    color: Colors.blue.shade100,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: const Icon(
+                    Icons.search,
+                    color: Colors.blue,
+                    size: 30,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Vehicle Inquiry',
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
                         ),
-                        padding: const EdgeInsets.symmetric(vertical: 12),
                       ),
-                      child: const Text('Proceed to Payment'),
+                      Text(
+                        'Looking for: $vehicleType',
+                        style: TextStyle(
+                          color: isDarkMode
+                              ? Colors.grey.shade400
+                              : Colors.grey.shade700,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: Colors.blue.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: Colors.blue),
+                  ),
+                  child: const Text(
+                    'INQUIRY',
+                    style: TextStyle(
+                      color: Colors.blue,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 12,
                     ),
                   ),
-                ],
+                ),
+              ],
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Inquiry Details',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 15,
+                    color: isDarkMode
+                        ? Colors.grey.shade300
+                        : Colors.grey.shade800,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                if (dateTime != null)
+                  _buildDetailRow(
+                    context,
+                    icon: Icons.access_time,
+                    label: 'Preferred Date/Time',
+                    value: DateFormat('MMM dd, yyyy \'at\' h:mm a')
+                        .format(dateTime),
+                  ),
+                if (location.isNotEmpty)
+                  _buildDetailRow(
+                    context,
+                    icon: Icons.location_on,
+                    label: 'Location',
+                    value: location,
+                  ),
+                if (details.isNotEmpty)
+                  _buildDetailRow(
+                    context,
+                    icon: Icons.description,
+                    label: 'Details',
+                    value: details,
+                  ),
+                if (contactNumber.isNotEmpty)
+                  _buildDetailRow(
+                    context,
+                    icon: Icons.phone,
+                    label: 'Contact',
+                    value: contactNumber,
+                  ),
+                if (email.isNotEmpty)
+                  _buildDetailRow(
+                    context,
+                    icon: Icons.email,
+                    label: 'Email',
+                    value: email,
+                  ),
+                if (data['createdAt'] != null)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 16),
+                    child: Text(
+                      'Submitted on ${DateFormat('MMM dd, yyyy \'at\' h:mm a').format((data['createdAt'] as Timestamp).toDate())}',
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontStyle: FontStyle.italic,
+                        color: isDarkMode
+                            ? Colors.grey.shade400
+                            : Colors.grey.shade600,
+                      ),
+                    ),
+                  ),
               ],
             ),
           ),
