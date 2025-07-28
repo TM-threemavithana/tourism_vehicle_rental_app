@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
 import '../../../models/vehicle_form_models.dart';
 import '../../../widgets/form_widgets.dart';
 
@@ -65,19 +66,36 @@ class _VehicleImagesSectionState extends State<VehicleImagesSection> {
     }
   }
 
+  Future<File?> _compressImage(File file) async {
+    final targetPath = file.path
+        .replaceFirst('.jpg', '_compressed.jpg')
+        .replaceFirst('.png', '_compressed.jpg');
+    final result = await FlutterImageCompress.compressAndGetFile(
+      file.path,
+      targetPath,
+      quality: 80, // Good balance between quality and size
+      minWidth: 1280,
+      minHeight: 1280,
+      format: CompressFormat.jpeg,
+    );
+    return result as File? ?? file;
+  }
+
   Future<void> _pickImage(int index, bool isRequired) async {
     try {
       final XFile? pickedFile = await _picker.pickImage(
         source: ImageSource.gallery,
-        imageQuality: 85,
+        imageQuality: null, // Let flutter_image_compress handle quality
       );
 
       if (pickedFile != null) {
+        File originalFile = File(pickedFile.path);
+        File? compressedFile = await _compressImage(originalFile);
         setState(() {
           if (isRequired) {
-            _requiredImages[index] = File(pickedFile.path);
+            _requiredImages[index] = compressedFile ?? originalFile;
           } else {
-            _optionalImages[index] = File(pickedFile.path);
+            _optionalImages[index] = compressedFile ?? originalFile;
           }
           _updateVehicleImages();
         });
