@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'Refine_search.dart';
 import '../utils/app_colors.dart';
-import 'filter_results.dart';
 import 'vehicle_detail_page.dart';
-import '../helpers/car_logo_helper.dart'; // Add this import at the top
+import '../helpers/car_logo_helper.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'merged_filter_drawer.dart';
 
 class VehicleSearchResultsScreen extends StatefulWidget {
   final Set<String> selectedVehicleTypes;
@@ -40,14 +39,12 @@ class VehicleSearchResultsScreen extends StatefulWidget {
 
 class _VehicleSearchResultsScreenState
     extends State<VehicleSearchResultsScreen> {
-  bool _isLoading = true;
   List<Map<String, dynamic>> _searchResults = [];
   String? _errorMessage;
+  bool _isLoading = false;
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
-  // Add a new GlobalKey for the end drawer
-  final GlobalKey<ScaffoldState> _filterDrawerKey = GlobalKey<ScaffoldState>();
-
+  // Filter state variables
   String _selectedSortOption = '';
   RangeValues _priceRange = const RangeValues(0, 50000);
   Set<String> _selectedFeatures = {};
@@ -76,6 +73,11 @@ class _VehicleSearchResultsScreenState
   }
 
   Future<void> _performSearch() async {
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
+
     try {
       Query query = FirebaseFirestore.instance.collection('vehicles');
 
@@ -137,6 +139,7 @@ class _VehicleSearchResultsScreenState
       setState(() {
         _searchResults = results;
         _isLoading = false;
+        _errorMessage = null;
       });
     } catch (e) {
       setState(() {
@@ -146,10 +149,8 @@ class _VehicleSearchResultsScreenState
     }
   }
 
-  // Replace the _showFilterResultsDrawer method
-  void _showFilterResultsDrawer() {
-    // Use the end drawer instead of modal bottom sheet
-    _filterDrawerKey.currentState?.openEndDrawer();
+  void _showMergedFilterDrawer() {
+    _scaffoldKey.currentState?.openDrawer();
   }
 
   // Helper to clean phone number for WhatsApp
@@ -171,10 +172,10 @@ class _VehicleSearchResultsScreenState
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
-      key: _filterDrawerKey, // Change from _scaffoldKey to _filterDrawerKey
+      key: _scaffoldKey,
       backgroundColor:
           isDarkMode ? AppColors.neutralDark : AppColors.neutralBackground,
-      drawer: RefineSearch(
+      drawer: MergedFilterDrawer(
         selectedVehicleTypes: widget.selectedVehicleTypes,
         location: widget.location,
         pickupDate: widget.pickupDate,
@@ -182,43 +183,11 @@ class _VehicleSearchResultsScreenState
         returnDate: widget.returnDate,
         returnTime: widget.returnTime,
         flexibleDates: widget.flexibleDates,
-        onApplyFilters: _applyFilters,
-      ),
-      endDrawer: FilterResultsDrawer(
-        selectedVehicleTypes: widget.selectedVehicleTypes,
+        make: widget.make,
+        model: widget.model,
         initialResults: _searchResults,
-        initialSortOption: _selectedSortOption,
-        initialPriceRange: _priceRange,
-        initialFeatures: _selectedFeatures,
-        initialFuelTypes: _selectedFuelTypes,
-        initialTransmissionTypes: _selectedTransmissionTypes,
-        initialRentModes: _selectedRentModes,
-        onFiltersApplied: (filteredResults, sortOption, priceRange, features,
-            fuelTypes, transmissionTypes, rentModes) {
-          setState(() {
-            _searchResults = filteredResults;
-            _selectedSortOption = sortOption;
-            _priceRange = priceRange;
-            _selectedFeatures = features;
-            _selectedFuelTypes = fuelTypes;
-            _selectedTransmissionTypes = transmissionTypes;
-            _selectedRentModes = rentModes;
-
-            // If the filtered results are empty after applying filters
-            if (_searchResults.isEmpty) {
-              bool shouldRefineSearch = true;
-              _errorMessage = "No vehicles match your filter criteria";
-              // Schedule for after the current build cycle
-              WidgetsBinding.instance.addPostFrameCallback((_) {
-                if (mounted && shouldRefineSearch) {
-                  _performSearch();
-                }
-              });
-            } else {
-              _errorMessage = null;
-            }
-          });
-        },
+        onApplySearch: _applySearchFilters,
+        onApplyFilters: _applyResultFilters,
       ),
       appBar: AppBar(
         backgroundColor: const Color(0xFFFFC107),
@@ -259,41 +228,13 @@ class _VehicleSearchResultsScreenState
                   children: [
                     Expanded(
                       child: GestureDetector(
-                        onTap: () {
-                          _filterDrawerKey.currentState?.openDrawer();
-                        },
+                        onTap: _showMergedFilterDrawer,
                         child: Row(
                           children: const [
                             Icon(Icons.tune, color: Colors.white, size: 20),
                             SizedBox(width: 8),
                             Text(
-                              'Refine Search',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 16,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    Container(
-                      height: 24,
-                      width: 1,
-                      color: Colors.white.withOpacity(0.3),
-                    ),
-                    Expanded(
-                      child: GestureDetector(
-                        onTap: _showFilterResultsDrawer,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: const [
-                            Icon(Icons.filter_list,
-                                color: Colors.white, size: 20),
-                            SizedBox(width: 8),
-                            Text(
-                              'Filter Results',
+                              'Search & Filter',
                               style: TextStyle(
                                 color: Colors.white,
                                 fontSize: 16,
@@ -330,6 +271,82 @@ class _VehicleSearchResultsScreenState
         ],
       ),
     );
+  }
+
+  void _applyResultFilters(
+    List<Map<String, dynamic>> filteredResults,
+    String sortOption,
+    RangeValues priceRange,
+    Set<String> features,
+    Set<String> fuelTypes,
+    Set<String> transmissionTypes,
+    Set<String> rentModes,
+  ) {
+    setState(() {
+      _searchResults = filteredResults;
+      _selectedSortOption = sortOption;
+      _priceRange = priceRange;
+      _selectedFeatures = features;
+      _selectedFuelTypes = fuelTypes;
+      _selectedTransmissionTypes = transmissionTypes;
+      _selectedRentModes = rentModes;
+    });
+  }
+
+  void _applySearchFilters(
+    Set<String> selectedVehicleTypes,
+    String location,
+    DateTime pickupDate,
+    TimeOfDay pickupTime,
+    DateTime returnDate,
+    TimeOfDay returnTime,
+    bool flexibleDates,
+    String? make,
+    String? model,
+  ) {
+    // Check if the search parameters are actually different from current ones
+    bool paramsChanged =
+        selectedVehicleTypes.length != widget.selectedVehicleTypes.length ||
+            !selectedVehicleTypes
+                .every((type) => widget.selectedVehicleTypes.contains(type)) ||
+            location != widget.location ||
+            pickupDate != widget.pickupDate ||
+            pickupTime != widget.pickupTime ||
+            returnDate != widget.returnDate ||
+            returnTime != widget.returnTime ||
+            flexibleDates != widget.flexibleDates ||
+            make != widget.make ||
+            model != widget.model;
+
+    // Only perform navigation if parameters have actually changed
+    if (paramsChanged) {
+      // Reset filter state when performing new search
+      setState(() {
+        _selectedSortOption = '';
+        _selectedFeatures = {};
+        _selectedFuelTypes = {};
+        _selectedTransmissionTypes = {};
+        _selectedRentModes = {};
+      });
+
+      // Use pushReplacement with a more direct approach
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => VehicleSearchResultsScreen(
+            selectedVehicleTypes: selectedVehicleTypes,
+            location: location,
+            pickupDate: pickupDate,
+            pickupTime: pickupTime,
+            returnDate: returnDate,
+            returnTime: returnTime,
+            flexibleDates: flexibleDates,
+            make: make,
+            model: model,
+          ),
+        ),
+      );
+    }
   }
 
   Widget _buildNoResultsView() {
@@ -791,42 +808,6 @@ class _VehicleSearchResultsScreenState
     return '${pluralizedTypes.join(", ")} in ${widget.location.isEmpty ? "All Locations" : widget.location}';
   }
 
-  void _applyFilters(
-    Set<String> selectedVehicleTypes,
-    String location,
-    DateTime pickupDate,
-    TimeOfDay pickupTime,
-    DateTime returnDate,
-    TimeOfDay returnTime,
-    bool flexibleDates,
-    String? make,
-    String? model,
-  ) {
-    Navigator.pop(context);
-
-    setState(() {
-      _isLoading = true;
-    });
-
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(
-        builder: (context) => VehicleSearchResultsScreen(
-          selectedVehicleTypes: selectedVehicleTypes,
-          location: location,
-          pickupDate: pickupDate,
-          pickupTime: pickupTime,
-          returnDate: returnDate,
-          returnTime: returnTime,
-          flexibleDates: flexibleDates,
-          make: make,
-          model: model,
-        ),
-      ),
-    );
-  }
-
-  // Also fix the buildResultsListView method:
   Widget _buildResultsListView() {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 

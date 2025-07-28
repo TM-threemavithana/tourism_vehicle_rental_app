@@ -78,10 +78,9 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
             color: const Color(0xFFFFC107),
           ),
           SafeArea(
-            child: SingleChildScrollView(
+            child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // Side menu button and centered title in a row
                   Row(
@@ -108,31 +107,38 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                           width: 48), // Spacer to balance the IconButton width
                     ],
                   ),
-                  _FeatureCard(
-                    image: 'assets/images/browse_vehicle.png',
-                    title: 'Browse Vehicles',
-                    description:
-                        "Explore our diverse fleet of vehicles, from scooters to luxury cars, perfect for your Sri Lankan adventure.",
-                    buttonText: 'Browse',
-                    onPressed:
-                        _isLoading ? null : () => _navigateToBrowse(context),
-                    isLoading: _isLoading,
+                  const SizedBox(height: 20),
+                  // First feature card - takes up available space
+                  Expanded(
+                    child: _FeatureCard(
+                      image: 'assets/images/browse_vehicle.png',
+                      title: 'Browse Vehicles',
+                      description:
+                          "Explore our diverse fleet of vehicles, from scooters to luxury cars, perfect for your Sri Lankan adventure.",
+                      buttonText: 'Browse',
+                      onPressed:
+                          _isLoading ? null : () => _navigateToBrowse(context),
+                      isLoading: _isLoading,
+                    ),
                   ),
                   const SizedBox(height: 20),
-                  _FeatureCard(
-                    image: 'assets/images/request_vehicle.png',
-                    title: 'Request a Vehicle',
-                    description:
-                        "Can't find what you're looking for? Post a request and let our network of providers find the perfect vehicle for you.",
-                    buttonText: 'Request',
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const RequestVehicleScreen(),
-                        ),
-                      );
-                    },
+                  // Second feature card - takes up remaining space
+                  Expanded(
+                    child: _FeatureCard(
+                      image: 'assets/images/request_vehicle.png',
+                      title: 'Request a Vehicle',
+                      description:
+                          "Can't find what you're looking for? Post a request and let our network of providers find the perfect vehicle for you.",
+                      buttonText: 'Request',
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const RequestVehicleScreen(),
+                          ),
+                        );
+                      },
+                    ),
                   ),
                 ],
               ),
