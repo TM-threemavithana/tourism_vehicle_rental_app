@@ -411,10 +411,6 @@ class _VehicleSearchResultsScreenState
     final String? imageUrl = vehicle['images']?['primaryImageUrl'];
     final String? city = vehicle['collectionPoint']?['city'];
     final String? district = vehicle['collectionPoint']?['district'];
-    final double? rating = (vehicle['rating'] is num)
-        ? (vehicle['rating'] as num).toDouble()
-        : null;
-    final int? trips = vehicle['trips'] is int ? vehicle['trips'] : null;
     final String? price =
         vehicle['pricing']?['daily']?['vehicleOnly']?['price']?.toString();
     final String? rentMode =
@@ -605,38 +601,9 @@ class _VehicleSearchResultsScreenState
                       ],
                     ),
                     const SizedBox(height: 8),
-                    // Stats row
+                    // Location only (removed rating and trips)
                     Row(
                       children: [
-                        // Rating
-                        Icon(Icons.star, color: AppColors.warning, size: 16),
-                        const SizedBox(width: 2),
-                        Text(
-                          rating != null ? rating.toStringAsFixed(1) : '0.0',
-                          style: TextStyle(
-                            fontWeight: FontWeight.w600,
-                            color: isDarkMode
-                                ? Colors.white
-                                : AppColors.neutralDark,
-                            fontSize: 13,
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        // Trips
-                        Icon(Icons.directions_car,
-                            color: AppColors.rentedColor, size: 16),
-                        const SizedBox(width: 2),
-                        Text(
-                          trips != null ? '$trips trips' : '0 trips',
-                          style: TextStyle(
-                            color: isDarkMode
-                                ? Colors.grey[300]
-                                : AppColors.neutralMedium,
-                            fontSize: 13,
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        // Location
                         Icon(Icons.location_on,
                             color: AppColors.primary, size: 16),
                         const SizedBox(width: 2),
@@ -674,49 +641,67 @@ class _VehicleSearchResultsScreenState
                     const SizedBox(height: 12),
                     // Action row
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
                         if (contactNumber != null && contactNumber.isNotEmpty)
-                          _buildActionButton(
-                            context,
-                            icon: Icons.phone,
-                            label: 'Call',
-                            color: AppColors.success,
-                            onTap: () async {
-                              final uri =
-                                  Uri(scheme: 'tel', path: contactNumber);
-                              if (await canLaunchUrl(uri)) {
-                                await launchUrl(uri);
-                              } else {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                      content: Text(
-                                          'Cannot make a call from this device.')),
-                                );
-                              }
-                            },
+                          Expanded(
+                            child: _buildActionButton(
+                              context,
+                              icon: Icons.phone,
+                              label: 'Call',
+                              color: AppColors.success,
+                              onTap: () async {
+                                final uri =
+                                    Uri(scheme: 'tel', path: contactNumber);
+                                if (await canLaunchUrl(uri)) {
+                                  await launchUrl(uri);
+                                } else {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                        content: Text(
+                                            'Cannot make a call from this device.')),
+                                  );
+                                }
+                              },
+                            ),
                           ),
                         if (contactNumber != null && contactNumber.isNotEmpty)
-                          const SizedBox(width: 10),
+                          const SizedBox(width: 8),
                         if (contactNumber != null && contactNumber.isNotEmpty)
-                          _buildActionButton(
-                            context,
-                            icon: FontAwesomeIcons.whatsapp,
-                            label: 'WhatsApp',
-                            color: AppColors.primary,
-                            isFaIcon: true,
-                            onTap: () async {
-                              final cleanedNumber =
-                                  cleanPhoneNumber(contactNumber);
-                              final whatsappUrl =
-                                  Uri.parse('https://wa.me/$cleanedNumber');
-                              // Try to launch WhatsApp
-                              if (await canLaunchUrl(whatsappUrl)) {
-                                final launched = await launchUrl(
-                                  whatsappUrl,
-                                  mode: LaunchMode.externalApplication,
-                                );
-                                if (!launched) {
+                          Expanded(
+                            child: _buildActionButton(
+                              context,
+                              icon: FontAwesomeIcons.whatsapp,
+                              label: 'WhatsApp',
+                              color: AppColors.primary,
+                              isFaIcon: true,
+                              onTap: () async {
+                                final cleanedNumber =
+                                    cleanPhoneNumber(contactNumber);
+                                final whatsappUrl =
+                                    Uri.parse('https://wa.me/$cleanedNumber');
+                                // Try to launch WhatsApp
+                                if (await canLaunchUrl(whatsappUrl)) {
+                                  final launched = await launchUrl(
+                                    whatsappUrl,
+                                    mode: LaunchMode.externalApplication,
+                                  );
+                                  if (!launched) {
+                                    // Fallback: try to open in browser
+                                    final browserLaunched = await launchUrl(
+                                      whatsappUrl,
+                                      mode: LaunchMode.platformDefault,
+                                    );
+                                    if (!browserLaunched) {
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        const SnackBar(
+                                            content: Text(
+                                                'Could not open WhatsApp or browser. Please make sure WhatsApp is installed and the number is valid.')),
+                                      );
+                                    }
+                                  }
+                                } else {
                                   // Fallback: try to open in browser
                                   final browserLaunched = await launchUrl(
                                     whatsappUrl,
@@ -730,21 +715,8 @@ class _VehicleSearchResultsScreenState
                                     );
                                   }
                                 }
-                              } else {
-                                // Fallback: try to open in browser
-                                final browserLaunched = await launchUrl(
-                                  whatsappUrl,
-                                  mode: LaunchMode.platformDefault,
-                                );
-                                if (!browserLaunched) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                        content: Text(
-                                            'Could not open WhatsApp or browser. Please make sure WhatsApp is installed and the number is valid.')),
-                                  );
-                                }
-                              }
-                            },
+                              },
+                            ),
                           ),
                       ],
                     ),
@@ -767,22 +739,23 @@ class _VehicleSearchResultsScreenState
     return ElevatedButton.icon(
       onPressed: onTap,
       icon: isFaIcon
-          ? FaIcon(icon as IconData, color: Colors.white, size: 18)
-          : Icon(icon as IconData, color: Colors.white, size: 18),
+          ? FaIcon(icon as IconData, color: Colors.white, size: 16)
+          : Icon(icon as IconData, color: Colors.white, size: 16),
       label: Text(
         label,
         style: const TextStyle(
-            fontWeight: FontWeight.bold, fontSize: 14, color: Colors.white),
+            fontWeight: FontWeight.w600, fontSize: 12, color: Colors.white),
       ),
       style: ElevatedButton.styleFrom(
         backgroundColor: color,
         foregroundColor: Colors.white,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(30),
+          borderRadius: BorderRadius.circular(20),
         ),
         elevation: 2,
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-        textStyle: const TextStyle(fontWeight: FontWeight.bold),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        textStyle: const TextStyle(fontWeight: FontWeight.w600),
+        minimumSize: const Size(0, 36),
       ),
     );
   }
