@@ -39,17 +39,6 @@ class _ProfileScreenState extends State<ProfileScreen>
   // Add current tab tracking
   final String _currentTab = 'Profile';
 
-  // Hardcoded stats until Firestore is set up
-  final Map<String, String> _userStats = {
-    'vehiclesRented': '0',
-    'totalReviews': '0',
-    'vehiclesListed': '0',
-    'activeRentals': '0',
-    'favoriteVehicles': '0',
-    'totalSpent': '0',
-    'totalEarnings': '0',
-  };
-
   @override
   void initState() {
     super.initState();
@@ -764,15 +753,23 @@ class _ProfileScreenState extends State<ProfileScreen>
                                 color: theme.colorScheme.primary,
                                 verified: widget.user?.emailVerified ?? false,
                               ),
+                              const Divider(height: 24),
+                              _buildInfoField(
+                                label: 'Contact Info',
+                                value: 'Add your phone number',
+                                icon: Icons.phone_outlined,
+                                color: theme.colorScheme.primary,
+                                isEditable: true,
+                                onTap: () {
+                                  _showEditContactDialog(context);
+                                },
+                              ),
                             ],
                           ),
                         ),
                       ),
 
                       const SizedBox(height: 24),
-
-                      // User Type Specific Options
-                      _buildUserTypeSpecificOptions(theme),
 
                       // Account & Security Section
                       const Text(
@@ -793,72 +790,15 @@ class _ProfileScreenState extends State<ProfileScreen>
                         child: Column(
                           children: [
                             _buildMenuOption(
-                              icon: Icons.credit_card_outlined,
-                              title: 'Payment Methods',
-                              subtitle: 'Add or remove payment options',
-                              iconColor: Colors.indigo,
-                              theme: theme,
-                            ),
-                            _buildDivider(),
-                            _buildMenuOption(
-                              icon: Icons.account_balance_outlined,
-                              title: userType == 'owner'
-                                  ? 'Bank Account'
-                                  : 'Payment Settings',
-                              subtitle: userType == 'owner'
-                                  ? 'Set up for deposits and withdrawals'
-                                  : 'Manage payment preferences',
-                              iconColor: Colors.blue,
-                              theme: theme,
-                            ),
-                            _buildDivider(),
-                            _buildMenuOption(
-                              icon: Icons.verified_user_outlined,
-                              title: 'License Verification',
-                              subtitle:
-                                  'Upload your driving license for verification',
-                              iconColor: Colors.green,
-                              theme: theme,
-                              showBadge: true,
-                            ),
-                            _buildDivider(),
-                            _buildMenuOption(
                               icon: Icons.lock_outline,
                               title: 'Change Password',
                               subtitle: 'Update your security credentials',
                               iconColor: Colors.orange,
                               theme: theme,
                             ),
-                            _buildDivider(),
-                            _buildMenuOption(
-                              icon: Icons.swap_horiz,
-                              title: userType == 'owner'
-                                  ? 'Switch to Renter Mode'
-                                  : 'Switch to Vehicle Owner Mode',
-                              subtitle: userType == 'owner'
-                                  ? 'Switch to renter mode'
-                                  : 'Start renting out your vehicles and earn money',
-                              iconColor: Colors.purple,
-                              theme: theme,
-                            ),
                           ],
                         ),
                       ),
-
-                      const SizedBox(height: 24),
-
-                      // Statistics Section
-                      const Text(
-                        'Activity Statistics',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black87,
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-
-                      _buildUserTypeSpecificStats(),
 
                       const SizedBox(height: 24),
 
@@ -967,6 +907,47 @@ class _ProfileScreenState extends State<ProfileScreen>
               if (newNameController.text.trim().isNotEmpty) {
                 _nameController.text = newNameController.text.trim();
                 _updateUserName();
+              }
+              Navigator.pop(context);
+            },
+            child: const Text('Save'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _showEditContactDialog(BuildContext context) {
+    final contactController = TextEditingController();
+
+    return showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Edit Contact Info'),
+        content: TextField(
+          controller: contactController,
+          decoration: const InputDecoration(
+            labelText: 'Phone Number',
+            hintText: 'Enter your phone number',
+          ),
+          keyboardType: TextInputType.phone,
+          autofocus: true,
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () {
+              if (contactController.text.trim().isNotEmpty) {
+                // TODO: Implement contact info update
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Contact info updated successfully'),
+                    backgroundColor: Colors.green,
+                  ),
+                );
               }
               Navigator.pop(context);
             },
@@ -1291,96 +1272,14 @@ class _ProfileScreenState extends State<ProfileScreen>
 
     // Assign proper actions based on the title
     switch (title) {
-      case 'Payment Methods':
-        onTap = () {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Payment Methods - Coming Soon')),
-          );
-        };
-        break;
-      case 'Bank Account':
-      case 'Payment Settings':
-        onTap = () {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('$title - Coming Soon')),
-          );
-        };
-        break;
-      case 'License Verification':
-        onTap = () {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('License Verification - Coming Soon')),
-          );
-        };
-        break;
       case 'Change Password':
         onTap = () {
           _showChangePasswordDialog();
         };
         break;
-      case 'Switch to Renter Mode':
-      case 'Switch to Vehicle Owner Mode':
-        onTap = () {
-          _switchUserType();
-        };
-        break;
       case 'Delete Account':
         onTap = () {
           _showDeleteAccountConfirmation();
-        };
-        break;
-      case 'Vehicle Management':
-        onTap = () {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Vehicle Management - Coming Soon')),
-          );
-        };
-        break;
-      case 'Earnings Analytics':
-        onTap = () {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Earnings Analytics - Coming Soon')),
-          );
-        };
-        break;
-      case 'Booking Management':
-        onTap = () {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Booking Management - Coming Soon')),
-          );
-        };
-        break;
-      case 'Vehicle Verification':
-        onTap = () {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Vehicle Verification - Coming Soon')),
-          );
-        };
-        break;
-      case 'Rental History':
-        onTap = () {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Rental History - Coming Soon')),
-          );
-        };
-        break;
-      case 'Favorite Vehicles':
-        onTap = () {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Favorite Vehicles - Coming Soon')),
-          );
-        };
-        break;
-      case 'My Reviews':
-        onTap = () {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('My Reviews - Coming Soon')),
-          );
-        };
-        break;
-      case 'Become a Vehicle Owner':
-        onTap = () {
-          _switchUserType();
         };
         break;
       default:
@@ -1466,45 +1365,6 @@ class _ProfileScreenState extends State<ProfileScreen>
     );
   }
 
-  Widget _buildStatItem(
-      String number, String label, Color color, IconData icon) {
-    return Column(
-      children: [
-        Container(
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: color.withOpacity(0.1),
-            shape: BoxShape.circle,
-          ),
-          child: Icon(
-            icon,
-            color: color,
-            size: 28,
-          ),
-        ),
-        const SizedBox(height: 12),
-        Text(
-          number,
-          style: TextStyle(
-            color: color,
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        const SizedBox(height: 5),
-        Text(
-          label,
-          style: TextStyle(
-            color: Colors.grey[600],
-            fontSize: 12,
-            fontWeight: FontWeight.w500,
-          ),
-          textAlign: TextAlign.center,
-        ),
-      ],
-    );
-  }
-
   String _getInitials() {
     if (widget.user == null ||
         widget.user!.displayName == null ||
@@ -1517,223 +1377,5 @@ class _ProfileScreenState extends State<ProfileScreen>
       return '${nameParts[0][0]}${nameParts[1][0]}'.toUpperCase();
     }
     return nameParts[0][0].toUpperCase();
-  }
-
-  Widget _buildUserTypeSpecificOptions(ThemeData theme) {
-    if (userType == 'owner') {
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            'Vehicle Owner Tools',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: Colors.black87,
-            ),
-          ),
-          const SizedBox(height: 16),
-          Card(
-            elevation: 2,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(15),
-            ),
-            child: Column(
-              children: [
-                _buildMenuOption(
-                  icon: Icons.directions_car_outlined,
-                  title: 'Vehicle Management',
-                  subtitle: 'Add, edit, or remove your vehicles',
-                  iconColor: Colors.blue,
-                  theme: theme,
-                ),
-                _buildDivider(),
-                _buildMenuOption(
-                  icon: Icons.analytics_outlined,
-                  title: 'Earnings Analytics',
-                  subtitle: 'View your rental income and statistics',
-                  iconColor: Colors.green,
-                  theme: theme,
-                ),
-                _buildDivider(),
-                _buildMenuOption(
-                  icon: Icons.calendar_today_outlined,
-                  title: 'Booking Management',
-                  subtitle: 'Manage vehicle bookings and availability',
-                  iconColor: Colors.orange,
-                  theme: theme,
-                ),
-                _buildDivider(),
-                _buildMenuOption(
-                  icon: Icons.verified_outlined,
-                  title: 'Vehicle Verification',
-                  subtitle: 'Upload and manage vehicle documents',
-                  iconColor: Colors.purple,
-                  theme: theme,
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 24),
-        ],
-      );
-    } else {
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            'Renter Features',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: Colors.black87,
-            ),
-          ),
-          const SizedBox(height: 16),
-          Card(
-            elevation: 2,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(15),
-            ),
-            child: Column(
-              children: [
-                _buildMenuOption(
-                  icon: Icons.history_outlined,
-                  title: 'Rental History',
-                  subtitle: 'View your past and current rentals',
-                  iconColor: Colors.blue,
-                  theme: theme,
-                ),
-                _buildDivider(),
-                _buildMenuOption(
-                  icon: Icons.favorite_outline,
-                  title: 'Favorite Vehicles',
-                  subtitle: 'Manage your saved vehicles',
-                  iconColor: Colors.red,
-                  theme: theme,
-                ),
-                _buildDivider(),
-                _buildMenuOption(
-                  icon: Icons.rate_review_outlined,
-                  title: 'My Reviews',
-                  subtitle: 'View and manage your vehicle reviews',
-                  iconColor: Colors.amber,
-                  theme: theme,
-                ),
-                _buildDivider(),
-                _buildMenuOption(
-                  icon: Icons.car_rental_outlined,
-                  title: 'Become a Vehicle Owner',
-                  subtitle: 'Start renting out your own vehicles',
-                  iconColor: Colors.green,
-                  theme: theme,
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 24),
-        ],
-      );
-    }
-  }
-
-  Widget _buildUserTypeSpecificStats() {
-    if (userType == 'owner') {
-      return Card(
-        elevation: 2,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(15),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            children: [
-              Row(
-                children: [
-                  Expanded(
-                    child: _buildStatItem(
-                        _userStats['vehiclesListed'] ?? '0',
-                        'Vehicles\nListed',
-                        Colors.blue,
-                        Icons.directions_car_outlined),
-                  ),
-                  Expanded(
-                    child: _buildStatItem(
-                        _userStats['activeRentals'] ?? '0',
-                        'Active\nRentals',
-                        Colors.green,
-                        Icons.local_activity_outlined),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 20),
-              Row(
-                children: [
-                  Expanded(
-                    child: _buildStatItem(
-                        'LKR ${_userStats['totalEarnings'] ?? '0'}',
-                        'Total\nEarnings',
-                        Colors.orange,
-                        Icons.account_balance_wallet_outlined),
-                  ),
-                  Expanded(
-                    child: _buildStatItem(_userStats['totalReviews'] ?? '0',
-                        'Total\nReviews', Colors.purple, Icons.star_outline),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-      );
-    } else {
-      return Card(
-        elevation: 2,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(15),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            children: [
-              Row(
-                children: [
-                  Expanded(
-                    child: _buildStatItem(
-                        _userStats['vehiclesRented'] ?? '0',
-                        'Vehicles\nRented',
-                        Colors.blue,
-                        Icons.directions_car_outlined),
-                  ),
-                  Expanded(
-                    child: _buildStatItem(_userStats['totalReviews'] ?? '0',
-                        'Reviews\nGiven', Colors.orange, Icons.star_outline),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 20),
-              Row(
-                children: [
-                  Expanded(
-                    child: _buildStatItem(
-                        _userStats['favoriteVehicles'] ?? '0',
-                        'Favorite\nVehicles',
-                        Colors.red,
-                        Icons.favorite_outline),
-                  ),
-                  Expanded(
-                    child: _buildStatItem(
-                        'LKR ${_userStats['totalSpent'] ?? '0'}',
-                        'Total\nSpent',
-                        Colors.green,
-                        Icons.payment_outlined),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-      );
-    }
   }
 }
