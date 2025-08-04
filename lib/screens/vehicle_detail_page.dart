@@ -8,6 +8,7 @@ import '../widgets/vehicle_detail/vehicle_specifications_section.dart';
 import '../widgets/vehicle_detail/vehicle_features_section.dart';
 import '../widgets/vehicle_detail/rental_info_section.dart';
 import '../widgets/vehicle_detail/booking_form_section.dart';
+import '../widgets/vehicle_detail/full_screen_image_viewer.dart';
 import '../utils/app_colors.dart';
 
 class VehicleDetailPage extends StatefulWidget {
@@ -36,6 +37,79 @@ class _VehicleDetailPageState extends State<VehicleDetailPage> {
   void _debugPrintVehicleImages() {
     debugPrint('Vehicle data: ${widget.vehicle['id']}');
     debugPrint('Image data: ${widget.vehicle['images']}');
+  }
+
+  // Extract images from vehicle data
+  List<String> _extractImages() {
+    List<String> imageUrls = [];
+
+    try {
+      // Check for images in different possible data structures
+
+      // Case 1: images is a direct list of strings
+      if (widget.vehicle['images'] is List) {
+        final List<dynamic> images = widget.vehicle['images'] as List;
+        imageUrls = images.map((img) => img.toString()).toList();
+      }
+      // Case 2: images is a map with nested structures
+      else if (widget.vehicle['images'] is Map) {
+        final Map<String, dynamic> imagesMap =
+            widget.vehicle['images'] as Map<String, dynamic>;
+
+        // Add primary image first if available
+        if (imagesMap['primaryImageUrl'] != null) {
+          imageUrls.add(imagesMap['primaryImageUrl']);
+        }
+
+        // Add image URLs if available
+        if (imagesMap['imageUrls'] is List) {
+          final List<dynamic> imagesList = imagesMap['imageUrls'] as List;
+          for (String url in imagesList) {
+            // Avoid duplicates if primary image is also in imageUrls
+            if (url != imagesMap['primaryImageUrl']) {
+              imageUrls.add(url);
+            }
+          }
+        }
+
+        // Add additional images if available
+        if (imagesMap['additionalImages'] is List) {
+          final List<dynamic> additionalImages =
+              imagesMap['additionalImages'] as List;
+          imageUrls.addAll(additionalImages.map((img) => img.toString()));
+        }
+      }
+
+      // If still no images, check for other possible formats
+      if (imageUrls.isEmpty && widget.vehicle['imageUrls'] is List) {
+        final List<dynamic> imagesList = widget.vehicle['imageUrls'] as List;
+        imageUrls = imagesList.map((img) => img.toString()).toList();
+      }
+    } catch (e) {
+      debugPrint('Error extracting images: $e');
+    }
+
+    // If no images found, use a placeholder
+    if (imageUrls.isEmpty) {
+      imageUrls
+          .add('https://via.placeholder.com/400x250?text=No+Image+Available');
+    }
+
+    return imageUrls;
+  }
+
+  // Open full screen image viewer
+  void _openFullScreenImageViewer(int initialIndex) {
+    final imageUrls = _extractImages();
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => FullScreenImageViewer(
+          imageUrls: imageUrls,
+          initialIndex: initialIndex,
+        ),
+      ),
+    );
   }
 
   @override

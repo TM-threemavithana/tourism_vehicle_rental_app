@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'full_screen_image_viewer.dart';
 
 class VehicleImageCarousel extends StatefulWidget {
   final Map<String, dynamic> vehicleDetails;
@@ -26,24 +27,25 @@ class _VehicleImageCarouselState extends State<VehicleImageCarousel> {
 
   void _extractImages() {
     _imageUrls = [];
-    
+
     try {
       // Check for images in different possible data structures
-      
+
       // Case 1: images is a direct list of strings
       if (widget.vehicleDetails['images'] is List) {
         final List<dynamic> images = widget.vehicleDetails['images'] as List;
         _imageUrls = images.map((img) => img.toString()).toList();
-      } 
+      }
       // Case 2: images is a map with nested structures
       else if (widget.vehicleDetails['images'] is Map) {
-        final Map<String, dynamic> imagesMap = widget.vehicleDetails['images'] as Map<String, dynamic>;
-        
+        final Map<String, dynamic> imagesMap =
+            widget.vehicleDetails['images'] as Map<String, dynamic>;
+
         // Add primary image first if available
         if (imagesMap['primaryImageUrl'] != null) {
           _imageUrls.add(imagesMap['primaryImageUrl']);
         }
-        
+
         // Add image URLs if available
         if (imagesMap['imageUrls'] is List) {
           final List<dynamic> imagesList = imagesMap['imageUrls'] as List;
@@ -54,32 +56,35 @@ class _VehicleImageCarouselState extends State<VehicleImageCarousel> {
             }
           }
         }
-        
+
         // Add additional images if available
         if (imagesMap['additionalImages'] is List) {
-          final List<dynamic> additionalImages = imagesMap['additionalImages'] as List;
+          final List<dynamic> additionalImages =
+              imagesMap['additionalImages'] as List;
           _imageUrls.addAll(additionalImages.map((img) => img.toString()));
         }
       }
-      
+
       // If still no images, check for other possible formats
       if (_imageUrls.isEmpty && widget.vehicleDetails['imageUrls'] is List) {
-        final List<dynamic> imagesList = widget.vehicleDetails['imageUrls'] as List;
+        final List<dynamic> imagesList =
+            widget.vehicleDetails['imageUrls'] as List;
         _imageUrls = imagesList.map((img) => img.toString()).toList();
       }
     } catch (e) {
       debugPrint('Error extracting images: $e');
     }
-    
+
     // If no images found, use a placeholder
     if (_imageUrls.isEmpty) {
-      _imageUrls.add('https://via.placeholder.com/400x250?text=No+Image+Available');
+      _imageUrls
+          .add('https://via.placeholder.com/400x250?text=No+Image+Available');
     }
-    
+
     // Debug output
     debugPrint('Found ${_imageUrls.length} images: $_imageUrls');
   }
-  
+
   @override
   Widget build(BuildContext context) {
     return SliverToBoxAdapter(
@@ -97,19 +102,32 @@ class _VehicleImageCarouselState extends State<VehicleImageCarousel> {
                 });
               },
               itemBuilder: (context, index) {
-                return CachedNetworkImage(
-                  imageUrl: _imageUrls[index],
-                  fit: BoxFit.cover,
-                  width: double.infinity,
-                  placeholder: (context, url) => Container(
-                    color: Colors.grey[300],
-                    child: const Center(
-                      child: CircularProgressIndicator(),
+                return GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => FullScreenImageViewer(
+                          imageUrls: _imageUrls,
+                          initialIndex: index,
+                        ),
+                      ),
+                    );
+                  },
+                  child: CachedNetworkImage(
+                    imageUrl: _imageUrls[index],
+                    fit: BoxFit.cover,
+                    width: double.infinity,
+                    placeholder: (context, url) => Container(
+                      color: Colors.grey[300],
+                      child: const Center(
+                        child: CircularProgressIndicator(),
+                      ),
                     ),
-                  ),
-                  errorWidget: (context, url, error) => Container(
-                    color: Colors.grey[300],
-                    child: const Icon(Icons.error, size: 50),
+                    errorWidget: (context, url, error) => Container(
+                      color: Colors.grey[300],
+                      child: const Icon(Icons.error, size: 50),
+                    ),
                   ),
                 );
               },
@@ -140,7 +158,8 @@ class _VehicleImageCarouselState extends State<VehicleImageCarousel> {
               top: 16,
               right: 16,
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
                   color: Colors.black.withOpacity(0.7),
                   borderRadius: BorderRadius.circular(20),
@@ -152,6 +171,24 @@ class _VehicleImageCarouselState extends State<VehicleImageCarousel> {
                     fontSize: 12,
                     fontWeight: FontWeight.bold,
                   ),
+                ),
+              ),
+            ),
+
+            // Full screen icon indicator
+            Positioned(
+              top: 16,
+              left: 16,
+              child: Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.black.withOpacity(0.7),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.fullscreen,
+                  color: Colors.white,
+                  size: 20,
                 ),
               ),
             ),
