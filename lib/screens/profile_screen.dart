@@ -555,6 +555,22 @@ class _ProfileScreenState extends State<ProfileScreen>
               ),
             ),
           ),
+          // Switch mode button (only show for renters)
+          if (userType == 'renter')
+            IconButton(
+              icon: _isLoading
+                  ? const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: Colors.white,
+                      ),
+                    )
+                  : const Icon(Icons.swap_horiz, color: Colors.white),
+              onPressed: _isLoading ? null : _switchUserType,
+              tooltip: 'Switch to Owner Mode',
+            ),
           IconButton(
             icon: const Icon(Icons.arrow_back_ios),
             onPressed: () => Navigator.of(context).pop(),
@@ -817,11 +833,11 @@ class _ProfileScreenState extends State<ProfileScreen>
                             _buildMenuOption(
                               icon: Icons.swap_horiz,
                               title: userType == 'owner'
-                                  ? 'Switch to Renter'
-                                  : 'Become Vehicle Owner',
+                                  ? 'Switch to Renter Mode'
+                                  : 'Switch to Vehicle Owner Mode',
                               subtitle: userType == 'owner'
                                   ? 'Switch to renter mode'
-                                  : 'Start renting out your vehicles',
+                                  : 'Start renting out your vehicles and earn money',
                               iconColor: Colors.purple,
                               theme: theme,
                             ),
@@ -1302,8 +1318,8 @@ class _ProfileScreenState extends State<ProfileScreen>
           _showChangePasswordDialog();
         };
         break;
-      case 'Switch to Renter':
-      case 'Become Vehicle Owner':
+      case 'Switch to Renter Mode':
+      case 'Switch to Vehicle Owner Mode':
         onTap = () {
           _switchUserType();
         };

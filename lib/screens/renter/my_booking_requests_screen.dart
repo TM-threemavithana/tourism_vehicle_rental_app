@@ -79,18 +79,18 @@ class MyBookingRequestsScreen extends StatelessWidget {
                                 if (bookingSnapshot.connectionState ==
                                         ConnectionState.waiting ||
                                     inquirySnapshot.connectionState ==
-                                        ConnectionState.waiting) {
-                                  return const Center(
-                                      child: CircularProgressIndicator());
-                                }
+                                ConnectionState.waiting) {
+                              return const Center(
+                                  child: CircularProgressIndicator());
+                            }
 
                                 if (bookingSnapshot.hasError ||
                                     inquirySnapshot.hasError) {
-                                  return Center(
+                              return Center(
                                     child: Text(
                                         'Error: ${bookingSnapshot.error ?? inquirySnapshot.error}'),
-                                  );
-                                }
+                              );
+                            }
 
                                 // Combine and sort all requests
                                 List<Map<String, dynamic>> allRequests = [];
@@ -137,52 +137,52 @@ class MyBookingRequestsScreen extends StatelessWidget {
                                 });
 
                                 if (allRequests.isEmpty) {
-                                  return Center(
-                                    child: Column(
+                              return Center(
+                                child: Column(
                                       mainAxisAlignment:
                                           MainAxisAlignment.center,
-                                      children: [
-                                        Icon(
-                                          Icons.car_rental,
-                                          size: 80,
-                                          color: isDarkMode
-                                              ? Colors.grey.shade700
-                                              : Colors.grey.shade400,
-                                        ),
-                                        const SizedBox(height: 16),
-                                        Text(
+                                  children: [
+                                    Icon(
+                                      Icons.car_rental,
+                                      size: 80,
+                                      color: isDarkMode
+                                          ? Colors.grey.shade700
+                                          : Colors.grey.shade400,
+                                    ),
+                                    const SizedBox(height: 16),
+                                    Text(
                                           'No requests yet',
-                                          style: TextStyle(
-                                            fontSize: 18,
-                                            fontWeight: FontWeight.bold,
-                                            color: isDarkMode
+                                      style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                        color: isDarkMode
                                                 ? Colors.white
                                                 : Colors.black87,
-                                          ),
-                                        ),
-                                        const SizedBox(height: 8),
-                                        Text(
-                                          'Your booking requests and inquiries will appear here',
-                                          style: TextStyle(
-                                            fontSize: 14,
-                                            color: isDarkMode
-                                                ? Colors.grey.shade400
-                                                : Colors.grey.shade600,
-                                          ),
-                                          textAlign: TextAlign.center,
-                                        ),
-                                      ],
+                                      ),
                                     ),
-                                  );
-                                }
+                                    const SizedBox(height: 8),
+                                    Text(
+                                          'Your booking requests and inquiries will appear here',
+                                      style: TextStyle(
+                                            fontSize: 14,
+                                        color: isDarkMode
+                                                ? Colors.grey.shade400
+                                            : Colors.grey.shade600,
+                                      ),
+                                          textAlign: TextAlign.center,
+                                    ),
+                                  ],
+                                ),
+                              );
+                            }
 
-                                return ListView.builder(
+                            return ListView.builder(
                                   padding: const EdgeInsets.symmetric(
                                       horizontal: 16),
                                   itemCount: allRequests.length,
-                                  itemBuilder: (context, index) {
+                              itemBuilder: (context, index) {
                                     final request = allRequests[index];
-                                    return _buildRequestCard(
+                                return _buildRequestCard(
                                         context, request, isDarkMode);
                                   },
                                 );
@@ -431,7 +431,7 @@ class MyBookingRequestsScreen extends StatelessWidget {
     return Card(
       margin: const EdgeInsets.only(bottom: 16),
       elevation: 2,
-      shape: RoundedRectangleBorder(
+                        shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
         side: BorderSide(color: Colors.blue.shade300, width: 1.5),
       ),
@@ -454,8 +454,8 @@ class MyBookingRequestsScreen extends StatelessWidget {
                   height: 60,
                   decoration: BoxDecoration(
                     color: Colors.blue.shade100,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
                   child: const Icon(
                     Icons.search,
                     color: Colors.blue,
@@ -492,7 +492,7 @@ class MyBookingRequestsScreen extends StatelessWidget {
                     color: Colors.blue.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(color: Colors.blue),
-                  ),
+                      ),
                   child: const Text(
                     'INQUIRY',
                     style: TextStyle(
@@ -500,9 +500,9 @@ class MyBookingRequestsScreen extends StatelessWidget {
                       fontWeight: FontWeight.bold,
                       fontSize: 12,
                     ),
+                    ),
                   ),
-                ),
-              ],
+                ],
             ),
           ),
           Padding(

@@ -3,10 +3,13 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:intl/intl.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../services/auth_service.dart';
 import '../auth/auth_wrapper.dart';
 import '../../widgets/side_menu.dart';
 import '../profile_screen.dart';
+import '../welcome_screen.dart';
 import 'add_vehicle_screen.dart';
 import 'vehicle_detail_screen.dart'; // Import the vehicle detail screen
 import 'booking_requests_screen.dart'; // Import the booking requests screen
@@ -25,6 +28,7 @@ class _OwnerDashboardScreenState extends State<OwnerDashboardScreen>
   String _currentTab = 'Dashboard';
   late AnimationController _animationController;
   late Animation<double> _fadeInAnimation;
+  bool _isLoading = false; // Added for loading state
 
   // Add this line to define isDarkMode
   bool get isDarkMode => Theme.of(context).brightness == Brightness.dark;
@@ -118,21 +122,59 @@ class _OwnerDashboardScreenState extends State<OwnerDashboardScreen>
   }
 
   void _navigateToProfile() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => ProfileScreen(
-          user: FirebaseAuth.instance.currentUser,
+    try {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => ProfileScreen(
+            user: FirebaseAuth.instance.currentUser,
+          ),
         ),
-      ),
-    );
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error navigating to profile: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
 
-  void _switchToRenterMode() {
-    // TODO: Implement switching to renter mode
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Switching to renter mode - Coming soon!')),
-    );
+  Future<void> _switchToRenterMode() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      // Update user type to 'renter' in Firestore
+      await _authService.updateUserType('renter');
+
+      // Navigate to the welcome screen (renter mode)
+      if (!mounted) return;
+
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(
+          builder: (context) => const WelcomeScreen(),
+        ),
+        (route) => false,
+      );
+    } catch (e) {
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error switching to renter mode: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
   }
 
   void _addNewVehicle() async {
@@ -342,9 +384,18 @@ class _OwnerDashboardScreenState extends State<OwnerDashboardScreen>
                       Row(
                         children: [
                           IconButton(
-                            icon: const Icon(Icons.swap_horiz,
-                                color: Colors.white),
-                            onPressed: _switchToRenterMode,
+                            icon: _isLoading
+                                ? const SizedBox(
+                                    width: 20,
+                                    height: 20,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      color: Colors.white,
+                                    ),
+                                  )
+                                : const Icon(Icons.swap_horiz,
+                                    color: Colors.white),
+                            onPressed: _isLoading ? null : _switchToRenterMode,
                             tooltip: 'Switch to Renter Mode',
                           ),
                           GestureDetector(
@@ -508,159 +559,20 @@ class _OwnerDashboardScreenState extends State<OwnerDashboardScreen>
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    // Stats cards
-                                    SizedBox(
-                                      height: 140,
-                                      child: ListView(
-                                        scrollDirection: Axis.horizontal,
-                                        physics: const BouncingScrollPhysics(),
-                                        children: [
-                                          _buildStatCard(
-                                            icon: Icons.directions_car,
-                                            title: 'Vehicles Listed',
-                                            value: _vehicleStats[
-                                                    'vehiclesListed'] ??
-                                                '0',
-                                            color: const Color(0xFF6C63FF),
-                                            change: 'Total vehicles',
-                                          ),
-                                          _buildStatCard(
-                                            icon: Icons.access_time,
-                                            title: 'Active Rentals',
-                                            value: _vehicleStats[
-                                                    'activeRentals'] ??
-                                                '0',
-                                            color: const Color(0xFF4CAF50),
-                                            change: 'Currently rented',
-                                          ),
-                                          _buildStatCard(
-                                            icon: Icons.attach_money,
-                                            title: 'Total Earnings',
-                                            value: _vehicleStats[
-                                                    'totalEarnings'] ??
-                                                'LKR 0',
-                                            color: const Color(0xFFF9A825),
-                                            change: 'All time earnings',
-                                          ),
-                                          _buildStatCard(
-                                            icon: Icons.star,
-                                            title: 'Avg Rating',
-                                            value: _vehicleStats['avgRating'] ??
-                                                'No ratings',
-                                            color: const Color(0xFFE53935),
-                                            change: 'From customer reviews',
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-
-                                    const SizedBox(height: 32),
-
-                                    // Earnings chart section
-                                    Container(
-                                      padding: const EdgeInsets.all(16),
-                                      decoration: BoxDecoration(
-                                        color: isDarkMode
-                                            ? Colors.grey[850]
-                                            : Colors.white,
-                                        borderRadius: BorderRadius.circular(16),
-                                        boxShadow: [
-                                          BoxShadow(
-                                            color:
-                                                Colors.black.withOpacity(0.05),
-                                            blurRadius: 10,
-                                            offset: const Offset(0, 4),
-                                          ),
-                                        ],
-                                      ),
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              Text(
-                                                'Earnings Overview',
-                                                style: TextStyle(
-                                                  fontSize: 18,
-                                                  fontWeight: FontWeight.bold,
-                                                  color: isDarkMode
-                                                      ? Colors.white
-                                                      : Colors.black87,
-                                                ),
-                                              ),
-                                              Container(
-                                                padding:
-                                                    const EdgeInsets.symmetric(
-                                                  horizontal: 12,
-                                                  vertical: 6,
-                                                ),
-                                                decoration: BoxDecoration(
-                                                  color: isDarkMode
-                                                      ? Colors.grey[800]
-                                                      : Colors.grey[100],
-                                                  borderRadius:
-                                                      BorderRadius.circular(20),
-                                                ),
-                                                child: Text(
-                                                  'This Month',
-                                                  style: TextStyle(
-                                                    fontSize: 12,
-                                                    fontWeight: FontWeight.w500,
-                                                    color: isDarkMode
-                                                        ? Colors.white70
-                                                        : Colors.black87,
-                                                  ),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                          const SizedBox(height: 24),
-                                          SizedBox(
-                                            height: 180,
-                                            child:
-                                                _buildEarningsChart(isDarkMode),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-
-                                    const SizedBox(height: 24),
-
-                                    // Upcoming bookings section
-                                    Text(
-                                      'Recent Bookings',
-                                      style: TextStyle(
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.bold,
-                                        color: isDarkMode
-                                            ? Colors.white
-                                            : Colors.black87,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 16),
-
-                                    ..._recentBookings.map((booking) =>
-                                        _buildBookingCard(booking, isDarkMode)),
-
-                                    const SizedBox(height: 30),
-
-                                    // Add Vehicle Button
+                                    // Add Vehicle Button - Prominent placement
                                     SizedBox(
                                       width: double.infinity,
-                                      height: 54,
+                                      height: 60,
                                       child: ElevatedButton(
                                         onPressed: _addNewVehicle,
                                         style: ElevatedButton.styleFrom(
                                           backgroundColor:
-                                              theme.colorScheme.secondary,
+                                              theme.colorScheme.primary,
                                           foregroundColor: Colors.white,
-                                          elevation: 1,
+                                          elevation: 2,
                                           shape: RoundedRectangleBorder(
                                             borderRadius:
-                                                BorderRadius.circular(12),
+                                                BorderRadius.circular(16),
                                           ),
                                         ),
                                         child: Row(
@@ -668,22 +580,22 @@ class _OwnerDashboardScreenState extends State<OwnerDashboardScreen>
                                               MainAxisAlignment.center,
                                           children: [
                                             Container(
-                                              padding: const EdgeInsets.all(4),
+                                              padding: const EdgeInsets.all(6),
                                               decoration: BoxDecoration(
                                                 color: Colors.white24,
                                                 borderRadius:
-                                                    BorderRadius.circular(6),
+                                                    BorderRadius.circular(8),
                                               ),
                                               child: const Icon(
                                                 Icons.add_circle_outline,
-                                                size: 18,
+                                                size: 24,
                                               ),
                                             ),
-                                            const SizedBox(width: 12),
+                                            const SizedBox(width: 16),
                                             const Text(
                                               'ADD A NEW VEHICLE',
                                               style: TextStyle(
-                                                fontSize: 16,
+                                                fontSize: 18,
                                                 fontWeight: FontWeight.bold,
                                                 letterSpacing: 0.5,
                                               ),
@@ -693,7 +605,7 @@ class _OwnerDashboardScreenState extends State<OwnerDashboardScreen>
                                       ),
                                     ),
 
-                                    const SizedBox(height: 24),
+                                    const SizedBox(height: 32),
 
                                     // My Vehicles section
                                     Text(
@@ -711,36 +623,60 @@ class _OwnerDashboardScreenState extends State<OwnerDashboardScreen>
                                     // Fetch and display vehicles from Firestore
                                     _buildVehiclesList(),
 
-                                    // View All Booking Requests button
-                                    Container(
-                                      margin: const EdgeInsets.only(
-                                          top: 16, bottom: 8),
-                                      width: double.infinity,
-                                      child: OutlinedButton.icon(
-                                        onPressed: () {
-                                          Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                                builder: (context) =>
-                                                    const BookingRequestsScreen()),
-                                          );
-                                        },
-                                        icon: const Icon(Icons.list_alt),
-                                        label: const Text(
-                                            'View All Booking Requests'),
-                                        style: OutlinedButton.styleFrom(
-                                          padding: const EdgeInsets.symmetric(
-                                              vertical: 12),
-                                          side: BorderSide(
-                                              color: Theme.of(context)
-                                                  .colorScheme
-                                                  .primary),
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(8),
-                                          ),
-                                        ),
+                                    const SizedBox(height: 32),
+
+                                    // Contact WayZ Team Section
+                                    Text(
+                                      'Need Help? Contact WayZ Team',
+                                      style: TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold,
+                                        color: isDarkMode
+                                            ? Colors.white
+                                            : Colors.black87,
                                       ),
+                                    ),
+                                    const SizedBox(height: 16),
+
+                                    // Contact Options Grid
+                                    GridView.count(
+                                      crossAxisCount: 2,
+                                      shrinkWrap: true,
+                                      physics:
+                                          const NeverScrollableScrollPhysics(),
+                                      crossAxisSpacing: 16,
+                                      mainAxisSpacing: 16,
+                                      childAspectRatio: 1.2,
+                                      children: [
+                                        _buildContactCard(
+                                          icon: Icons.phone,
+                                          title: 'Call Support',
+                                          subtitle: 'Speak with our team',
+                                          color: Colors.green,
+                                          onTap: () => _contactWayZ('call'),
+                                        ),
+                                        _buildContactCard(
+                                          icon: FontAwesomeIcons.whatsapp,
+                                          title: 'WhatsApp',
+                                          subtitle: 'Chat with us',
+                                          color: Colors.green,
+                                          onTap: () => _contactWayZ('whatsapp'),
+                                        ),
+                                        _buildContactCard(
+                                          icon: Icons.email,
+                                          title: 'Email Support',
+                                          subtitle: 'Send us an email',
+                                          color: Colors.blue,
+                                          onTap: () => _contactWayZ('email'),
+                                        ),
+                                        _buildContactCard(
+                                          icon: Icons.help_outline,
+                                          title: 'Help Center',
+                                          subtitle: 'Find answers',
+                                          color: Colors.orange,
+                                          onTap: () => _contactWayZ('help'),
+                                        ),
+                                      ],
                                     ),
                                   ],
                                 ),
@@ -1471,6 +1407,119 @@ class _OwnerDashboardScreenState extends State<OwnerDashboardScreen>
           },
         );
       },
+    );
+  }
+
+  Future<void> _contactWayZ(String method) async {
+    String message = 'Hello WayZ Team, I need assistance.';
+    String title = '';
+    Uri? launchUri;
+
+    switch (method) {
+      case 'call':
+        title = 'Call Support';
+        launchUri = Uri(scheme: 'tel', path: '+94771234567');
+        break;
+      case 'whatsapp':
+        title = 'WhatsApp Chat';
+        final whatsappUrl =
+            'https://wa.me/94771234567?text=${Uri.encodeComponent(message)}';
+        launchUri = Uri.parse(whatsappUrl);
+        break;
+      case 'email':
+        title = 'Email Support';
+        launchUri = Uri(
+          scheme: 'mailto',
+          path: 'support@wayz.com',
+          queryParameters: {
+            'subject': 'WayZ Support Request',
+            'body': message,
+          },
+        );
+        break;
+      case 'help':
+        title = 'Help Center';
+        launchUri = Uri.parse('https://wayz.com/help');
+        break;
+    }
+
+    if (launchUri != null) {
+      try {
+        if (await canLaunchUrl(launchUri)) {
+          await launchUrl(launchUri);
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Could not launch $title')),
+          );
+        }
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error launching $title: $e')),
+        );
+      }
+    }
+  }
+
+  Widget _buildContactCard({
+    required IconData icon,
+    required String title,
+    required String subtitle,
+    required Color color,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: isDarkMode ? Colors.grey[800] : Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: isDarkMode ? Colors.grey[700]! : Colors.grey[300]!,
+            width: 1,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 5,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Column(
+          children: [
+            // Check if it's a FontAwesome icon
+            icon.runtimeType.toString().contains('FontAwesomeIcons')
+                ? FaIcon(
+                    icon as dynamic,
+                    size: 30,
+                    color: color,
+                  )
+                : Icon(
+                    icon,
+                    size: 30,
+                    color: color,
+                  ),
+            const SizedBox(height: 12),
+            Text(
+              title,
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: isDarkMode ? Colors.white : Colors.black87,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              subtitle,
+              style: TextStyle(
+                fontSize: 12,
+                color: isDarkMode ? Colors.white60 : Colors.black54,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
