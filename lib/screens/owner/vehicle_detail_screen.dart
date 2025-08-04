@@ -3,8 +3,6 @@ import 'package:intl/intl.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 // Remove carousel_slider import
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:url_launcher/url_launcher.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class VehicleDetailScreen extends StatefulWidget {
   final Map<String, dynamic> vehicle;
@@ -272,69 +270,6 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
                             fontSize: 16,
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                ),
-
-                // Contact Owner Section
-                Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Contact Vehicle Owner',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: isDarkMode ? Colors.white : Colors.black87,
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: ElevatedButton.icon(
-                              onPressed: () => _contactOwner('call'),
-                              icon:
-                                  const Icon(Icons.phone, color: Colors.white),
-                              label: const Text(
-                                'Call Owner',
-                                style: TextStyle(color: Colors.white),
-                              ),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.green,
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 12),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: ElevatedButton.icon(
-                              onPressed: () => _contactOwner('whatsapp'),
-                              icon: const FaIcon(FontAwesomeIcons.whatsapp,
-                                  color: Colors.white),
-                              label: const Text(
-                                'WhatsApp',
-                                style: TextStyle(color: Colors.white),
-                              ),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.green,
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 12),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
                       ),
                     ],
                   ),
@@ -969,46 +904,6 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
         return Colors.amber;
       default:
         return Colors.grey;
-    }
-  }
-
-  // Method to contact owner
-  void _contactOwner(String type) async {
-    final ownerPhone = _vehicleDetails['ownerDetails']?['phoneNumber'];
-    final ownerWhatsApp = _vehicleDetails['ownerDetails']?['whatsAppNumber'];
-
-    if (ownerPhone == null && ownerWhatsApp == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Owner contact details not available.')),
-      );
-      return;
-    }
-
-    String message = 'Hello, I am interested in your vehicle.';
-    String url = '';
-
-    if (type == 'call') {
-      if (ownerPhone != null) {
-        url = 'tel:$ownerPhone';
-      }
-    } else if (type == 'whatsapp') {
-      if (ownerWhatsApp != null) {
-        url = 'https://wa.me/$ownerWhatsApp';
-      }
-    }
-
-    if (url.isNotEmpty) {
-      if (await canLaunchUrl(Uri.parse(url))) {
-        await launchUrl(Uri.parse(url));
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Could not launch $url')),
-        );
-      }
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('No contact method available.')),
-      );
     }
   }
 }
