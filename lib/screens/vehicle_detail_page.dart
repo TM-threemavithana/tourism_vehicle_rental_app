@@ -7,7 +7,7 @@ import '../widgets/vehicle_detail/vehicle_info_header.dart';
 import '../widgets/vehicle_detail/vehicle_specifications_section.dart';
 import '../widgets/vehicle_detail/vehicle_features_section.dart';
 import '../widgets/vehicle_detail/rental_info_section.dart';
-import '../widgets/vehicle_detail/booking_form_section.dart';
+// import '../widgets/vehicle_detail/booking_form_section.dart'; // Commented out booking form
 import '../widgets/vehicle_detail/full_screen_image_viewer.dart';
 import '../utils/app_colors.dart';
 
@@ -172,8 +172,8 @@ class _VehicleDetailPageState extends State<VehicleDetailPage> {
                     // Divider
                     const Divider(height: 1),
 
-                    // Booking form section
-                    BookingFormSection(vehicleDetails: _vehicleDetails),
+                    // Booking form section - COMMENTED OUT
+                    // BookingFormSection(vehicleDetails: _vehicleDetails),
 
                     // Divider
                     const Divider(height: 1),
