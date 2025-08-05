@@ -54,6 +54,8 @@ class _MergedFilterDrawerState extends State<MergedFilterDrawer> {
   // Filter parameters
   String _selectedSortOption = '';
   RangeValues _priceRange = const RangeValues(0, 50000);
+  double _minPrice = 0;
+  double _maxPrice = 50000;
   Set<String> _selectedFeatures = {};
   Set<String> _selectedFuelTypes = {};
   Set<String> _selectedTransmissionTypes = {};
@@ -108,49 +110,13 @@ class _MergedFilterDrawerState extends State<MergedFilterDrawer> {
       _selectedVehicleType = _selectedVehicles.first;
     }
 
-    // Initialize price range from data
-    if (widget.initialResults.isNotEmpty) {
-      _setPriceRangeFromData();
-    } else {
-      // Set default price range if no results
-      _priceRange = const RangeValues(0, 50000);
-    }
+    // Always use 0-50000 for price range
+    _minPrice = 0;
+    _maxPrice = 50000;
+    _priceRange = const RangeValues(0, 50000);
   }
 
-  void _setPriceRangeFromData() {
-    if (widget.initialResults.isEmpty) return;
-
-    double minPrice = double.infinity;
-    double maxPrice = 0;
-
-    for (var vehicle in widget.initialResults) {
-      final price = vehicle['pricing']?['daily']?['vehicleOnly']?['price'];
-      if (price != null) {
-        double numPrice;
-        if (price is num) {
-          numPrice = price.toDouble();
-        } else if (price is String) {
-          numPrice = double.tryParse(price) ?? 0.0;
-        } else {
-          continue;
-        }
-
-        if (numPrice < minPrice) minPrice = numPrice;
-        if (numPrice > maxPrice) maxPrice = numPrice;
-      }
-    }
-
-    if (minPrice != double.infinity && maxPrice > 0) {
-      setState(() {
-        _priceRange = RangeValues(minPrice, maxPrice);
-      });
-    } else {
-      // Fallback to default range if no valid prices found
-      setState(() {
-        _priceRange = const RangeValues(0, 50000);
-      });
-    }
-  }
+  // Removed _setPriceRangeFromData, always use 0-50000
 
   @override
   void dispose() {
@@ -481,9 +447,11 @@ class _MergedFilterDrawerState extends State<MergedFilterDrawer> {
                       const SizedBox(height: 8),
                       RangeSlider(
                         values: _priceRange,
-                        min: 0,
-                        max: 50000,
-                        divisions: 50,
+                        min: _minPrice,
+                        max: _maxPrice,
+                        divisions: (_maxPrice - _minPrice > 0)
+                            ? ((_maxPrice - _minPrice) ~/ 1000).clamp(1, 50)
+                            : 1,
                         labels: RangeLabels(
                           'Rs. ${_priceRange.start.round()}',
                           'Rs. ${_priceRange.end.round()}',
@@ -990,8 +958,12 @@ class _MergedFilterDrawerState extends State<MergedFilterDrawer> {
 
     // Reset price range
     if (widget.initialResults.isNotEmpty) {
-      _setPriceRangeFromData();
+      _minPrice = 0;
+      _maxPrice = 50000;
+      _priceRange = const RangeValues(0, 50000);
     } else {
+      _minPrice = 0;
+      _maxPrice = 50000;
       _priceRange = const RangeValues(0, 50000);
     }
 

@@ -192,6 +192,7 @@ class _VehicleSearchResultsScreenState
       appBar: AppBar(
         backgroundColor: const Color(0xFFFFC107),
         elevation: 0,
+        toolbarHeight: 44, // Reduced AppBar height
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () => Navigator.pop(context),
@@ -205,6 +206,31 @@ class _VehicleSearchResultsScreenState
           ),
         ),
         automaticallyImplyLeading: false,
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 12.0),
+            child: ElevatedButton.icon(
+              onPressed: _showMergedFilterDrawer,
+              icon: const Icon(Icons.filter_alt,
+                  color: Color(0xFFFFC107), size: 20),
+              label: const Text(
+                'Filter',
+                style: TextStyle(
+                  color: Color(0xFFFFC107),
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.black,
+                shape: const StadiumBorder(),
+                elevation: 2,
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              ),
+            ),
+          ),
+        ],
       ),
       body: Stack(
         children: [
@@ -220,34 +246,6 @@ class _VehicleSearchResultsScreenState
           ),
           Column(
             children: [
-              Container(
-                color: isDarkMode ? AppColors.neutralDark : AppColors.secondary,
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: GestureDetector(
-                        onTap: _showMergedFilterDrawer,
-                        child: Row(
-                          children: const [
-                            Icon(Icons.tune, color: Colors.white, size: 20),
-                            SizedBox(width: 8),
-                            Text(
-                              'Search & Filter',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 16,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
               Expanded(
                 child: _isLoading
                     ? Center(
