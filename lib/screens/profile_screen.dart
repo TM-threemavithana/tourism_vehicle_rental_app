@@ -559,7 +559,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                   : const Icon(Icons.swap_horiz, color: Colors.white),
               onPressed: _isLoading ? null : _switchUserType,
               tooltip: 'Switch to Owner Mode',
-            ),
+          ),
           IconButton(
             icon: const Icon(Icons.arrow_back_ios),
             onPressed: () => Navigator.of(context).pop(),

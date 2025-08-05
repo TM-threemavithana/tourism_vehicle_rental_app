@@ -123,14 +123,14 @@ class _OwnerDashboardScreenState extends State<OwnerDashboardScreen>
 
   void _navigateToProfile() {
     try {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => ProfileScreen(
-            user: FirebaseAuth.instance.currentUser,
-          ),
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ProfileScreen(
+          user: FirebaseAuth.instance.currentUser,
         ),
-      );
+      ),
+    );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -162,7 +162,7 @@ class _OwnerDashboardScreenState extends State<OwnerDashboardScreen>
     } catch (e) {
       if (!mounted) return;
 
-      ScaffoldMessenger.of(context).showSnackBar(
+    ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Error switching to renter mode: $e'),
           backgroundColor: Colors.red,
@@ -394,7 +394,7 @@ class _OwnerDashboardScreenState extends State<OwnerDashboardScreen>
                                     ),
                                   )
                                 : const Icon(Icons.swap_horiz,
-                                    color: Colors.white),
+                                color: Colors.white),
                             onPressed: _isLoading ? null : _switchToRenterMode,
                             tooltip: 'Switch to Renter Mode',
                           ),
