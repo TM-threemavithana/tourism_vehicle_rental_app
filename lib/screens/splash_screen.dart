@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'welcome_screen.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -34,15 +35,7 @@ class _SplashScreenState extends State<SplashScreen>
     );
     Future.delayed(const Duration(seconds: 5), () {
       if (mounted) {
-        Navigator.of(context).pushReplacement(
-          PageRouteBuilder(
-            transitionDuration: const Duration(milliseconds: 700),
-            pageBuilder: (_, __, ___) => const WelcomeScreen(),
-            transitionsBuilder: (_, animation, __, child) {
-              return FadeTransition(opacity: animation, child: child);
-            },
-          ),
-        );
+        Get.offAllNamed('/welcome');
       }
     });
   }
@@ -98,80 +91,67 @@ class _SplashScreenState extends State<SplashScreen>
                     },
                   ),
                   Container(
-                    width: 140,
-                    height: 140,
-                    decoration: BoxDecoration(
+                    width: 120,
+                    height: 120,
+                    decoration: const BoxDecoration(
                       shape: BoxShape.circle,
                       color: Colors.white,
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.08),
-                          blurRadius: 12,
-                          offset: Offset(0, 4),
-                        ),
-                      ],
                     ),
-                    child: ClipOval(
-                      child: Image.asset(
-                        'assets/images/logo.png',
-                        width: 120,
-                        height: 120,
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) {
-                          return Image.asset(
-                            'assets/images/fallback_logo.png',
-                            width: 120,
-                            height: 120,
-                            fit: BoxFit.cover,
-                          );
-                        },
+                    child: const Center(
+                      child: Image(
+                        image: AssetImage('assets/images/logo.png'),
+                        width: 80,
+                        height: 80,
                       ),
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: 32),
-              // Animated app name
-              FadeTransition(
-                opacity: _fadeAnimation,
-                child: AnimatedBuilder(
-                  animation: _scaleAnimation,
-                  builder: (context, child) {
-                    return Transform.scale(
-                      scale: _scaleAnimation.value,
-                      filterQuality: FilterQuality.high,
-                      alignment: Alignment.center,
-                      child: child,
-                    );
-                  },
-                  child: Text(
-                    'Wayz',
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      fontSize: 48,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.yellow,
-                      letterSpacing: 1.5,
-                      fontFamily: 'Montserrat',
-                    ),
-                  ),
+              const SizedBox(height: 40),
+              // Loading indicator
+              SizedBox(
+                width: 200,
+                child: LinearProgressIndicator(
+                  backgroundColor: Colors.white.withOpacity(0.3),
+                  valueColor:
+                      const AlwaysStoppedAnimation<Color>(Colors.yellow),
                 ),
               ),
-              const SizedBox(height: 16),
-              // Tagline
-              FadeTransition(
-                opacity: _fadeAnimation,
-                child: Text(
-                  'Where Paradise Meets Adventure',
-                  style: TextStyle(
-                    fontSize: 18,
-                    color: Colors.white.withOpacity(0.92),
-                    fontWeight: FontWeight.w400,
-                    fontFamily: 'Montserrat',
-                    letterSpacing: 0.5,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
+              const SizedBox(height: 20),
+              // App name with fade animation
+              AnimatedBuilder(
+                animation: _fadeAnimation,
+                builder: (context, child) {
+                  return Opacity(
+                    opacity: _fadeAnimation.value,
+                    child: const Text(
+                      'Wayz.lk',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 28,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 2,
+                      ),
+                    ),
+                  );
+                },
+              ),
+              const SizedBox(height: 10),
+              AnimatedBuilder(
+                animation: _fadeAnimation,
+                builder: (context, child) {
+                  return Opacity(
+                    opacity: _fadeAnimation.value,
+                    child: const Text(
+                      'Your Tourism Vehicle Rental Partner',
+                      style: TextStyle(
+                        color: Colors.white70,
+                        fontSize: 14,
+                        letterSpacing: 1,
+                      ),
+                    ),
+                  );
+                },
               ),
             ],
           ),

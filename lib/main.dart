@@ -5,14 +5,20 @@ import 'services/onesignal_service.dart';
 import 'screens/splash_screen.dart';
 import 'screens/auth/auth_wrapper.dart';
 import 'screens/favorites_screen.dart';
-import 'screens/vehicle_detail_page.dart'; // Add this import
-import 'screens/notifications_screen.dart'; // Import the new screen
+import 'screens/vehicle_detail_page.dart';
+import 'screens/notifications_screen.dart';
 import 'package:flutter/services.dart';
+import 'package:get/get.dart';
+import 'controllers/auth_controller.dart';
+import 'controllers/vehicle_controller.dart';
+import 'controllers/navigation_controller.dart';
+import 'controllers/favorites_controller.dart';
+import 'controllers/theme_controller.dart';
+import 'screens/welcome_screen.dart';
+
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
-  // Remove direct SystemChrome.setSystemUIOverlayStyle call
 
   try {
     await Firebase.initializeApp(
@@ -23,10 +29,16 @@ void main() async {
     await OneSignalService().initialize();
     print("OneSignal initialized successfully");
 
+    // Initialize GetX controllers
+    Get.put(AuthController());
+    Get.put(VehicleController());
+    Get.put(NavigationController());
+    Get.put(FavoritesController());
+    Get.put(ThemeController());
+
     runApp(const MyApp());
   } catch (e) {
     print('Error during initialization: $e');
-    // Run app even if services fail to initialize
     runApp(const MyApp());
   }
 }
@@ -39,62 +51,50 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+  late ThemeController themeController;
+
   @override
   void initState() {
     super.initState();
-
-    // Remove or comment out the dynamic links initialization
+    themeController = Get.find<ThemeController>();
   }
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Wayz.lk',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        primaryColor: Colors.black,
-        colorScheme: ColorScheme.fromSwatch().copyWith(
-          primary: Colors.black,
-          secondary: const Color(0xFFFFC107),
-        ),
-        appBarTheme: const AppBarTheme(
-          backgroundColor: Colors.black,
-          foregroundColor: Colors.white,
-          iconTheme: IconThemeData(color: Colors.white),
-          titleTextStyle: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-            fontSize: 18,
-          ),
-        ),
-        elevatedButtonTheme: ElevatedButtonThemeData(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: const Color(0xFFFFC107),
-            foregroundColor: Colors.black,
-            textStyle: const TextStyle(fontWeight: FontWeight.bold),
-          ),
-        ),
-      ),
-      initialRoute: '/',
-      routes: {
-        '/': (context) => const SplashScreen(),
-        '/auth': (context) => const AuthWrapper(),
-        '/favorites': (context) => const FavoritesScreen(),
-        '/vehicle-detail': (context) {
-          final args = ModalRoute.of(context)!.settings.arguments
-              as Map<String, dynamic>?;
-          return VehicleDetailPage(vehicle: args ?? {});
-        },
-        '/notifications': (context) =>
-            const NotificationsScreen(), // Add the new route
-      },
-      builder: (context, child) {
-        return AnnotatedRegion<SystemUiOverlayStyle>(
-          value: const SystemUiOverlayStyle(
-            statusBarColor: Color(0xFFFFC107), // Yellow
-            statusBarIconBrightness: Brightness.dark,
-          ),
-          child: child!,
+    return GetBuilder<ThemeController>(
+      builder: (controller) {
+        return GetMaterialApp(
+          title: 'Wayz.lk',
+          debugShowCheckedModeBanner: false,
+          theme: controller.lightTheme,
+          darkTheme: controller.darkTheme,
+          themeMode: controller.themeMode,
+          initialRoute: '/',
+          getPages: [
+            GetPage(name: '/', page: () => const SplashScreen()),
+            GetPage(name: '/welcome', page: () => const WelcomeScreen()),
+            GetPage(name: '/auth', page: () => const AuthWrapper()),
+            GetPage(name: '/favorites', page: () => const FavoritesScreen()),
+            GetPage(
+                name: '/vehicle-detail',
+                page: () {
+                  final args = Get.arguments as Map<String, dynamic>?;
+                  return VehicleDetailPage(vehicle: args ?? {});
+                }),
+            GetPage(
+                name: '/notifications',
+                page: () => const NotificationsScreen()),
+            
+          ],
+          builder: (context, child) {
+            return AnnotatedRegion<SystemUiOverlayStyle>(
+              value: const SystemUiOverlayStyle(
+                statusBarColor: Color(0xFFFFC107),
+                statusBarIconBrightness: Brightness.dark,
+              ),
+              child: child!,
+            );
+          },
         );
       },
     );
