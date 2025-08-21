@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:tourism_vehicle_rental_app/screens/owner/owner_vehicle_form.dart';
-import 'package:tourism_vehicle_rental_app/screens/owner/non_owner_vehicle_form.dart';
+import 'package:wayz/screens/owner/owner_vehicle_form.dart';
+import 'package:wayz/screens/owner/non_owner_vehicle_form.dart';
 
 class AddVehicleScreen extends StatefulWidget {
   const AddVehicleScreen({super.key});
@@ -65,9 +65,11 @@ class _AddVehicleScreenState extends State<AddVehicleScreen>
             opacity: _fadeAnimation,
             child: Padding(
               padding: const EdgeInsets.all(24.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
+              child: SingleChildScrollView(
+                physics: const ClampingScrollPhysics(),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
                   // Header with illustration
                   Center(
                     child: Container(
@@ -159,9 +161,9 @@ class _AddVehicleScreenState extends State<AddVehicleScreen>
                       ),
                     ],
                   ),
-
-                  const Spacer(),
-
+                  
+                  const SizedBox(height: 40),
+                  
                   // Selection summary
                   if (_isRegisteredOwner != null)
                     Container(
@@ -200,6 +202,8 @@ class _AddVehicleScreenState extends State<AddVehicleScreen>
                                     : Colors.orange.shade800,
                                 fontSize: 14,
                               ),
+                              softWrap: true,
+                              overflow: TextOverflow.visible,
                             ),
                           ),
                         ],
@@ -209,13 +213,15 @@ class _AddVehicleScreenState extends State<AddVehicleScreen>
                   const SizedBox(height: 24),
 
                   // Continue button
-                  SizedBox(
-                    width: double.infinity,
-                    height: 55,
-                    child: ElevatedButton(
-                      onPressed: _isRegisteredOwner == null
-                          ? null
-                          : () {
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 20),
+                    child: SizedBox(
+                      width: double.infinity,
+                      height: 55,
+                      child: ElevatedButton(
+                        onPressed: _isRegisteredOwner == null
+                            ? null
+                            : () {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
@@ -244,8 +250,10 @@ class _AddVehicleScreenState extends State<AddVehicleScreen>
                       ),
                     ),
                   ),
+                  ),
                 ],
               ),
+            ),
             ),
           ),
         ),

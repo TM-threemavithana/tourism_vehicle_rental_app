@@ -1,23 +1,32 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'firebase_options.dart';
 import 'services/onesignal_service.dart';
 import 'screens/splash_screen.dart';
 import 'screens/auth/auth_wrapper.dart';
 import 'screens/favorites_screen.dart';
-import 'screens/vehicle_detail_page.dart'; // Add this import
-import 'screens/notifications_screen.dart'; // Import the new screen
+import 'screens/vehicle_detail_page.dart';
+import 'screens/notifications_screen.dart';
 import 'package:flutter/services.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Remove direct SystemChrome.setSystemUIOverlayStyle call
-
   try {
+    // Initialize Firebase first with detailed error logging
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
+    print("Firebase initialized successfully");
+    
+    // Test Firestore connection
+    try {
+      await FirebaseFirestore.instance.collection('test').doc('test').get();
+      print("Firestore connection verified");
+    } catch (firestoreError) {
+      print('Firestore connection error: $firestoreError');
+    }
 
     // Initialize OneSignal
     await OneSignalService().initialize();
@@ -25,7 +34,7 @@ void main() async {
 
     runApp(const MyApp());
   } catch (e) {
-    print('Error during initialization: $e');
+    print('Error during Firebase initialization: $e');
     // Run app even if services fail to initialize
     runApp(const MyApp());
   }

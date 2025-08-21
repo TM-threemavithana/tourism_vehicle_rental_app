@@ -79,7 +79,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
           ),
           SafeArea(
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               child: Column(
                 children: [
                   // Side menu button and centered title in a row
@@ -107,9 +107,10 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                           width: 48), // Spacer to balance the IconButton width
                     ],
                   ),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 12),
                   // First feature card - takes up available space
                   Expanded(
+                    flex: 1,
                     child: _FeatureCard(
                       image: 'assets/images/browse_vehicle.png',
                       title: 'Browse Vehicles',
@@ -121,9 +122,10 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                       isLoading: _isLoading,
                     ),
                   ),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 12),
                   // Second feature card - takes up remaining space
                   Expanded(
+                    flex: 1,
                     child: _FeatureCard(
                       image: 'assets/images/request_vehicle.png',
                       title: 'Request a Vehicle',
@@ -208,7 +210,7 @@ class _FeatureCard extends StatelessWidget {
           ClipRRect(
             borderRadius: const BorderRadius.vertical(top: Radius.circular(18)),
             child: AspectRatio(
-              aspectRatio: 2.2,
+              aspectRatio: 2.5, // Increased aspect ratio for a shorter image
               child: Image.asset(
                 image,
                 fit: BoxFit.cover,
@@ -222,26 +224,28 @@ class _FeatureCard extends StatelessWidget {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.all(16.0),
+            padding: const EdgeInsets.fromLTRB(16.0, 12.0, 16.0, 12.0), // Reduced padding
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   title,
                   style: const TextStyle(
-                    fontSize: 17,
+                    fontSize: 16, // Slightly smaller font
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                const SizedBox(height: 6),
+                const SizedBox(height: 4), // Reduced spacing
                 Text(
                   description,
                   style: TextStyle(
-                    fontSize: 13.5,
+                    fontSize: 13, // Slightly smaller font
                     color: Colors.grey[700],
                   ),
+                  maxLines: 2, // Limit to 2 lines
+                  overflow: TextOverflow.ellipsis,
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 8), // Reduced spacing
                 Align(
                   alignment: Alignment.centerRight,
                   child: ElevatedButton(

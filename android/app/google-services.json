@@ -1,41 +1,33 @@
 {
   "project_info": {
-    "project_number": "112419920911",
-    "project_id": "vehicle-rental-app-aba3c",
-    "storage_bucket": "vehicle-rental-app-aba3c.firebasestorage.app"
+    "project_number": "921265432897",
+    "project_id": "wayz-e430e",
+    "storage_bucket": "wayz-e430e.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:112419920911:android:3db434901fc1dc6f51577a",
+        "mobilesdk_app_id": "1:921265432897:android:164eef49bbc692778759c0",
         "android_client_info": {
-          "package_name": "com.example.tourism_vehicle_rental_app"
+          "package_name": "com.wayzlk.wayz"
         }
       },
       "oauth_client": [
         {
-          "client_id": "112419920911-m9008fd172lr5knjk75bsj0s4vv88rpp.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.example.tourism_vehicle_rental_app",
-            "certificate_hash": "17608a855618414f30ca0152e017a7b7cbc99e25"
-          }
-        },
-        {
-          "client_id": "112419920911-6ih1i7ad9u96joop31a95723gpt4mhdg.apps.googleusercontent.com",
+          "client_id": "921265432897-ifmr0kaut4fbdnuimokro90i76nfbv4l.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyB8zdbH32dE_6CVEEb7HACuWFyLkZqwiP0"
+          "current_key": "AIzaSyDM0Ltd6pXEQOGypvr4-_1Oha5Ce37lQZ8"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "112419920911-6ih1i7ad9u96joop31a95723gpt4mhdg.apps.googleusercontent.com",
+              "client_id": "921265432897-ifmr0kaut4fbdnuimokro90i76nfbv4l.apps.googleusercontent.com",
               "client_type": 3
             }
           ]

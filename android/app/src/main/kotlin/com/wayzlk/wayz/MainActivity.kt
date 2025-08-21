@@ -1,4 +1,4 @@
-package com.example.tourism_vehicle_rental_app
+package com.wayzlk.wayz
 
 import io.flutter.embedding.android.FlutterActivity
 
