@@ -544,26 +544,36 @@ class _ProfileScreenState extends State<ProfileScreen>
               ),
             ),
           ),
-          // Switch mode button (only show for renters)
-          if (userType == 'renter')
-            IconButton(
-              icon: _isLoading
-                  ? const SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        color: Colors.white,
-                      ),
-                    )
-                  : const Icon(Icons.swap_horiz, color: Colors.white),
-              onPressed: _isLoading ? null : _switchUserType,
-              tooltip: 'Switch to Owner Mode',
-          ),
+          // Switch mode button (show for both renters and owners)
           IconButton(
-            icon: const Icon(Icons.arrow_back_ios),
-            onPressed: () => Navigator.of(context).pop(),
+            icon: _isLoading
+                ? const SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: Colors.white,
+                    ),
+                  )
+                : const Icon(Icons.swap_horiz, color: Colors.white),
+            onPressed: _isLoading ? null : _switchUserType,
+            tooltip: userType == 'renter'
+                ? 'Switch to Owner Mode'
+                : 'Switch to Renter Mode',
           ),
+          // Go to Dashboard button (only show for owners)
+          if (userType == 'owner')
+            IconButton(
+              icon: const Icon(Icons.dashboard, color: Colors.white),
+              onPressed: () {
+                Navigator.of(context).pushReplacement(
+                  MaterialPageRoute(
+                    builder: (context) => const OwnerDashboardScreen(),
+                  ),
+                );
+              },
+              tooltip: 'Go to Owner Dashboard',
+            ),
         ],
       ),
       body: Stack(
