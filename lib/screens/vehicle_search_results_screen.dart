@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../utils/app_colors.dart';
+import '../utils/responsive_helper.dart';
 import 'vehicle_detail_page.dart';
 import '../helpers/car_logo_helper.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -192,41 +193,56 @@ class _VehicleSearchResultsScreenState
       appBar: AppBar(
         backgroundColor: const Color(0xFFFFC107),
         elevation: 0,
-        toolbarHeight: 44, // Reduced AppBar height
+        toolbarHeight: ResponsiveHelper.getResponsiveIconSize(context,
+            mobile: 44, tablet: 56, desktop: 64),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          icon: Icon(
+            Icons.arrow_back,
+            color: Colors.black,
+            size: ResponsiveHelper.getResponsiveIconSize(context,
+                mobile: 24, tablet: 28, desktop: 32),
+          ),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
           _buildSearchTitle(),
-          style: const TextStyle(
+          style: TextStyle(
             color: Colors.black,
             fontWeight: FontWeight.bold,
-            fontSize: 18,
+            fontSize: ResponsiveHelper.getResponsiveFontSize(context,
+                mobile: 18, tablet: 22, desktop: 26),
           ),
         ),
         automaticallyImplyLeading: false,
         actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 12.0),
+          // Compact Filter Button
+          Container(
+            margin: const EdgeInsets.only(right: 16),
             child: ElevatedButton.icon(
               onPressed: _showMergedFilterDrawer,
-              icon: const Icon(Icons.filter_alt,
-                  color: Color(0xFFFFC107), size: 20),
+              icon: Icon(
+                Icons.filter_alt,
+                color: const Color(0xFFFFC107),
+                size: 20,
+              ),
               label: const Text(
                 'Filter',
                 style: TextStyle(
                   color: Color(0xFFFFC107),
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
                 ),
               ),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.black,
-                shape: const StadiumBorder(),
-                elevation: 2,
+                foregroundColor: const Color(0xFFFFC107),
+                elevation: 3,
                 padding:
                     const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                minimumSize: const Size(80, 36),
               ),
             ),
           ),
@@ -418,8 +434,12 @@ class _VehicleSearchResultsScreenState
         .where((e) => e.isNotEmpty)
         .join(', ');
 
+    final isTablet = ResponsiveHelper.isTablet(context);
+    final isLargeTablet = ResponsiveHelper.isLargeTablet(context);
+
     return InkWell(
-      borderRadius: BorderRadius.circular(18),
+      borderRadius: BorderRadius.circular(
+          ResponsiveHelper.getResponsiveBorderRadius(context)),
       onTap: () {
         Navigator.push(
           context,
@@ -430,13 +450,19 @@ class _VehicleSearchResultsScreenState
       },
       child: Card(
         elevation: 5,
-        margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 0),
+        margin: EdgeInsets.symmetric(
+          vertical: ResponsiveHelper.getResponsiveSpacing(context,
+              mobile: 10, tablet: 12, desktop: 16),
+          horizontal: 0,
+        ),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(18),
+          borderRadius: BorderRadius.circular(
+              ResponsiveHelper.getResponsiveBorderRadius(context)),
         ),
         color: isDarkMode ? AppColors.neutralDark : Colors.white,
         child: Padding(
-          padding: const EdgeInsets.all(10),
+          padding: ResponsiveHelper.getResponsivePadding(context,
+              mobile: 10, tablet: 16, desktop: 20),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -444,35 +470,83 @@ class _VehicleSearchResultsScreenState
               Stack(
                 children: [
                   ClipRRect(
-                    borderRadius: BorderRadius.circular(14),
+                    borderRadius: BorderRadius.circular(
+                        ResponsiveHelper.getResponsiveBorderRadius(context,
+                            mobile: 14, tablet: 18, desktop: 22)),
                     child: imageUrl != null
                         ? CachedNetworkImage(
                             imageUrl: imageUrl,
-                            width: 140,
-                            height: 150,
+                            width: ResponsiveHelper.getResponsiveImageSize(
+                                context,
+                                mobile: 140,
+                                tablet: 180,
+                                desktop: 220),
+                            height: ResponsiveHelper.getResponsiveImageSize(
+                                context,
+                                mobile: 150,
+                                tablet: 200,
+                                desktop: 250),
                             fit: BoxFit.cover,
                             placeholder: (context, url) => Container(
-                              width: 140,
-                              height: 150,
+                              width: ResponsiveHelper.getResponsiveImageSize(
+                                  context,
+                                  mobile: 140,
+                                  tablet: 180,
+                                  desktop: 220),
+                              height: ResponsiveHelper.getResponsiveImageSize(
+                                  context,
+                                  mobile: 150,
+                                  tablet: 200,
+                                  desktop: 250),
                               color: Colors.grey[300],
-                              child: const Center(
+                              child: Center(
                                   child: CircularProgressIndicator(
                                       strokeWidth: 2)),
                             ),
                             errorWidget: (context, url, error) => Container(
-                              width: 140,
-                              height: 150,
+                              width: ResponsiveHelper.getResponsiveImageSize(
+                                  context,
+                                  mobile: 140,
+                                  tablet: 180,
+                                  desktop: 220),
+                              height: ResponsiveHelper.getResponsiveImageSize(
+                                  context,
+                                  mobile: 150,
+                                  tablet: 200,
+                                  desktop: 250),
                               color: Colors.grey[200],
-                              child: const Icon(Icons.car_rental,
-                                  size: 40, color: Colors.grey),
+                              child: Icon(
+                                Icons.car_rental,
+                                size: ResponsiveHelper.getResponsiveIconSize(
+                                    context,
+                                    mobile: 40,
+                                    tablet: 56,
+                                    desktop: 72),
+                                color: Colors.grey,
+                              ),
                             ),
                           )
                         : Container(
-                            width: 140,
-                            height: 150,
+                            width: ResponsiveHelper.getResponsiveImageSize(
+                                context,
+                                mobile: 140,
+                                tablet: 180,
+                                desktop: 220),
+                            height: ResponsiveHelper.getResponsiveImageSize(
+                                context,
+                                mobile: 150,
+                                tablet: 200,
+                                desktop: 250),
                             color: Colors.grey[200],
-                            child: const Icon(Icons.car_rental,
-                                size: 40, color: Colors.grey),
+                            child: Icon(
+                              Icons.car_rental,
+                              size: ResponsiveHelper.getResponsiveIconSize(
+                                  context,
+                                  mobile: 40,
+                                  tablet: 56,
+                                  desktop: 72),
+                              color: Colors.grey,
+                            ),
                           ),
                   ),
                   if ((price ?? '').isNotEmpty)
@@ -481,27 +555,31 @@ class _VehicleSearchResultsScreenState
                       right: 0,
                       bottom: 0,
                       child: Container(
-                        margin: const EdgeInsets.symmetric(
-                            horizontal: 8, vertical: 8),
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 12, vertical: 6),
+                        margin: ResponsiveHelper.getResponsivePadding(context,
+                            mobile: 8, tablet: 12, desktop: 16),
+                        padding: ResponsiveHelper.getResponsivePadding(context,
+                            mobile: 12, tablet: 16, desktop: 20),
                         decoration: BoxDecoration(
                           color: Color(0xFFFFC107).withOpacity(0.92),
-                          borderRadius: BorderRadius.circular(8),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.08),
-                              blurRadius: 4,
-                              offset: const Offset(0, 2),
-                            ),
-                          ],
+                          borderRadius: BorderRadius.circular(
+                              ResponsiveHelper.getResponsiveBorderRadius(
+                                  context,
+                                  mobile: 8,
+                                  tablet: 12,
+                                  desktop: 16)),
+                          boxShadow:
+                              ResponsiveHelper.getResponsiveShadow(context),
                         ),
                         child: Text(
                           'Rs. ${price ?? ''} / Day',
-                          style: const TextStyle(
+                          style: TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.bold,
-                            fontSize: 13,
+                            fontSize: ResponsiveHelper.getResponsiveFontSize(
+                                context,
+                                mobile: 13,
+                                tablet: 15,
+                                desktop: 17),
                           ),
                           textAlign: TextAlign.center,
                           maxLines: 1,
@@ -511,7 +589,9 @@ class _VehicleSearchResultsScreenState
                     ),
                 ],
               ),
-              const SizedBox(width: 16),
+              SizedBox(
+                  width: ResponsiveHelper.getResponsiveSpacing(context,
+                      mobile: 16, tablet: 20, desktop: 24)),
               // Info and actions
               Expanded(
                 child: Column(
@@ -523,21 +603,35 @@ class _VehicleSearchResultsScreenState
                       children: [
                         // Brand logo to the left of make/model
                         Container(
-                          margin: const EdgeInsets.only(right: 8),
-                          width: 32,
-                          height: 32,
+                          margin: EdgeInsets.only(
+                              right: ResponsiveHelper.getResponsiveSpacing(
+                                  context,
+                                  mobile: 8,
+                                  tablet: 12,
+                                  desktop: 16)),
+                          width: ResponsiveHelper.getResponsiveIconSize(context,
+                              mobile: 32, tablet: 40, desktop: 48),
+                          height: ResponsiveHelper.getResponsiveIconSize(
+                              context,
+                              mobile: 32,
+                              tablet: 40,
+                              desktop: 48),
                           decoration: BoxDecoration(
                             color: Colors.white,
-                            borderRadius: BorderRadius.circular(20),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.08),
-                                blurRadius: 4,
-                                offset: const Offset(0, 2),
-                              ),
-                            ],
+                            borderRadius: BorderRadius.circular(
+                                ResponsiveHelper.getResponsiveBorderRadius(
+                                    context,
+                                    mobile: 20,
+                                    tablet: 25,
+                                    desktop: 30)),
+                            boxShadow:
+                                ResponsiveHelper.getResponsiveShadow(context),
                           ),
-                          padding: const EdgeInsets.all(4),
+                          padding: ResponsiveHelper.getResponsivePadding(
+                              context,
+                              mobile: 4,
+                              tablet: 6,
+                              desktop: 8),
                           child: CarLogoHelper.getCarLogo(make),
                         ),
                         Expanded(
@@ -547,7 +641,12 @@ class _VehicleSearchResultsScreenState
                               Text(
                                 '$make $model',
                                 style: TextStyle(
-                                  fontSize: 18,
+                                  fontSize:
+                                      ResponsiveHelper.getResponsiveFontSize(
+                                          context,
+                                          mobile: 18,
+                                          tablet: 22,
+                                          desktop: 26),
                                   fontWeight: FontWeight.bold,
                                   color: isDarkMode
                                       ? Colors.white
@@ -556,14 +655,23 @@ class _VehicleSearchResultsScreenState
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                               ),
-                              const SizedBox(height: 2),
+                              SizedBox(
+                                  height: ResponsiveHelper.getResponsiveSpacing(
+                                      context,
+                                      mobile: 2,
+                                      tablet: 4,
+                                      desktop: 6)),
                               Row(
                                 children: [
                                   if (year != null && year.isNotEmpty)
                                     Text(
                                       year,
                                       style: TextStyle(
-                                        fontSize: 13,
+                                        fontSize: ResponsiveHelper
+                                            .getResponsiveFontSize(context,
+                                                mobile: 13,
+                                                tablet: 15,
+                                                desktop: 17),
                                         color: isDarkMode
                                             ? Colors.grey[400]
                                             : AppColors.neutralMedium,
@@ -572,19 +680,38 @@ class _VehicleSearchResultsScreenState
                                   if (category != null &&
                                       category.isNotEmpty) ...[
                                     if (year != null && year.isNotEmpty)
-                                      const SizedBox(width: 8),
+                                      SizedBox(
+                                          width: ResponsiveHelper
+                                              .getResponsiveSpacing(context,
+                                                  mobile: 8,
+                                                  tablet: 12,
+                                                  desktop: 16)),
                                     Container(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 8, vertical: 2),
+                                      padding:
+                                          ResponsiveHelper.getResponsivePadding(
+                                              context,
+                                              mobile: 8,
+                                              tablet: 12,
+                                              desktop: 16),
                                       decoration: BoxDecoration(
                                         color:
                                             AppColors.skyBlue.withOpacity(0.15),
-                                        borderRadius: BorderRadius.circular(8),
+                                        borderRadius: BorderRadius.circular(
+                                            ResponsiveHelper
+                                                .getResponsiveBorderRadius(
+                                                    context,
+                                                    mobile: 8,
+                                                    tablet: 12,
+                                                    desktop: 16)),
                                       ),
                                       child: Text(
                                         category,
                                         style: TextStyle(
-                                          fontSize: 12,
+                                          fontSize: ResponsiveHelper
+                                              .getResponsiveFontSize(context,
+                                                  mobile: 12,
+                                                  tablet: 14,
+                                                  desktop: 16),
                                           color: AppColors.primary,
                                           fontWeight: FontWeight.w500,
                                         ),
@@ -781,9 +908,33 @@ class _VehicleSearchResultsScreenState
 
   Widget _buildResultsListView() {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final isTablet = ResponsiveHelper.isTablet(context);
+    final isLargeTablet = ResponsiveHelper.isLargeTablet(context);
 
+    // Use grid layout for tablets and iPads
+    if (isTablet || isLargeTablet) {
+      return GridView.builder(
+        padding: ResponsiveHelper.getResponsivePadding(context),
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: ResponsiveHelper.getResponsiveGridColumns(context,
+              mobile: 1, tablet: 2, desktop: 3),
+          childAspectRatio: ResponsiveHelper.getResponsiveAspectRatio(context,
+              mobile: 1.2, tablet: 1.4, desktop: 1.6),
+          crossAxisSpacing: ResponsiveHelper.getResponsiveSpacing(context,
+              mobile: 16, tablet: 20, desktop: 24),
+          mainAxisSpacing: ResponsiveHelper.getResponsiveSpacing(context,
+              mobile: 16, tablet: 20, desktop: 24),
+        ),
+        itemCount: _searchResults.length,
+        itemBuilder: (context, index) {
+          return _buildVehicleCard(context, _searchResults[index], isDarkMode);
+        },
+      );
+    }
+
+    // Use list layout for mobile
     return ListView.builder(
-      padding: const EdgeInsets.all(16),
+      padding: ResponsiveHelper.getResponsivePadding(context),
       itemCount: _searchResults.length,
       itemBuilder: (context, index) {
         return _buildVehicleCard(context, _searchResults[index], isDarkMode);

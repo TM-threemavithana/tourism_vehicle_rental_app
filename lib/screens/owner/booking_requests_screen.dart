@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:intl/intl.dart';
 import '../../utils/app_colors.dart';
+import '../../utils/responsive_helper.dart';
 import '../../services/onesignal_service.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
@@ -16,15 +17,33 @@ class BookingRequestsScreen extends StatelessWidget {
 
     if (currentUser == null) {
       return Scaffold(
-        appBar: AppBar(title: const Text('Booking Requests')),
-        body:
-            const Center(child: Text('Please log in to view booking requests')),
+        appBar: AppBar(
+          title: Text(
+            'Booking Requests',
+            style: TextStyle(
+              fontSize: ResponsiveHelper.getResponsiveFontSize(context, mobile: 18, tablet: 20, desktop: 22),
+            ),
+          ),
+        ),
+        body: Center(
+          child: Text(
+            'Please log in to view booking requests',
+            style: TextStyle(
+              fontSize: ResponsiveHelper.getResponsiveFontSize(context, mobile: 16, tablet: 18, desktop: 20),
+            ),
+          ),
+        ),
       );
     }
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Booking Requests'),
+        title: Text(
+          'Booking Requests',
+          style: TextStyle(
+            fontSize: ResponsiveHelper.getResponsiveFontSize(context, mobile: 18, tablet: 20, desktop: 22),
+          ),
+        ),
         backgroundColor: AppColors.primary,
         foregroundColor: Colors.white,
       ),
@@ -36,12 +55,21 @@ class BookingRequestsScreen extends StatelessWidget {
             .snapshots(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
+            return Center(
+              child: CircularProgressIndicator(
+                strokeWidth: ResponsiveHelper.getResponsiveSpacing(context, mobile: 3, tablet: 4, desktop: 5),
+              ),
+            );
           }
 
           if (snapshot.hasError) {
             return Center(
-              child: Text('Error: ${snapshot.error}'),
+              child: Text(
+                'Error: ${snapshot.error}',
+                style: TextStyle(
+                  fontSize: ResponsiveHelper.getResponsiveFontSize(context, mobile: 16, tablet: 18, desktop: 20),
+                ),
+              ),
             );
           }
 
@@ -52,27 +80,28 @@ class BookingRequestsScreen extends StatelessWidget {
                 children: [
                   Icon(
                     Icons.inbox_outlined,
-                    size: 80,
+                    size: ResponsiveHelper.getResponsiveIconSize(context, mobile: 80, tablet: 100, desktop: 120),
                     color: isDarkMode
                         ? Colors.grey.shade700
                         : Colors.grey.shade400,
                   ),
-                  const SizedBox(height: 16),
+                  SizedBox(height: ResponsiveHelper.getResponsiveSpacing(context, mobile: 16, tablet: 20, desktop: 24)),
                   Text(
                     'No booking requests yet',
                     style: TextStyle(
-                      fontSize: 18,
+                      fontSize: ResponsiveHelper.getResponsiveFontSize(context, mobile: 18, tablet: 20, desktop: 22),
                       fontWeight: FontWeight.bold,
                       color: isDarkMode
                           ? Colors.grey.shade400
                           : Colors.grey.shade700,
                     ),
                   ),
-                  const SizedBox(height: 8),
+                  SizedBox(height: ResponsiveHelper.getResponsiveSpacing(context, mobile: 8, tablet: 12, desktop: 16)),
                   Text(
                     'When users request to book your vehicles, they\'ll appear here.',
                     textAlign: TextAlign.center,
                     style: TextStyle(
+                      fontSize: ResponsiveHelper.getResponsiveFontSize(context, mobile: 14, tablet: 16, desktop: 18),
                       color: isDarkMode
                           ? Colors.grey.shade500
                           : Colors.grey.shade600,
@@ -85,7 +114,7 @@ class BookingRequestsScreen extends StatelessWidget {
 
           return ListView.builder(
             itemCount: snapshot.data!.docs.length,
-            padding: const EdgeInsets.all(16),
+            padding: ResponsiveHelper.getResponsivePadding(context, mobile: 16, tablet: 20, desktop: 24),
             itemBuilder: (context, index) {
               final doc = snapshot.data!.docs[index];
               final data = doc.data() as Map<String, dynamic>;
@@ -138,10 +167,10 @@ class BookingRequestsScreen extends StatelessWidget {
     }
 
     return Card(
-      elevation: 2,
-      margin: const EdgeInsets.only(bottom: 16),
+      elevation: ResponsiveHelper.isTablet(context) ? 4 : 2,
+      margin: EdgeInsets.only(bottom: ResponsiveHelper.getResponsiveSpacing(context, mobile: 16, tablet: 20, desktop: 24)),
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(ResponsiveHelper.getResponsiveBorderRadius(context, mobile: 12, tablet: 14, desktop: 16)),
         side: BorderSide(color: cardBorderColor, width: 1.5),
       ),
       child: Column(
@@ -149,42 +178,47 @@ class BookingRequestsScreen extends StatelessWidget {
         children: [
           // Header with vehicle info and status
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            padding: ResponsiveHelper.getResponsivePadding(context, mobile: 12, tablet: 16, desktop: 20),
             decoration: BoxDecoration(
               color: isDarkMode ? Colors.grey.shade800 : Colors.grey.shade50,
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(12),
-                topRight: Radius.circular(12),
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(ResponsiveHelper.getResponsiveBorderRadius(context, mobile: 12, tablet: 14, desktop: 16)),
+                topRight: Radius.circular(ResponsiveHelper.getResponsiveBorderRadius(context, mobile: 12, tablet: 14, desktop: 16)),
               ),
             ),
             child: Row(
               children: [
                 // Vehicle image
                 ClipRRect(
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(ResponsiveHelper.getResponsiveBorderRadius(context, mobile: 8, tablet: 10, desktop: 12)),
                   child: CachedNetworkImage(
                     imageUrl: vehicleInfo['primaryImage'] ??
                         'https://via.placeholder.com/60?text=No+Image',
-                    width: 60,
-                    height: 60,
+                    width: ResponsiveHelper.getResponsiveImageSize(context, mobile: 60, tablet: 70, desktop: 80),
+                    height: ResponsiveHelper.getResponsiveImageSize(context, mobile: 60, tablet: 70, desktop: 80),
                     fit: BoxFit.cover,
                     placeholder: (context, url) => Container(
-                      width: 60,
-                      height: 60,
+                      width: ResponsiveHelper.getResponsiveImageSize(context, mobile: 60, tablet: 70, desktop: 80),
+                      height: ResponsiveHelper.getResponsiveImageSize(context, mobile: 60, tablet: 70, desktop: 80),
                       color: Colors.grey.shade300,
-                      child: const Center(
-                          child: CircularProgressIndicator(strokeWidth: 2)),
+                      child: Center(
+                          child: CircularProgressIndicator(
+                            strokeWidth: ResponsiveHelper.getResponsiveSpacing(context, mobile: 2, tablet: 3, desktop: 4),
+                          )),
                     ),
                     errorWidget: (context, url, error) => Container(
-                      width: 60,
-                      height: 60,
+                      width: ResponsiveHelper.getResponsiveImageSize(context, mobile: 60, tablet: 70, desktop: 80),
+                      height: ResponsiveHelper.getResponsiveImageSize(context, mobile: 60, tablet: 70, desktop: 80),
                       color: Colors.grey.shade300,
-                      child:
-                          const Icon(Icons.directions_car, color: Colors.grey),
+                      child: Icon(
+                        Icons.directions_car, 
+                        color: Colors.grey,
+                        size: ResponsiveHelper.getResponsiveIconSize(context, mobile: 24, tablet: 28, desktop: 32),
+                      ),
                     ),
                   ),
                 ),
-                const SizedBox(width: 12),
+                SizedBox(width: ResponsiveHelper.getResponsiveSpacing(context, mobile: 12, tablet: 14, desktop: 16)),
 
                 // Vehicle details
                 Expanded(
@@ -193,14 +227,15 @@ class BookingRequestsScreen extends StatelessWidget {
                     children: [
                       Text(
                         '${vehicleInfo['make']} ${vehicleInfo['model']} (${vehicleInfo['year']})',
-                        style: const TextStyle(
-                          fontSize: 16,
+                        style: TextStyle(
+                          fontSize: ResponsiveHelper.getResponsiveFontSize(context, mobile: 16, tablet: 18, desktop: 20),
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                       Text(
                         vehicleInfo['vehicleNo'],
                         style: TextStyle(
+                          fontSize: ResponsiveHelper.getResponsiveFontSize(context, mobile: 14, tablet: 15, desktop: 16),
                           color: isDarkMode
                               ? Colors.grey.shade400
                               : Colors.grey.shade700,
@@ -212,11 +247,13 @@ class BookingRequestsScreen extends StatelessWidget {
 
                 // Status chip
                 Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  padding: EdgeInsets.symmetric(
+                    horizontal: ResponsiveHelper.getResponsiveSpacing(context, mobile: 10, tablet: 12, desktop: 14),
+                    vertical: ResponsiveHelper.getResponsiveSpacing(context, mobile: 4, tablet: 6, desktop: 8),
+                  ),
                   decoration: BoxDecoration(
                     color: statusColor.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(ResponsiveHelper.getResponsiveBorderRadius(context, mobile: 12, tablet: 14, desktop: 16)),
                     border: Border.all(color: statusColor),
                   ),
                   child: Text(
@@ -224,7 +261,7 @@ class BookingRequestsScreen extends StatelessWidget {
                     style: TextStyle(
                       color: statusColor,
                       fontWeight: FontWeight.bold,
-                      fontSize: 12,
+                      fontSize: ResponsiveHelper.getResponsiveFontSize(context, mobile: 12, tablet: 13, desktop: 14),
                     ),
                   ),
                 ),
@@ -234,39 +271,42 @@ class BookingRequestsScreen extends StatelessWidget {
 
           // Request details
           Padding(
-            padding: const EdgeInsets.all(16),
+            padding: ResponsiveHelper.getResponsivePadding(context, mobile: 16, tablet: 20, desktop: 24),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Requester info
                 Row(
                   children: [
-                    const Icon(Icons.person, size: 18),
-                    const SizedBox(width: 8),
+                    Icon(
+                      Icons.person, 
+                      size: ResponsiveHelper.getResponsiveIconSize(context, mobile: 18, tablet: 20, desktop: 22),
+                    ),
+                    SizedBox(width: ResponsiveHelper.getResponsiveSpacing(context, mobile: 8, tablet: 10, desktop: 12)),
                     Text(
                       'Request from $userName',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontWeight: FontWeight.w500,
-                        fontSize: 15,
+                        fontSize: ResponsiveHelper.getResponsiveFontSize(context, mobile: 15, tablet: 16, desktop: 17),
                       ),
                     ),
                   ],
                 ),
 
-                const SizedBox(height: 16),
+                SizedBox(height: ResponsiveHelper.getResponsiveSpacing(context, mobile: 16, tablet: 20, desktop: 24)),
 
                 // Trip details
                 Text(
                   'Trip Details',
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
-                    fontSize: 15,
+                    fontSize: ResponsiveHelper.getResponsiveFontSize(context, mobile: 15, tablet: 16, desktop: 17),
                     color: isDarkMode
                         ? Colors.grey.shade300
                         : Colors.grey.shade800,
                   ),
                 ),
-                const SizedBox(height: 8),
+                SizedBox(height: ResponsiveHelper.getResponsiveSpacing(context, mobile: 8, tablet: 10, desktop: 12)),
 
                 // Rental period
                 _buildDetailRow(
@@ -306,11 +346,11 @@ class BookingRequestsScreen extends StatelessWidget {
                 // Request date
                 if (data['createdAt'] != null)
                   Padding(
-                    padding: const EdgeInsets.only(top: 16),
+                    padding: EdgeInsets.only(top: ResponsiveHelper.getResponsiveSpacing(context, mobile: 16, tablet: 20, desktop: 24)),
                     child: Text(
                       'Requested on ${DateFormat('MMM dd, yyyy \'at\' h:mm a').format((data['createdAt'] as Timestamp).toDate())}',
                       style: TextStyle(
-                        fontSize: 12,
+                        fontSize: ResponsiveHelper.getResponsiveFontSize(context, mobile: 12, tablet: 13, desktop: 14),
                         fontStyle: FontStyle.italic,
                         color: isDarkMode
                             ? Colors.grey.shade400
@@ -321,9 +361,9 @@ class BookingRequestsScreen extends StatelessWidget {
 
                 // Response options for pending requests
                 if (isPending) ...[
-                  const SizedBox(height: 24),
-                  const Divider(),
-                  const SizedBox(height: 16),
+                  SizedBox(height: ResponsiveHelper.getResponsiveSpacing(context, mobile: 24, tablet: 28, desktop: 32)),
+                  Divider(height: ResponsiveHelper.getResponsiveSpacing(context, mobile: 16, tablet: 20, desktop: 24)),
+                  SizedBox(height: ResponsiveHelper.getResponsiveSpacing(context, mobile: 16, tablet: 20, desktop: 24)),
                   Row(
                     children: [
                       Expanded(
@@ -334,15 +374,22 @@ class BookingRequestsScreen extends StatelessWidget {
                             backgroundColor: Colors.red.shade50,
                             foregroundColor: Colors.red,
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
+                              borderRadius: BorderRadius.circular(ResponsiveHelper.getResponsiveBorderRadius(context, mobile: 8, tablet: 10, desktop: 12)),
                               side: BorderSide(color: Colors.red.shade300),
                             ),
-                            padding: const EdgeInsets.symmetric(vertical: 12),
+                            padding: EdgeInsets.symmetric(
+                              vertical: ResponsiveHelper.getResponsiveSpacing(context, mobile: 12, tablet: 14, desktop: 16),
+                            ),
                           ),
-                          child: const Text('Decline'),
+                          child: Text(
+                            'Decline',
+                            style: TextStyle(
+                              fontSize: ResponsiveHelper.getResponsiveFontSize(context, mobile: 14, tablet: 16, desktop: 18),
+                            ),
+                          ),
                         ),
                       ),
-                      const SizedBox(width: 12),
+                      SizedBox(width: ResponsiveHelper.getResponsiveSpacing(context, mobile: 12, tablet: 14, desktop: 16)),
                       Expanded(
                         child: ElevatedButton(
                           onPressed: () =>
@@ -351,11 +398,18 @@ class BookingRequestsScreen extends StatelessWidget {
                             backgroundColor: Colors.green,
                             foregroundColor: Colors.white,
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
+                              borderRadius: BorderRadius.circular(ResponsiveHelper.getResponsiveBorderRadius(context, mobile: 8, tablet: 10, desktop: 12)),
                             ),
-                            padding: const EdgeInsets.symmetric(vertical: 12),
+                            padding: EdgeInsets.symmetric(
+                              vertical: ResponsiveHelper.getResponsiveSpacing(context, mobile: 12, tablet: 14, desktop: 16),
+                            ),
                           ),
-                          child: const Text('Accept'),
+                          child: Text(
+                            'Accept',
+                            style: TextStyle(
+                              fontSize: ResponsiveHelper.getResponsiveFontSize(context, mobile: 14, tablet: 16, desktop: 18),
+                            ),
+                          ),
                         ),
                       ),
                     ],
@@ -379,30 +433,32 @@ class BookingRequestsScreen extends StatelessWidget {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
     return Padding(
-      padding: const EdgeInsets.only(bottom: 8.0),
+      padding: EdgeInsets.only(bottom: ResponsiveHelper.getResponsiveSpacing(context, mobile: 8, tablet: 10, desktop: 12)),
       child: Row(
         children: [
           Icon(
             icon,
-            size: 16,
+            size: ResponsiveHelper.getResponsiveIconSize(context, mobile: 16, tablet: 18, desktop: 20),
             color: isDarkMode ? Colors.grey.shade400 : Colors.grey.shade700,
           ),
-          const SizedBox(width: 8),
+          SizedBox(width: ResponsiveHelper.getResponsiveSpacing(context, mobile: 8, tablet: 10, desktop: 12)),
           Expanded(
             flex: 2,
             child: Text(
               label,
               style: TextStyle(
+                fontSize: ResponsiveHelper.getResponsiveFontSize(context, mobile: 14, tablet: 15, desktop: 16),
                 color: isDarkMode ? Colors.grey.shade400 : Colors.grey.shade700,
               ),
             ),
           ),
-          const SizedBox(width: 8),
+          SizedBox(width: ResponsiveHelper.getResponsiveSpacing(context, mobile: 8, tablet: 10, desktop: 12)),
           Expanded(
             flex: 3,
             child: Text(
               value,
               style: TextStyle(
+                fontSize: ResponsiveHelper.getResponsiveFontSize(context, mobile: 14, tablet: 15, desktop: 16),
                 fontWeight: isHighlighted ? FontWeight.bold : FontWeight.w500,
                 color: isHighlighted
                     ? (isDarkMode ? Colors.tealAccent : Colors.teal.shade700)

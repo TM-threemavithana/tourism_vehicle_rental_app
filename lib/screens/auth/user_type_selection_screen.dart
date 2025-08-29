@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../../services/auth_service.dart';
+import '../../utils/responsive_helper.dart';
 import '../auth/auth_wrapper.dart';
 import '../../widgets/side_menu.dart';
 import '../profile_screen.dart';
@@ -326,7 +327,12 @@ class _UserTypeSelectionScreenState extends State<UserTypeSelectionScreen> {
 
     return Scaffold(
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
+          ? Center(
+              child: CircularProgressIndicator(
+                strokeWidth: ResponsiveHelper.getResponsiveSpacing(context,
+                    mobile: 3, tablet: 4, desktop: 5),
+              ),
+            )
           : Stack(
               children: [
                 // Background gradient
@@ -349,7 +355,10 @@ class _UserTypeSelectionScreenState extends State<UserTypeSelectionScreen> {
                   left: 0,
                   right: 0,
                   child: CustomPaint(
-                    size: Size(size.width, 100),
+                    size: Size(
+                        size.width,
+                        ResponsiveHelper.getResponsiveSpacing(context,
+                            mobile: 100, tablet: 120, desktop: 140)),
                     painter: WavePainter(
                       color: theme.colorScheme.tertiary.withOpacity(0.3),
                     ),
@@ -359,34 +368,58 @@ class _UserTypeSelectionScreenState extends State<UserTypeSelectionScreen> {
                 // Content
                 SafeArea(
                   child: Padding(
-                    padding: const EdgeInsets.all(24.0),
+                    padding: ResponsiveHelper.getResponsivePadding(context,
+                        mobile: 24, tablet: 32, desktop: 40),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const SizedBox(height: 40),
+                        SizedBox(
+                            height: ResponsiveHelper.getResponsiveSpacing(
+                                context,
+                                mobile: 40,
+                                tablet: 50,
+                                desktop: 60)),
 
                         // Title
-                        const Text(
+                        Text(
                           'How will you use WayZ?',
                           style: TextStyle(
                             color: Colors.white,
-                            fontSize: 32,
+                            fontSize: ResponsiveHelper.getResponsiveFontSize(
+                                context,
+                                mobile: 32,
+                                tablet: 36,
+                                desktop: 40),
                             fontWeight: FontWeight.bold,
                           ),
                         ),
 
-                        const SizedBox(height: 16),
+                        SizedBox(
+                            height: ResponsiveHelper.getResponsiveSpacing(
+                                context,
+                                mobile: 16,
+                                tablet: 20,
+                                desktop: 24)),
 
                         // Subtitle
                         Text(
                           'Choose your primary role. You can change this later.',
                           style: TextStyle(
                             color: Colors.white.withOpacity(0.9),
-                            fontSize: 16,
+                            fontSize: ResponsiveHelper.getResponsiveFontSize(
+                                context,
+                                mobile: 16,
+                                tablet: 18,
+                                desktop: 20),
                           ),
                         ),
 
-                        const SizedBox(height: 60),
+                        SizedBox(
+                            height: ResponsiveHelper.getResponsiveSpacing(
+                                context,
+                                mobile: 60,
+                                tablet: 70,
+                                desktop: 80)),
 
                         // Renter option
                         _buildRoleCard(
@@ -398,7 +431,12 @@ class _UserTypeSelectionScreenState extends State<UserTypeSelectionScreen> {
                           onTap: () => _selectUserType('renter'),
                         ),
 
-                        const SizedBox(height: 24),
+                        SizedBox(
+                            height: ResponsiveHelper.getResponsiveSpacing(
+                                context,
+                                mobile: 24,
+                                tablet: 28,
+                                desktop: 32)),
 
                         // Owner option
                         _buildRoleCard(
@@ -429,16 +467,23 @@ class _UserTypeSelectionScreenState extends State<UserTypeSelectionScreen> {
       onTap: onTap,
       child: Container(
         width: double.infinity,
-        padding: const EdgeInsets.all(24),
+        padding: ResponsiveHelper.getResponsivePadding(context,
+            mobile: 24, tablet: 28, desktop: 32),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(
+              ResponsiveHelper.getResponsiveBorderRadius(context,
+                  mobile: 16, tablet: 18, desktop: 20)),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(0.1),
-              blurRadius: 10,
+              blurRadius: ResponsiveHelper.getResponsiveSpacing(context,
+                  mobile: 10, tablet: 12, desktop: 14),
               spreadRadius: 0,
-              offset: const Offset(0, 5),
+              offset: Offset(
+                  0,
+                  ResponsiveHelper.getResponsiveSpacing(context,
+                      mobile: 5, tablet: 6, desktop: 7)),
             ),
           ],
         ),
@@ -446,7 +491,8 @@ class _UserTypeSelectionScreenState extends State<UserTypeSelectionScreen> {
           children: [
             // Icon
             Container(
-              padding: const EdgeInsets.all(12),
+              padding: ResponsiveHelper.getResponsivePadding(context,
+                  mobile: 12, tablet: 14, desktop: 16),
               decoration: BoxDecoration(
                 color: color.withOpacity(0.1),
                 shape: BoxShape.circle,
@@ -454,11 +500,14 @@ class _UserTypeSelectionScreenState extends State<UserTypeSelectionScreen> {
               child: Icon(
                 iconData,
                 color: color,
-                size: 32,
+                size: ResponsiveHelper.getResponsiveIconSize(context,
+                    mobile: 32, tablet: 36, desktop: 40),
               ),
             ),
 
-            const SizedBox(width: 16),
+            SizedBox(
+                width: ResponsiveHelper.getResponsiveSpacing(context,
+                    mobile: 16, tablet: 18, desktop: 20)),
 
             // Text content
             Expanded(
@@ -467,16 +516,20 @@ class _UserTypeSelectionScreenState extends State<UserTypeSelectionScreen> {
                 children: [
                   Text(
                     title,
-                    style: const TextStyle(
-                      fontSize: 18,
+                    style: TextStyle(
+                      fontSize: ResponsiveHelper.getResponsiveFontSize(context,
+                          mobile: 18, tablet: 20, desktop: 22),
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  const SizedBox(height: 4),
+                  SizedBox(
+                      height: ResponsiveHelper.getResponsiveSpacing(context,
+                          mobile: 4, tablet: 6, desktop: 8)),
                   Text(
                     description,
                     style: TextStyle(
-                      fontSize: 14,
+                      fontSize: ResponsiveHelper.getResponsiveFontSize(context,
+                          mobile: 14, tablet: 16, desktop: 18),
                       color: Colors.grey[600],
                     ),
                   ),
@@ -488,7 +541,8 @@ class _UserTypeSelectionScreenState extends State<UserTypeSelectionScreen> {
             Icon(
               Icons.arrow_forward_ios,
               color: Colors.grey[400],
-              size: 16,
+              size: ResponsiveHelper.getResponsiveIconSize(context,
+                  mobile: 16, tablet: 18, desktop: 20),
             ),
           ],
         ),

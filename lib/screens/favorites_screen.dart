@@ -8,6 +8,7 @@ import '../services/favorites_service.dart';
 import '../widgets/side_menu.dart';
 import '../widgets/custom_app_bar.dart';
 import 'vehicle_detail_page.dart';
+import '../utils/responsive_helper.dart';
 
 class FavoritesScreen extends StatefulWidget {
   const FavoritesScreen({super.key});
@@ -130,23 +131,41 @@ class _FavoritesScreenState extends State<FavoritesScreen>
                         children: [
                           Icon(
                             Icons.favorite_border,
-                            size: 80,
+                            size: ResponsiveHelper.getResponsiveIconSize(
+                                context,
+                                mobile: 80,
+                                tablet: 100,
+                                desktop: 120),
                             color: isDarkMode
                                 ? Colors.grey.shade700
                                 : Colors.grey.shade400,
                           ),
-                          const SizedBox(height: 16),
+                          SizedBox(
+                              height: ResponsiveHelper.getResponsiveSpacing(
+                                  context,
+                                  mobile: 16,
+                                  tablet: 20,
+                                  desktop: 24)),
                           Text(
                             'No favorite vehicles yet',
                             style: TextStyle(
-                              fontSize: 18,
+                              fontSize: ResponsiveHelper.getResponsiveFontSize(
+                                  context,
+                                  mobile: 18,
+                                  tablet: 20,
+                                  desktop: 22),
                               fontWeight: FontWeight.bold,
                               color: isDarkMode
                                   ? Colors.grey.shade400
                                   : Colors.grey.shade700,
                             ),
                           ),
-                          const SizedBox(height: 8),
+                          SizedBox(
+                              height: ResponsiveHelper.getResponsiveSpacing(
+                                  context,
+                                  mobile: 8,
+                                  tablet: 12,
+                                  desktop: 16)),
                           Text(
                             'Your favorite vehicles will appear here',
                             textAlign: TextAlign.center,
@@ -154,9 +173,19 @@ class _FavoritesScreenState extends State<FavoritesScreen>
                               color: isDarkMode
                                   ? Colors.grey.shade500
                                   : Colors.grey.shade600,
+                              fontSize: ResponsiveHelper.getResponsiveFontSize(
+                                  context,
+                                  mobile: 14,
+                                  tablet: 16,
+                                  desktop: 18),
                             ),
                           ),
-                          const SizedBox(height: 24),
+                          SizedBox(
+                              height: ResponsiveHelper.getResponsiveSpacing(
+                                  context,
+                                  mobile: 24,
+                                  tablet: 32,
+                                  desktop: 40)),
                           ElevatedButton(
                             onPressed: () {
                               Navigator.pushReplacementNamed(context, '/home');
@@ -164,10 +193,11 @@ class _FavoritesScreenState extends State<FavoritesScreen>
                             style: ElevatedButton.styleFrom(
                               backgroundColor: theme.colorScheme.primary,
                               foregroundColor: Colors.white,
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 24, vertical: 12),
+                              padding:
+                                  ResponsiveHelper.getResponsiveButtonPadding(
+                                      context),
                             ),
-                            child: const Text('Browse Vehicles'),
+                            child: Text('Browse Vehicles'),
                           ),
                         ],
                       ),
@@ -179,7 +209,7 @@ class _FavoritesScreenState extends State<FavoritesScreen>
                       setState(() {}); // Refresh the UI
                     },
                     child: ListView.builder(
-                      padding: const EdgeInsets.all(16),
+                      padding: ResponsiveHelper.getResponsivePadding(context),
                       itemCount: favorites.length,
                       itemBuilder: (context, index) {
                         final favorite = favorites[index];
@@ -274,12 +304,19 @@ class _FavoritesScreenState extends State<FavoritesScreen>
     final formattedPrice = 'LKR ${_currencyFormat.format(price)}';
 
     return Card(
-      margin: const EdgeInsets.only(bottom: 16),
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      margin: EdgeInsets.only(
+          bottom: ResponsiveHelper.getResponsiveSpacing(context,
+              mobile: 16, tablet: 20, desktop: 24)),
+      elevation: ResponsiveHelper.isTablet(context) ? 4 : 2,
+      shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(
+              ResponsiveHelper.getResponsiveBorderRadius(context,
+                  mobile: 12, tablet: 16, desktop: 20))),
       child: InkWell(
         onTap: () => _navigateToVehicleDetail(vehicleData),
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(
+            ResponsiveHelper.getResponsiveBorderRadius(context,
+                mobile: 12, tablet: 16, desktop: 20)),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -288,13 +325,18 @@ class _FavoritesScreenState extends State<FavoritesScreen>
               children: [
                 // Vehicle image
                 ClipRRect(
-                  borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(12),
-                    topRight: Radius.circular(12),
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(
+                        ResponsiveHelper.getResponsiveBorderRadius(context,
+                            mobile: 12, tablet: 16, desktop: 20)),
+                    topRight: Radius.circular(
+                        ResponsiveHelper.getResponsiveBorderRadius(context,
+                            mobile: 12, tablet: 16, desktop: 20)),
                   ),
                   child: SizedBox(
                     width: double.infinity,
-                    height: 160,
+                    height: ResponsiveHelper.getResponsiveImageSize(context,
+                        mobile: 160, tablet: 200, desktop: 240),
                     child: CachedNetworkImage(
                       imageUrl: mainImageUrl,
                       fit: BoxFit.cover,
@@ -312,20 +354,33 @@ class _FavoritesScreenState extends State<FavoritesScreen>
 
                 // Price badge
                 Positioned(
-                  bottom: 12,
-                  right: 12,
+                  bottom: ResponsiveHelper.getResponsiveSpacing(context,
+                      mobile: 12, tablet: 16, desktop: 20),
+                  right: ResponsiveHelper.getResponsiveSpacing(context,
+                      mobile: 12, tablet: 16, desktop: 20),
                   child: Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    padding: EdgeInsets.symmetric(
+                        horizontal: ResponsiveHelper.getResponsiveSpacing(
+                            context,
+                            mobile: 12,
+                            tablet: 16,
+                            desktop: 20),
+                        vertical: ResponsiveHelper.getResponsiveSpacing(context,
+                            mobile: 6, tablet: 8, desktop: 10)),
                     decoration: BoxDecoration(
                       color: theme.colorScheme.primary,
                       borderRadius: BorderRadius.circular(30),
                     ),
                     child: Text(
                       '$formattedPrice/day',
-                      style: const TextStyle(
+                      style: TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
+                        fontSize: ResponsiveHelper.getResponsiveFontSize(
+                            context,
+                            mobile: 12,
+                            tablet: 14,
+                            desktop: 16),
                       ),
                     ),
                   ),
@@ -333,13 +388,18 @@ class _FavoritesScreenState extends State<FavoritesScreen>
 
                 // Favorite icon button
                 Positioned(
-                  top: 8,
-                  right: 8,
+                  top: ResponsiveHelper.getResponsiveSpacing(context,
+                      mobile: 8, tablet: 12, desktop: 16),
+                  right: ResponsiveHelper.getResponsiveSpacing(context,
+                      mobile: 8, tablet: 12, desktop: 16),
                   child: CircleAvatar(
-                    radius: 18,
+                    radius: ResponsiveHelper.getResponsiveIconSize(context,
+                        mobile: 18, tablet: 22, desktop: 26),
                     backgroundColor: Colors.white,
                     child: IconButton(
-                      icon: const Icon(Icons.delete_outline, size: 18),
+                      icon: Icon(Icons.delete_outline,
+                          size: ResponsiveHelper.getResponsiveIconSize(context,
+                              mobile: 18, tablet: 22, desktop: 26)),
                       color: Colors.red,
                       onPressed: () => _removeFavorite(vehicleData['id']),
                       tooltip: 'Remove from favorites',
@@ -351,20 +411,32 @@ class _FavoritesScreenState extends State<FavoritesScreen>
 
                 // Vehicle type badge
                 Positioned(
-                  top: 10,
-                  left: 10,
+                  top: ResponsiveHelper.getResponsiveSpacing(context,
+                      mobile: 10, tablet: 12, desktop: 16),
+                  left: ResponsiveHelper.getResponsiveSpacing(context,
+                      mobile: 10, tablet: 12, desktop: 16),
                   child: Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                    padding: EdgeInsets.symmetric(
+                        horizontal: ResponsiveHelper.getResponsiveSpacing(
+                            context,
+                            mobile: 10,
+                            tablet: 12,
+                            desktop: 16),
+                        vertical: ResponsiveHelper.getResponsiveSpacing(context,
+                            mobile: 6, tablet: 8, desktop: 10)),
                     decoration: BoxDecoration(
                       color: Colors.black.withOpacity(0.7),
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Text(
                       vehicleData['type'] ?? 'Vehicle',
-                      style: const TextStyle(
+                      style: TextStyle(
                         color: Colors.white,
-                        fontSize: 12,
+                        fontSize: ResponsiveHelper.getResponsiveFontSize(
+                            context,
+                            mobile: 12,
+                            tablet: 14,
+                            desktop: 16),
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -375,7 +447,8 @@ class _FavoritesScreenState extends State<FavoritesScreen>
 
             // Vehicle details
             Padding(
-              padding: const EdgeInsets.all(12),
+              padding: ResponsiveHelper.getResponsivePadding(context,
+                  mobile: 12, tablet: 16, desktop: 20),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -383,28 +456,38 @@ class _FavoritesScreenState extends State<FavoritesScreen>
                   Text(
                     '${vehicleData['make'] ?? 'Unknown'} ${vehicleData['model'] ?? ''}',
                     style: TextStyle(
-                      fontSize: 18,
+                      fontSize: ResponsiveHelper.getResponsiveFontSize(context,
+                          mobile: 18, tablet: 20, desktop: 22),
                       fontWeight: FontWeight.bold,
                       color: isDarkMode ? Colors.white : Colors.black87,
                     ),
                   ),
-                  const SizedBox(height: 6),
+                  SizedBox(
+                      height: ResponsiveHelper.getResponsiveSpacing(context,
+                          mobile: 6, tablet: 8, desktop: 10)),
 
                   // Location
                   Row(
                     children: [
                       Icon(
                         Icons.location_on,
-                        size: 16,
+                        size: ResponsiveHelper.getResponsiveIconSize(context,
+                            mobile: 16, tablet: 18, desktop: 20),
                         color: isDarkMode ? Colors.grey[400] : Colors.grey[700],
                       ),
-                      const SizedBox(width: 4),
+                      SizedBox(
+                          width: ResponsiveHelper.getResponsiveSpacing(context,
+                              mobile: 4, tablet: 6, desktop: 8)),
                       Expanded(
                         child: Text(
                           vehicleData['collectionPoint']?['district'] ??
                               'Location not specified',
                           style: TextStyle(
-                            fontSize: 14,
+                            fontSize: ResponsiveHelper.getResponsiveFontSize(
+                                context,
+                                mobile: 14,
+                                tablet: 16,
+                                desktop: 18),
                             color: isDarkMode
                                 ? Colors.grey[400]
                                 : Colors.grey[700],
@@ -415,7 +498,9 @@ class _FavoritesScreenState extends State<FavoritesScreen>
                       ),
                     ],
                   ),
-                  const SizedBox(height: 8),
+                  SizedBox(
+                      height: ResponsiveHelper.getResponsiveSpacing(context,
+                          mobile: 8, tablet: 10, desktop: 12)),
 
                   // Vehicle specs row
                   Row(
@@ -475,7 +560,11 @@ class _FavoritesScreenState extends State<FavoritesScreen>
 
   Widget _buildSpecChip(IconData icon, String text, bool isDarkMode) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      padding: EdgeInsets.symmetric(
+          horizontal: ResponsiveHelper.getResponsiveSpacing(context,
+              mobile: 8, tablet: 10, desktop: 12),
+          vertical: ResponsiveHelper.getResponsiveSpacing(context,
+              mobile: 4, tablet: 6, desktop: 8)),
       decoration: BoxDecoration(
         color: isDarkMode ? Colors.grey.shade800 : Colors.grey.shade200,
         borderRadius: BorderRadius.circular(30),
@@ -485,14 +574,18 @@ class _FavoritesScreenState extends State<FavoritesScreen>
         children: [
           Icon(
             icon,
-            size: 14,
+            size: ResponsiveHelper.getResponsiveIconSize(context,
+                mobile: 14, tablet: 16, desktop: 18),
             color: isDarkMode ? Colors.white70 : Colors.black87,
           ),
-          const SizedBox(width: 4),
+          SizedBox(
+              width: ResponsiveHelper.getResponsiveSpacing(context,
+                  mobile: 4, tablet: 6, desktop: 8)),
           Text(
             text,
             style: TextStyle(
-              fontSize: 12,
+              fontSize: ResponsiveHelper.getResponsiveFontSize(context,
+                  mobile: 12, tablet: 14, desktop: 16),
               color: isDarkMode ? Colors.white70 : Colors.black87,
             ),
           ),

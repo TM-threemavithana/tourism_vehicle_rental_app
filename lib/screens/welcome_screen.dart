@@ -6,6 +6,7 @@ import 'profile_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'vehicle_search_results_screen.dart';
 import '../widgets/side_menu.dart';
+import '../utils/responsive_helper.dart';
 
 class WelcomeScreen extends StatefulWidget {
   const WelcomeScreen({super.key});
@@ -58,6 +59,9 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isTablet = ResponsiveHelper.isTablet(context);
+    final isLargeTablet = ResponsiveHelper.isLargeTablet(context);
+
     return Scaffold(
       key: _scaffoldKey,
       backgroundColor: const Color(0xFFF7FBEF),
@@ -79,15 +83,23 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
           ),
           SafeArea(
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              padding: ResponsiveHelper.getResponsiveHorizontalPadding(context),
               child: Column(
                 children: [
+                  // Responsive spacing
+                  SizedBox(
+                      height: ResponsiveHelper.getResponsiveSpacing(context,
+                          mobile: 12, tablet: 20, desktop: 24)),
+
                   // Side menu button and centered title in a row
                   Row(
                     children: [
                       IconButton(
-                        icon: const Icon(Icons.menu,
-                            color: Colors.black, size: 28),
+                        icon: Icon(
+                          Icons.menu,
+                          color: Colors.black,
+                          size: ResponsiveHelper.getResponsiveIconSize(context),
+                        ),
                         onPressed: () =>
                             _scaffoldKey.currentState?.openDrawer(),
                       ),
@@ -96,7 +108,11 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                           child: Text(
                             'Wayz',
                             style: TextStyle(
-                              fontSize: 20,
+                              fontSize: ResponsiveHelper.getResponsiveFontSize(
+                                  context,
+                                  mobile: 20,
+                                  tablet: 28,
+                                  desktop: 32),
                               fontWeight: FontWeight.bold,
                               color: Colors.black.withOpacity(0.8),
                             ),
@@ -104,44 +120,101 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                         ),
                       ),
                       SizedBox(
-                          width: 48), // Spacer to balance the IconButton width
+                          width:
+                              ResponsiveHelper.getResponsiveIconSize(context) +
+                                  20), // Responsive spacer
                     ],
                   ),
-                  const SizedBox(height: 12),
-                  // First feature card - takes up available space
-                  Expanded(
-                    flex: 1,
-                    child: _FeatureCard(
-                      image: 'assets/images/browse_vehicle.png',
-                      title: 'Browse Vehicles',
-                      description:
-                          "Explore our diverse fleet of vehicles, from scooters to luxury cars, perfect for your Sri Lankan adventure.",
-                      buttonText: 'Browse',
-                      onPressed:
-                          _isLoading ? null : () => _navigateToBrowse(context),
-                      isLoading: _isLoading,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  // Second feature card - takes up remaining space
-                  Expanded(
-                    flex: 1,
-                    child: _FeatureCard(
-                      image: 'assets/images/request_vehicle.png',
-                      title: 'Request a Vehicle',
-                      description:
-                          "Can't find what you're looking for? Post a request and let our network of providers find the perfect vehicle for you.",
-                      buttonText: 'Request',
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const RequestVehicleScreen(),
+
+                  SizedBox(
+                      height: ResponsiveHelper.getResponsiveSpacing(context,
+                          mobile: 12, tablet: 20, desktop: 24)),
+
+                  // Responsive layout for tablets
+                  if (isTablet || isLargeTablet) ...[
+                    // Tablet layout - side by side cards
+                    Expanded(
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: _FeatureCard(
+                              image: 'assets/images/browse_vehicle.png',
+                              title: 'Browse Vehicles',
+                              description:
+                                  "Explore our diverse fleet of vehicles, from scooters to luxury cars, perfect for your Sri Lankan adventure.",
+                              buttonText: 'Browse',
+                              onPressed: _isLoading
+                                  ? null
+                                  : () => _navigateToBrowse(context),
+                              isLoading: _isLoading,
+                            ),
                           ),
-                        );
-                      },
+                          SizedBox(
+                              width: ResponsiveHelper.getResponsiveSpacing(
+                                  context,
+                                  mobile: 12,
+                                  tablet: 20,
+                                  desktop: 24)),
+                          Expanded(
+                            child: _FeatureCard(
+                              image: 'assets/images/request_vehicle.png',
+                              title: 'Request a Vehicle',
+                              description:
+                                  "Can't find what you're looking for? Post a request and let our network of providers find the perfect vehicle for you.",
+                              buttonText: 'Request',
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        const RequestVehicleScreen(),
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
+                  ] else ...[
+                    // Mobile layout - stacked cards
+                    Expanded(
+                      flex: 1,
+                      child: _FeatureCard(
+                        image: 'assets/images/browse_vehicle.png',
+                        title: 'Browse Vehicles',
+                        description:
+                            "Explore our diverse fleet of vehicles, from scooters to luxury cars, perfect for your Sri Lankan adventure.",
+                        buttonText: 'Browse',
+                        onPressed: _isLoading
+                            ? null
+                            : () => _navigateToBrowse(context),
+                        isLoading: _isLoading,
+                      ),
+                    ),
+                    SizedBox(
+                        height: ResponsiveHelper.getResponsiveSpacing(context,
+                            mobile: 12, tablet: 20, desktop: 24)),
+                    Expanded(
+                      flex: 1,
+                      child: _FeatureCard(
+                        image: 'assets/images/request_vehicle.png',
+                        title: 'Request a Vehicle',
+                        description:
+                            "Can't find what you're looking for? Post a request and let our network of providers find the perfect vehicle for you.",
+                        buttonText: 'Request',
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  const RequestVehicleScreen(),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ],
                 ],
               ),
             ),
@@ -192,60 +265,72 @@ class _FeatureCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isTablet = ResponsiveHelper.isTablet(context);
+    final isLargeTablet = ResponsiveHelper.isLargeTablet(context);
+
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(18),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.04),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
+        borderRadius: BorderRadius.circular(
+            ResponsiveHelper.getResponsiveBorderRadius(context)),
+        boxShadow: ResponsiveHelper.getResponsiveShadow(context),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           ClipRRect(
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(18)),
+            borderRadius: BorderRadius.vertical(
+              top: Radius.circular(
+                  ResponsiveHelper.getResponsiveBorderRadius(context)),
+            ),
             child: AspectRatio(
-              aspectRatio: 2.5, // Increased aspect ratio for a shorter image
+              aspectRatio: ResponsiveHelper.getResponsiveAspectRatio(context),
               child: Image.asset(
                 image,
                 fit: BoxFit.cover,
                 errorBuilder: (context, error, stackTrace) => Container(
                   color: Colors.grey[200],
-                  child: const Center(
-                      child: Icon(Icons.directions_car,
-                          size: 48, color: Colors.grey)),
+                  child: Icon(
+                    Icons.directions_car,
+                    size: ResponsiveHelper.getResponsiveIconSize(context,
+                        mobile: 48, tablet: 64, desktop: 80),
+                    color: Colors.grey,
+                  ),
                 ),
               ),
             ),
           ),
           Padding(
-            padding: const EdgeInsets.fromLTRB(16.0, 12.0, 16.0, 12.0), // Reduced padding
+            padding: ResponsiveHelper.getResponsivePadding(context),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   title,
-                  style: const TextStyle(
-                    fontSize: 16, // Slightly smaller font
+                  style: TextStyle(
+                    fontSize: ResponsiveHelper.getResponsiveFontSize(context,
+                        mobile: 16, tablet: 20, desktop: 24),
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                const SizedBox(height: 4), // Reduced spacing
+                SizedBox(
+                    height: ResponsiveHelper.getResponsiveSpacing(context,
+                        mobile: 4, tablet: 8, desktop: 12)),
                 Text(
                   description,
                   style: TextStyle(
-                    fontSize: 13, // Slightly smaller font
+                    fontSize: ResponsiveHelper.getResponsiveFontSize(context,
+                        mobile: 13, tablet: 15, desktop: 17),
                     color: Colors.grey[700],
                   ),
-                  maxLines: 2, // Limit to 2 lines
+                  maxLines: isTablet || isLargeTablet
+                      ? 3
+                      : 2, // More lines for tablets
                   overflow: TextOverflow.ellipsis,
                 ),
-                const SizedBox(height: 8), // Reduced spacing
+                SizedBox(
+                    height: ResponsiveHelper.getResponsiveSpacing(context,
+                        mobile: 8, tablet: 12, desktop: 16)),
                 Align(
                   alignment: Alignment.centerRight,
                   child: ElevatedButton(
@@ -253,19 +338,36 @@ class _FeatureCard extends StatelessWidget {
                       backgroundColor: buttonColor ?? const Color(0xFFB6E23A),
                       foregroundColor: Colors.black,
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20),
+                        borderRadius: BorderRadius.circular(
+                            ResponsiveHelper.getResponsiveBorderRadius(context,
+                                mobile: 20, tablet: 25, desktop: 30)),
                       ),
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 22, vertical: 8),
-                      textStyle: const TextStyle(fontWeight: FontWeight.bold),
+                      padding:
+                          ResponsiveHelper.getResponsiveButtonPadding(context),
+                      textStyle: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: ResponsiveHelper.getResponsiveFontSize(
+                            context,
+                            mobile: 14,
+                            tablet: 16,
+                            desktop: 18),
+                      ),
                       elevation: 0,
                     ),
                     onPressed: onPressed,
                     child: isLoading
-                        ? const SizedBox(
-                            width: 20,
-                            height: 20,
-                            child: CircularProgressIndicator(
+                        ? SizedBox(
+                            width: ResponsiveHelper.getResponsiveIconSize(
+                                context,
+                                mobile: 20,
+                                tablet: 24,
+                                desktop: 28),
+                            height: ResponsiveHelper.getResponsiveIconSize(
+                                context,
+                                mobile: 20,
+                                tablet: 24,
+                                desktop: 28),
+                            child: const CircularProgressIndicator(
                               strokeWidth: 2,
                               valueColor:
                                   AlwaysStoppedAnimation<Color>(Colors.black),

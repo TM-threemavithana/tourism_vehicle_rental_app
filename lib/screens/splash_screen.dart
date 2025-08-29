@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'welcome_screen.dart';
+import '../utils/responsive_helper.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -81,8 +82,8 @@ class _SplashScreenState extends State<SplashScreen>
                     animation: _controller,
                     builder: (context, child) {
                       return Container(
-                        width: 180,
-                        height: 180,
+                        width: ResponsiveHelper.getResponsiveProfileSize(context, mobile: 180, tablet: 220, desktop: 260),
+                        height: ResponsiveHelper.getResponsiveProfileSize(context, mobile: 180, tablet: 220, desktop: 260),
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           boxShadow: [
@@ -98,79 +99,74 @@ class _SplashScreenState extends State<SplashScreen>
                     },
                   ),
                   Container(
-                    width: 140,
-                    height: 140,
+                    width: ResponsiveHelper.getResponsiveProfileSize(context, mobile: 120, tablet: 150, desktop: 180),
+                    height: ResponsiveHelper.getResponsiveProfileSize(context, mobile: 120, tablet: 150, desktop: 180),
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: Colors.white,
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.08),
-                          blurRadius: 12,
-                          offset: Offset(0, 4),
+                          color: Colors.white.withOpacity(0.3),
+                          blurRadius: 20,
+                          spreadRadius: 2,
                         ),
                       ],
                     ),
                     child: ClipOval(
                       child: Image.asset(
                         'assets/images/logo.png',
-                        width: 120,
-                        height: 120,
                         fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) {
-                          return Image.asset(
-                            'assets/images/fallback_logo.png',
-                            width: 120,
-                            height: 120,
-                            fit: BoxFit.cover,
-                          );
-                        },
+                        errorBuilder: (context, error, stackTrace) =>
+                            Container(
+                          color: Colors.grey[200],
+                          child: Icon(
+                            Icons.image,
+                            size: ResponsiveHelper.getResponsiveIconSize(context, mobile: 60, tablet: 80, desktop: 100),
+                          ),
+                        ),
                       ),
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: 32),
-              // Animated app name
+              SizedBox(height: ResponsiveHelper.getResponsiveSpacing(context, mobile: 40, tablet: 60, desktop: 80)),
+              // App name with fade animation
               FadeTransition(
                 opacity: _fadeAnimation,
-                child: AnimatedBuilder(
-                  animation: _scaleAnimation,
-                  builder: (context, child) {
-                    return Transform.scale(
-                      scale: _scaleAnimation.value,
-                      filterQuality: FilterQuality.high,
-                      alignment: Alignment.center,
-                      child: child,
-                    );
-                  },
-                  child: Text(
-                    'Wayz',
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      fontSize: 48,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.yellow,
-                      letterSpacing: 1.5,
-                      fontFamily: 'Montserrat',
-                    ),
+                child: Text(
+                  'Wayz.lk',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: ResponsiveHelper.getResponsiveFontSize(context, mobile: 36, tablet: 42, desktop: 48),
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 2.0,
+                    shadows: [
+                      Shadow(
+                        color: Colors.black.withOpacity(0.3),
+                        offset: const Offset(2, 2),
+                        blurRadius: 4,
+                      ),
+                    ],
                   ),
                 ),
               ),
-              const SizedBox(height: 16),
-              // Tagline
+              SizedBox(height: ResponsiveHelper.getResponsiveSpacing(context, mobile: 16, tablet: 20, desktop: 24)),
+              // Tagline with fade animation
               FadeTransition(
                 opacity: _fadeAnimation,
                 child: Text(
                   'Where Paradise Meets Adventure',
                   style: TextStyle(
-                    fontSize: 18,
-                    color: Colors.white.withOpacity(0.92),
-                    fontWeight: FontWeight.w400,
-                    fontFamily: 'Montserrat',
-                    letterSpacing: 0.5,
+                    color: Colors.white.withOpacity(0.9),
+                    fontSize: ResponsiveHelper.getResponsiveFontSize(context, mobile: 18, tablet: 20, desktop: 22),
+                    letterSpacing: 1.0,
+                    shadows: [
+                      Shadow(
+                        color: Colors.black.withOpacity(0.3),
+                        offset: const Offset(1, 1),
+                        blurRadius: 2,
+                      ),
+                    ],
                   ),
-                  textAlign: TextAlign.center,
                 ),
               ),
             ],

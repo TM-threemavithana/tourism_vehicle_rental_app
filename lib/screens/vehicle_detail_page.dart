@@ -10,6 +10,7 @@ import '../widgets/vehicle_detail/rental_info_section.dart';
 // import '../widgets/vehicle_detail/booking_form_section.dart'; // Commented out booking form
 import '../widgets/vehicle_detail/full_screen_image_viewer.dart';
 import '../utils/app_colors.dart';
+import '../utils/responsive_helper.dart';
 
 class VehicleDetailPage extends StatefulWidget {
   final Map<String, dynamic> vehicle;
@@ -182,7 +183,7 @@ class _VehicleDetailPageState extends State<VehicleDetailPage> {
                     _buildContactButtonsSection(),
 
                     // Bottom padding
-                    const SizedBox(height: 24),
+                    SizedBox(height: ResponsiveHelper.getResponsiveSpacing(context, mobile: 24, tablet: 32, desktop: 40)),
                   ],
                 ),
               ),
@@ -207,19 +208,19 @@ class _VehicleDetailPageState extends State<VehicleDetailPage> {
     }
 
     return Container(
-      padding: const EdgeInsets.all(16.0),
+      padding: ResponsiveHelper.getResponsivePadding(context, mobile: 16, tablet: 20, desktop: 24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             'Contact Vehicle Owner',
             style: TextStyle(
-              fontSize: 20,
+              fontSize: ResponsiveHelper.getResponsiveFontSize(context, mobile: 20, tablet: 22, desktop: 24),
               fontWeight: FontWeight.bold,
               color: Colors.black,
             ),
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: ResponsiveHelper.getResponsiveSpacing(context, mobile: 16, tablet: 20, desktop: 24)),
           Row(
             children: [
               Expanded(
@@ -230,7 +231,7 @@ class _VehicleDetailPageState extends State<VehicleDetailPage> {
                   () => _makePhoneCall(contactNumber),
                 ),
               ),
-              const SizedBox(width: 12),
+              SizedBox(width: ResponsiveHelper.getResponsiveSpacing(context, mobile: 12, tablet: 16, desktop: 20)),
               Expanded(
                 child: _buildContactButton(
                   'WhatsApp',
@@ -253,13 +254,13 @@ class _VehicleDetailPageState extends State<VehicleDetailPage> {
     return ElevatedButton.icon(
       onPressed: onPressed,
       icon: isFaIcon
-          ? FaIcon(icon as IconData, color: Colors.white, size: 18)
-          : Icon(icon as IconData, color: Colors.white, size: 18),
+          ? FaIcon(icon as IconData, color: Colors.white, size: ResponsiveHelper.getResponsiveIconSize(context, mobile: 18, tablet: 20, desktop: 22))
+          : Icon(icon as IconData, color: Colors.white, size: ResponsiveHelper.getResponsiveIconSize(context, mobile: 18, tablet: 20, desktop: 22)),
       label: Text(
         text,
-        style: const TextStyle(
+        style: TextStyle(
           fontWeight: FontWeight.w600,
-          fontSize: 14,
+          fontSize: ResponsiveHelper.getResponsiveFontSize(context, mobile: 14, tablet: 16, desktop: 18),
           color: Colors.white,
         ),
       ),
@@ -267,10 +268,10 @@ class _VehicleDetailPageState extends State<VehicleDetailPage> {
         backgroundColor: color,
         foregroundColor: Colors.white,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(ResponsiveHelper.getResponsiveBorderRadius(context, mobile: 20, tablet: 24, desktop: 28)),
         ),
         elevation: 2,
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        padding: ResponsiveHelper.getResponsiveButtonPadding(context),
         textStyle: const TextStyle(fontWeight: FontWeight.w600),
       ),
     );

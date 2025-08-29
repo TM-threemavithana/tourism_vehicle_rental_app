@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import '../widgets/side_menu.dart';
 import 'owner/booking_requests_screen.dart';
 import 'vehicle_detail_page.dart';
+import '../utils/responsive_helper.dart';
 
 class NotificationsScreen extends StatefulWidget {
   const NotificationsScreen({super.key});
@@ -181,36 +182,58 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     }
 
     return Card(
-      elevation: 2,
-      margin: const EdgeInsets.symmetric(vertical: 8),
+      elevation: ResponsiveHelper.isTablet(context) ? 4 : 2,
+      margin: EdgeInsets.symmetric(
+          vertical: ResponsiveHelper.getResponsiveSpacing(context,
+              mobile: 8, tablet: 10, desktop: 12)),
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(
+            ResponsiveHelper.getResponsiveBorderRadius(context,
+                mobile: 12, tablet: 16, desktop: 20)),
       ),
       child: ListTile(
-        contentPadding: const EdgeInsets.all(16),
+        contentPadding: ResponsiveHelper.getResponsivePadding(context,
+            mobile: 16, tablet: 20, desktop: 24),
         leading: CircleAvatar(
           backgroundColor: iconColor.withOpacity(0.2),
+          radius: ResponsiveHelper.getResponsiveIconSize(context,
+              mobile: 20, tablet: 24, desktop: 28),
           child: Icon(
             icon,
             color: iconColor,
+            size: ResponsiveHelper.getResponsiveIconSize(context,
+                mobile: 20, tablet: 24, desktop: 28),
           ),
         ),
         title: Text(
           title,
-          style: const TextStyle(
+          style: TextStyle(
             fontWeight: FontWeight.bold,
+            fontSize: ResponsiveHelper.getResponsiveFontSize(context,
+                mobile: 16, tablet: 18, desktop: 20),
           ),
         ),
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const SizedBox(height: 4),
-            Text(description),
-            const SizedBox(height: 4),
+            SizedBox(
+                height: ResponsiveHelper.getResponsiveSpacing(context,
+                    mobile: 4, tablet: 6, desktop: 8)),
+            Text(
+              description,
+              style: TextStyle(
+                fontSize: ResponsiveHelper.getResponsiveFontSize(context,
+                    mobile: 14, tablet: 16, desktop: 18),
+              ),
+            ),
+            SizedBox(
+                height: ResponsiveHelper.getResponsiveSpacing(context,
+                    mobile: 4, tablet: 6, desktop: 8)),
             Text(
               formattedDate,
               style: TextStyle(
-                fontSize: 12,
+                fontSize: ResponsiveHelper.getResponsiveFontSize(context,
+                    mobile: 12, tablet: 14, desktop: 16),
                 color: Colors.grey.shade600,
               ),
             ),
@@ -228,12 +251,19 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     return Scaffold(
       backgroundColor: isDarkMode ? Colors.grey.shade900 : Colors.grey.shade100,
       appBar: AppBar(
-        title: const Text(
+        title: Text(
           'Notifications',
-          style: TextStyle(fontWeight: FontWeight.bold),
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: ResponsiveHelper.getResponsiveFontSize(context,
+                mobile: 20, tablet: 22, desktop: 24),
+          ),
         ),
         leading: IconButton(
-          icon: const Icon(Icons.menu),
+          icon: Icon(
+            Icons.menu,
+            size: ResponsiveHelper.getResponsiveIconSize(context),
+          ),
           onPressed: _toggleMenu,
         ),
       ),
@@ -241,11 +271,13 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         children: [
           // Main content
           Padding(
-            padding: const EdgeInsets.all(16.0),
+            padding: ResponsiveHelper.getResponsivePadding(context),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const SizedBox(height: 8),
+                SizedBox(
+                    height: ResponsiveHelper.getResponsiveSpacing(context,
+                        mobile: 8, tablet: 12, desktop: 16)),
                 StreamBuilder<QuerySnapshot>(
                   stream: _userType == 'owner'
                       ? FirebaseFirestore.instance
@@ -280,14 +312,28 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                           children: [
                             Icon(
                               Icons.notifications_off,
-                              size: 64,
+                              size: ResponsiveHelper.getResponsiveIconSize(
+                                  context,
+                                  mobile: 64,
+                                  tablet: 80,
+                                  desktop: 96),
                               color: Colors.grey.shade400,
                             ),
-                            const SizedBox(height: 16),
+                            SizedBox(
+                                height: ResponsiveHelper.getResponsiveSpacing(
+                                    context,
+                                    mobile: 16,
+                                    tablet: 20,
+                                    desktop: 24)),
                             Text(
                               'No notifications yet',
                               style: TextStyle(
-                                fontSize: 18,
+                                fontSize:
+                                    ResponsiveHelper.getResponsiveFontSize(
+                                        context,
+                                        mobile: 18,
+                                        tablet: 20,
+                                        desktop: 22),
                                 color: Colors.grey.shade600,
                               ),
                             ),
@@ -314,14 +360,28 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                           children: [
                             Icon(
                               Icons.notifications_off,
-                              size: 64,
+                              size: ResponsiveHelper.getResponsiveIconSize(
+                                  context,
+                                  mobile: 64,
+                                  tablet: 80,
+                                  desktop: 96),
                               color: Colors.grey.shade400,
                             ),
-                            const SizedBox(height: 16),
+                            SizedBox(
+                                height: ResponsiveHelper.getResponsiveSpacing(
+                                    context,
+                                    mobile: 16,
+                                    tablet: 20,
+                                    desktop: 24)),
                             Text(
                               'No notifications yet',
                               style: TextStyle(
-                                fontSize: 18,
+                                fontSize:
+                                    ResponsiveHelper.getResponsiveFontSize(
+                                        context,
+                                        mobile: 18,
+                                        tablet: 20,
+                                        desktop: 22),
                                 color: Colors.grey.shade600,
                               ),
                             ),

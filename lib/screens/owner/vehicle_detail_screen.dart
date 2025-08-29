@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 // Remove carousel_slider import
 import 'package:cached_network_image/cached_network_image.dart';
+import '../../utils/responsive_helper.dart';
 
 class VehicleDetailScreen extends StatefulWidget {
   final Map<String, dynamic> vehicle;
@@ -72,7 +73,8 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
         slivers: [
           // App Bar with Image Carousel
           SliverAppBar(
-            expandedHeight: 300,
+            expandedHeight: ResponsiveHelper.getResponsiveSpacing(context,
+                mobile: 250, tablet: 300, desktop: 350),
             pinned: true,
             backgroundColor: theme.colorScheme.primary,
             flexibleSpace: FlexibleSpaceBar(
@@ -97,16 +99,31 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
                   // Dots indicator
                   if (_imageUrls.length > 1)
                     Positioned(
-                      bottom: 20,
+                      bottom: ResponsiveHelper.getResponsiveSpacing(context,
+                          mobile: 16, tablet: 20, desktop: 24),
                       left: 0,
                       right: 0,
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: _imageUrls.asMap().entries.map((entry) {
                           return Container(
-                            width: 8.0,
-                            height: 8.0,
-                            margin: const EdgeInsets.symmetric(horizontal: 4.0),
+                            width: ResponsiveHelper.getResponsiveSpacing(
+                                context,
+                                mobile: 6,
+                                tablet: 8,
+                                desktop: 10),
+                            height: ResponsiveHelper.getResponsiveSpacing(
+                                context,
+                                mobile: 6,
+                                tablet: 8,
+                                desktop: 10),
+                            margin: EdgeInsets.symmetric(
+                                horizontal:
+                                    ResponsiveHelper.getResponsiveSpacing(
+                                        context,
+                                        mobile: 3,
+                                        tablet: 4,
+                                        desktop: 5)),
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
                               color: _currentImageIndex == entry.key
@@ -121,36 +138,54 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
               ),
             ),
             leading: Container(
-              margin: const EdgeInsets.all(8),
+              margin: ResponsiveHelper.getResponsivePadding(context,
+                  mobile: 6, tablet: 8, desktop: 10),
               decoration: BoxDecoration(
                 color: Colors.black.withOpacity(0.4),
                 shape: BoxShape.circle,
               ),
               child: IconButton(
-                icon: const Icon(Icons.arrow_back, color: Colors.white),
+                icon: Icon(
+                  Icons.arrow_back,
+                  color: Colors.white,
+                  size: ResponsiveHelper.getResponsiveIconSize(context,
+                      mobile: 20, tablet: 24, desktop: 28),
+                ),
                 onPressed: () => Navigator.pop(context),
               ),
             ),
             actions: [
               Container(
-                margin: const EdgeInsets.all(8),
+                margin: ResponsiveHelper.getResponsivePadding(context,
+                    mobile: 6, tablet: 8, desktop: 10),
                 decoration: BoxDecoration(
                   color: Colors.black.withOpacity(0.4),
                   shape: BoxShape.circle,
                 ),
                 child: IconButton(
-                  icon: const Icon(Icons.edit, color: Colors.white),
+                  icon: Icon(
+                    Icons.edit,
+                    color: Colors.white,
+                    size: ResponsiveHelper.getResponsiveIconSize(context,
+                        mobile: 20, tablet: 24, desktop: 28),
+                  ),
                   onPressed: () => _editVehicle(),
                 ),
               ),
               Container(
-                margin: const EdgeInsets.all(8),
+                margin: ResponsiveHelper.getResponsivePadding(context,
+                    mobile: 6, tablet: 8, desktop: 10),
                 decoration: BoxDecoration(
                   color: Colors.black.withOpacity(0.4),
                   shape: BoxShape.circle,
                 ),
                 child: IconButton(
-                  icon: const Icon(Icons.delete, color: Colors.white),
+                  icon: Icon(
+                    Icons.delete,
+                    color: Colors.white,
+                    size: ResponsiveHelper.getResponsiveIconSize(context,
+                        mobile: 20, tablet: 24, desktop: 28),
+                  ),
                   onPressed: () => _showDeleteDialog(),
                 ),
               ),
@@ -164,7 +199,16 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
               children: [
                 // Vehicle title and status
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+                  padding: EdgeInsets.fromLTRB(
+                    ResponsiveHelper.getResponsiveSpacing(context,
+                        mobile: 12, tablet: 16, desktop: 20),
+                    ResponsiveHelper.getResponsiveSpacing(context,
+                        mobile: 12, tablet: 16, desktop: 20),
+                    ResponsiveHelper.getResponsiveSpacing(context,
+                        mobile: 12, tablet: 16, desktop: 20),
+                    ResponsiveHelper.getResponsiveSpacing(context,
+                        mobile: 6, tablet: 8, desktop: 10),
+                  ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -174,16 +218,31 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
                           children: [
                             Text(
                               '${_vehicleDetails['make'] ?? ''} ${_vehicleDetails['model'] ?? ''}',
-                              style: const TextStyle(
-                                fontSize: 24,
+                              style: TextStyle(
+                                fontSize:
+                                    ResponsiveHelper.getResponsiveFontSize(
+                                        context,
+                                        mobile: 20,
+                                        tablet: 24,
+                                        desktop: 28),
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
-                            const SizedBox(height: 4),
+                            SizedBox(
+                                height: ResponsiveHelper.getResponsiveSpacing(
+                                    context,
+                                    mobile: 3,
+                                    tablet: 4,
+                                    desktop: 5)),
                             Text(
                               '${_vehicleDetails['category'] ?? 'Vehicle'} - ${_vehicleDetails['year'] ?? ''}',
                               style: TextStyle(
-                                fontSize: 16,
+                                fontSize:
+                                    ResponsiveHelper.getResponsiveFontSize(
+                                        context,
+                                        mobile: 14,
+                                        tablet: 16,
+                                        desktop: 18),
                                 color: isDarkMode
                                     ? Colors.white70
                                     : Colors.grey[700],
@@ -201,15 +260,25 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
                             Text(
                               'LKR ${_vehicleDetails['pricing']['daily']['vehicleOnly']['price']}',
                               style: TextStyle(
-                                fontSize: 22,
+                                fontSize:
+                                    ResponsiveHelper.getResponsiveFontSize(
+                                        context,
+                                        mobile: 18,
+                                        tablet: 22,
+                                        desktop: 26),
                                 fontWeight: FontWeight.bold,
                                 color: theme.colorScheme.primary,
                               ),
                             ),
-                            const Text(
+                            Text(
                               'per day',
                               style: TextStyle(
-                                fontSize: 14,
+                                fontSize:
+                                    ResponsiveHelper.getResponsiveFontSize(
+                                        context,
+                                        mobile: 12,
+                                        tablet: 14,
+                                        desktop: 16),
                                 color: Colors.grey,
                               ),
                             ),
@@ -221,7 +290,9 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
 
                 // Status chip
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  padding: EdgeInsets.symmetric(
+                      horizontal: ResponsiveHelper.getResponsiveSpacing(context,
+                          mobile: 12, tablet: 16, desktop: 20)),
                   child: Chip(
                     backgroundColor: _getStatusColor(_vehicleDetails['status'])
                         .withOpacity(0.2),
@@ -235,6 +306,11 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
                       style: TextStyle(
                         color: _getStatusColor(_vehicleDetails['status']),
                         fontWeight: FontWeight.bold,
+                        fontSize: ResponsiveHelper.getResponsiveFontSize(
+                            context,
+                            mobile: 12,
+                            tablet: 14,
+                            desktop: 16),
                       ),
                     ),
                   ),
@@ -242,12 +318,17 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
 
                 // Vehicle Registration Details
                 Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  padding: EdgeInsets.symmetric(
+                    horizontal: ResponsiveHelper.getResponsiveSpacing(context,
+                        mobile: 12, tablet: 16, desktop: 20),
+                    vertical: ResponsiveHelper.getResponsiveSpacing(context,
+                        mobile: 6, tablet: 8, desktop: 10),
+                  ),
                   child: Text(
                     'Vehicle No: ${_vehicleDetails['vehicleNo'] ?? 'N/A'}',
                     style: TextStyle(
-                      fontSize: 16,
+                      fontSize: ResponsiveHelper.getResponsiveFontSize(context,
+                          mobile: 14, tablet: 16, desktop: 18),
                       fontWeight: FontWeight.w500,
                       color: isDarkMode ? Colors.white70 : Colors.black87,
                     ),
@@ -256,18 +337,32 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
 
                 // Location
                 Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                  padding: EdgeInsets.symmetric(
+                    horizontal: ResponsiveHelper.getResponsiveSpacing(context,
+                        mobile: 12, tablet: 16, desktop: 20),
+                    vertical: ResponsiveHelper.getResponsiveSpacing(context,
+                        mobile: 3, tablet: 4, desktop: 5),
+                  ),
                   child: Row(
                     children: [
-                      Icon(Icons.location_on,
-                          size: 18, color: theme.colorScheme.primary),
-                      const SizedBox(width: 4),
+                      Icon(
+                        Icons.location_on,
+                        size: ResponsiveHelper.getResponsiveIconSize(context,
+                            mobile: 16, tablet: 18, desktop: 20),
+                        color: theme.colorScheme.primary,
+                      ),
+                      SizedBox(
+                          width: ResponsiveHelper.getResponsiveSpacing(context,
+                              mobile: 3, tablet: 4, desktop: 5)),
                       Expanded(
                         child: Text(
                           '${_vehicleDetails['collectionPoint']?['city'] ?? 'N/A'}, ${_vehicleDetails['collectionPoint']?['district'] ?? 'N/A'}',
-                          style: const TextStyle(
-                            fontSize: 16,
+                          style: TextStyle(
+                            fontSize: ResponsiveHelper.getResponsiveFontSize(
+                                context,
+                                mobile: 14,
+                                tablet: 16,
+                                desktop: 18),
                           ),
                         ),
                       ),
@@ -275,7 +370,9 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
                   ),
                 ),
 
-                const Divider(height: 32),
+                Divider(
+                    height: ResponsiveHelper.getResponsiveSpacing(context,
+                        mobile: 24, tablet: 32, desktop: 40)),
 
                 // Tabs for more details
                 DefaultTabController(
@@ -288,11 +385,59 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
                         unselectedLabelColor:
                             isDarkMode ? Colors.white70 : Colors.grey[700],
                         indicatorColor: theme.colorScheme.primary,
-                        tabs: const [
-                          Tab(text: 'Specs'),
-                          Tab(text: 'Features'),
-                          Tab(text: 'Rental'),
-                          Tab(text: 'Insurance'),
+                        tabs: [
+                          Tab(
+                            child: Text(
+                              'Specs',
+                              style: TextStyle(
+                                fontSize:
+                                    ResponsiveHelper.getResponsiveFontSize(
+                                        context,
+                                        mobile: 14,
+                                        tablet: 16,
+                                        desktop: 18),
+                              ),
+                            ),
+                          ),
+                          Tab(
+                            child: Text(
+                              'Features',
+                              style: TextStyle(
+                                fontSize:
+                                    ResponsiveHelper.getResponsiveFontSize(
+                                        context,
+                                        mobile: 14,
+                                        tablet: 16,
+                                        desktop: 18),
+                              ),
+                            ),
+                          ),
+                          Tab(
+                            child: Text(
+                              'Rental',
+                              style: TextStyle(
+                                fontSize:
+                                    ResponsiveHelper.getResponsiveFontSize(
+                                        context,
+                                        mobile: 14,
+                                        tablet: 16,
+                                        desktop: 18),
+                              ),
+                            ),
+                          ),
+                          Tab(
+                            child: Text(
+                              'Insurance',
+                              style: TextStyle(
+                                fontSize:
+                                    ResponsiveHelper.getResponsiveFontSize(
+                                        context,
+                                        mobile: 14,
+                                        tablet: 16,
+                                        desktop: 18),
+                              ),
+                            ),
+                          ),
                         ],
                       ),
                       SizedBox(

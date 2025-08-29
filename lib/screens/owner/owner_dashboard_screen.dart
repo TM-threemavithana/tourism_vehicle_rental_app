@@ -6,6 +6,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../services/auth_service.dart';
+import '../../utils/responsive_helper.dart';
 import '../auth/auth_wrapper.dart';
 import '../../widgets/side_menu.dart';
 import '../profile_screen.dart';
@@ -363,20 +364,23 @@ class _OwnerDashboardScreenState extends State<OwnerDashboardScreen>
               children: [
                 // App Bar
                 Padding(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 16.0, vertical: 8.0),
+                  padding: ResponsiveHelper.getResponsiveHorizontalPadding(context),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       IconButton(
-                        icon: const Icon(Icons.menu, color: Colors.white),
+                        icon: Icon(
+                          Icons.menu, 
+                          color: Colors.white,
+                          size: ResponsiveHelper.getResponsiveIconSize(context),
+                        ),
                         onPressed: _toggleMenu,
                       ),
-                      const Text(
+                      Text(
                         'OWNER DASHBOARD',
                         style: TextStyle(
                           color: Colors.white,
-                          fontSize: 18,
+                          fontSize: ResponsiveHelper.getResponsiveFontSize(context, mobile: 18, tablet: 22, desktop: 26),
                           fontWeight: FontWeight.bold,
                           letterSpacing: 1.2,
                         ),
@@ -385,16 +389,19 @@ class _OwnerDashboardScreenState extends State<OwnerDashboardScreen>
                         children: [
                           IconButton(
                             icon: _isLoading
-                                ? const SizedBox(
-                                    width: 20,
-                                    height: 20,
+                                ? SizedBox(
+                                    width: ResponsiveHelper.getResponsiveIconSize(context, mobile: 20, tablet: 24, desktop: 28),
+                                    height: ResponsiveHelper.getResponsiveIconSize(context, mobile: 20, tablet: 24, desktop: 28),
                                     child: CircularProgressIndicator(
                                       strokeWidth: 2,
                                       color: Colors.white,
                                     ),
                                   )
-                                : const Icon(Icons.swap_horiz,
-                                color: Colors.white),
+                                : Icon(
+                                    Icons.swap_horiz,
+                                    color: Colors.white,
+                                    size: ResponsiveHelper.getResponsiveIconSize(context),
+                                  ),
                             onPressed: _isLoading ? null : _switchToRenterMode,
                             tooltip: 'Switch to Renter Mode',
                           ),
@@ -403,11 +410,13 @@ class _OwnerDashboardScreenState extends State<OwnerDashboardScreen>
                             child: Container(
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
-                                border:
-                                    Border.all(color: Colors.white, width: 2),
+                                border: Border.all(
+                                  color: Colors.white, 
+                                  width: ResponsiveHelper.getResponsiveSpacing(context, mobile: 2, tablet: 3, desktop: 4),
+                                ),
                               ),
                               child: CircleAvatar(
-                                radius: 14,
+                                radius: ResponsiveHelper.getResponsiveProfileSize(context, mobile: 14, tablet: 18, desktop: 22),
                                 backgroundColor: Colors.grey[300],
                                 backgroundImage: FirebaseAuth
                                             .instance.currentUser?.photoURL !=
@@ -422,9 +431,10 @@ class _OwnerDashboardScreenState extends State<OwnerDashboardScreen>
                                         _getUserFirstName()
                                             .substring(0, 1)
                                             .toUpperCase(),
-                                        style: const TextStyle(
+                                        style: TextStyle(
                                           fontWeight: FontWeight.bold,
                                           color: Colors.black54,
+                                          fontSize: ResponsiveHelper.getResponsiveFontSize(context, mobile: 14, tablet: 18, desktop: 22),
                                         ),
                                       )
                                     : null,
@@ -450,8 +460,7 @@ class _OwnerDashboardScreenState extends State<OwnerDashboardScreen>
                           children: [
                             // Header and welcome text
                             Padding(
-                              padding: const EdgeInsets.only(
-                                  left: 24.0, right: 24.0, top: 16.0),
+                              padding: ResponsiveHelper.getResponsivePadding(context, mobile: 24, tablet: 32, desktop: 40),
                               child: Row(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
@@ -463,16 +472,16 @@ class _OwnerDashboardScreenState extends State<OwnerDashboardScreen>
                                         Text(
                                           'Welcome back,',
                                           style: TextStyle(
-                                            fontSize: 16,
+                                            fontSize: ResponsiveHelper.getResponsiveFontSize(context, mobile: 16, tablet: 18, desktop: 20),
                                             color:
                                                 Colors.white.withOpacity(0.9),
                                           ),
                                         ),
-                                        const SizedBox(height: 4),
+                                        SizedBox(height: ResponsiveHelper.getResponsiveSpacing(context, mobile: 4, tablet: 6, desktop: 8)),
                                         Text(
                                           _getUserFirstName(),
-                                          style: const TextStyle(
-                                            fontSize: 28,
+                                          style: TextStyle(
+                                            fontSize: ResponsiveHelper.getResponsiveFontSize(context, mobile: 28, tablet: 32, desktop: 36),
                                             fontWeight: FontWeight.bold,
                                             color: Colors.white,
                                           ),
@@ -488,15 +497,12 @@ class _OwnerDashboardScreenState extends State<OwnerDashboardScreen>
                                             .format(DateTime.now()),
                                         style: TextStyle(
                                           color: Colors.white.withOpacity(0.9),
-                                          fontSize: 14,
+                                          fontSize: ResponsiveHelper.getResponsiveFontSize(context, mobile: 14, tablet: 16, desktop: 18),
                                         ),
                                       ),
-                                      const SizedBox(height: 4),
+                                      SizedBox(height: ResponsiveHelper.getResponsiveSpacing(context, mobile: 4, tablet: 6, desktop: 8)),
                                       Container(
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 10,
-                                          vertical: 4,
-                                        ),
+                                        padding: ResponsiveHelper.getResponsivePadding(context, mobile: 10, tablet: 12, desktop: 16),
                                         decoration: BoxDecoration(
                                           color: Colors.white.withOpacity(0.2),
                                           borderRadius:

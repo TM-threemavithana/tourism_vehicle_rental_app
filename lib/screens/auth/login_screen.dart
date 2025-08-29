@@ -5,6 +5,7 @@ import 'forgot_password_screen.dart';
 import '../../services/auth_service.dart';
 import '../../widgets/google_sign_in_button.dart';
 import '../welcome_screen.dart';
+import '../../utils/responsive_helper.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -150,7 +151,7 @@ class _LoginScreenState extends State<LoginScreen>
             left: 0,
             right: 0,
             child: CustomPaint(
-              size: Size(MediaQuery.of(context).size.width, 80),
+              size: Size(MediaQuery.of(context).size.width, ResponsiveHelper.getResponsiveSpacing(context, mobile: 80, tablet: 100, desktop: 120)),
               painter: WavePainter(
                 color: Theme.of(context).colorScheme.primary.withOpacity(0.3),
               ),
@@ -161,13 +162,13 @@ class _LoginScreenState extends State<LoginScreen>
           SafeArea(
             child: SingleChildScrollView(
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                padding: ResponsiveHelper.getResponsiveHorizontalPadding(context),
                 child: FadeTransition(
                   opacity: _fadeAnimation,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const SizedBox(height: 40),
+                      SizedBox(height: ResponsiveHelper.getResponsiveSpacing(context, mobile: 40, tablet: 60, desktop: 80)),
 
                       // Logo and name
                       Center(
@@ -176,9 +177,9 @@ class _LoginScreenState extends State<LoginScreen>
                             Hero(
                               tag: 'appLogo',
                               child: Container(
-                                width: 100,
-                                height: 100,
-                                padding: const EdgeInsets.all(5),
+                                width: ResponsiveHelper.getResponsiveProfileSize(context, mobile: 100, tablet: 120, desktop: 140),
+                                height: ResponsiveHelper.getResponsiveProfileSize(context, mobile: 100, tablet: 120, desktop: 140),
+                                padding: ResponsiveHelper.getResponsivePadding(context, mobile: 5, tablet: 8, desktop: 10),
                                 decoration: BoxDecoration(
                                   color: Colors.white.withOpacity(0.2),
                                   shape: BoxShape.circle,
@@ -191,29 +192,28 @@ class _LoginScreenState extends State<LoginScreen>
                                         (context, error, stackTrace) =>
                                             Container(
                                       color: Colors.grey[200],
-                                      child: const Center(
-                                          child: Icon(Icons.image, size: 40)),
+                                      child: Icon(Icons.image, size: ResponsiveHelper.getResponsiveIconSize(context, mobile: 40, tablet: 50, desktop: 60)),
                                     ),
                                   ),
                                 ),
                               ),
                             ),
-                            const SizedBox(height: 16),
-                            const Text(
+                            SizedBox(height: ResponsiveHelper.getResponsiveSpacing(context, mobile: 16, tablet: 20, desktop: 24)),
+                            Text(
                               'Wayz.lk', // Updated from 'WayZ.lk' to 'Wayz.lk'
                               style: TextStyle(
                                 color: Colors.white,
-                                fontSize: 32,
+                                fontSize: ResponsiveHelper.getResponsiveFontSize(context, mobile: 32, tablet: 36, desktop: 40),
                                 fontWeight: FontWeight.bold,
                                 letterSpacing: 1.5,
                               ),
                             ),
-                            const SizedBox(height: 8),
+                            SizedBox(height: ResponsiveHelper.getResponsiveSpacing(context, mobile: 8, tablet: 12, desktop: 16)),
                             Text(
                               'Where Paradise Meets Adventure',
                               style: TextStyle(
                                 color: Colors.white.withOpacity(0.9),
-                                fontSize: 16,
+                                fontSize: ResponsiveHelper.getResponsiveFontSize(context, mobile: 16, tablet: 18, desktop: 20),
                                 letterSpacing: 0.5,
                               ),
                             ),
@@ -221,39 +221,39 @@ class _LoginScreenState extends State<LoginScreen>
                         ),
                       ),
 
-                      const SizedBox(height: 50),
+                      SizedBox(height: ResponsiveHelper.getResponsiveSpacing(context, mobile: 50, tablet: 70, desktop: 90)),
 
                       // Login Form Card
                       Card(
-                        elevation: 8,
+                        elevation: ResponsiveHelper.isTablet(context) ? 12 : 8,
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20),
+                          borderRadius: BorderRadius.circular(ResponsiveHelper.getResponsiveBorderRadius(context)),
                         ),
                         color: Colors.white.withOpacity(0.9),
                         child: Padding(
-                          padding: const EdgeInsets.all(24.0),
+                          padding: ResponsiveHelper.getResponsivePadding(context, mobile: 24, tablet: 32, desktop: 40),
                           child: Form(
                             key: _formKey,
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                const Text(
+                                Text(
                                   'Welcome Back!',
                                   style: TextStyle(
-                                    fontSize: 24,
+                                    fontSize: ResponsiveHelper.getResponsiveFontSize(context, mobile: 24, tablet: 28, desktop: 32),
                                     fontWeight: FontWeight.bold,
                                     color: Colors.black87,
                                   ),
                                 ),
-                                const SizedBox(height: 8),
+                                SizedBox(height: ResponsiveHelper.getResponsiveSpacing(context, mobile: 8, tablet: 12, desktop: 16)),
                                 Text(
                                   'Sign in to continue your adventure',
                                   style: TextStyle(
-                                    fontSize: 14,
+                                    fontSize: ResponsiveHelper.getResponsiveFontSize(context, mobile: 14, tablet: 16, desktop: 18),
                                     color: Colors.grey[600],
                                   ),
                                 ),
-                                const SizedBox(height: 24),
+                                SizedBox(height: ResponsiveHelper.getResponsiveSpacing(context, mobile: 24, tablet: 32, desktop: 40)),
 
                                 // Email field
                                 TextFormField(
@@ -266,18 +266,19 @@ class _LoginScreenState extends State<LoginScreen>
                                       Icons.email_outlined,
                                       color:
                                           Theme.of(context).colorScheme.primary,
+                                      size: ResponsiveHelper.getResponsiveIconSize(context),
                                     ),
                                     border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(12),
+                                      borderRadius: BorderRadius.circular(ResponsiveHelper.getResponsiveBorderRadius(context, mobile: 12, tablet: 16, desktop: 20)),
                                     ),
                                     enabledBorder: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(12),
+                                      borderRadius: BorderRadius.circular(ResponsiveHelper.getResponsiveBorderRadius(context, mobile: 12, tablet: 16, desktop: 20)),
                                       borderSide: BorderSide(
                                         color: Colors.grey.shade300,
                                       ),
                                     ),
                                     focusedBorder: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(12),
+                                      borderRadius: BorderRadius.circular(ResponsiveHelper.getResponsiveBorderRadius(context, mobile: 12, tablet: 16, desktop: 20)),
                                       borderSide: BorderSide(
                                         color: Theme.of(context)
                                             .colorScheme
@@ -298,7 +299,8 @@ class _LoginScreenState extends State<LoginScreen>
                                     return null;
                                   },
                                 ),
-                                const SizedBox(height: 20),
+
+                                SizedBox(height: ResponsiveHelper.getResponsiveSpacing(context, mobile: 20, tablet: 24, desktop: 28)),
 
                                 // Password field
                                 TextFormField(
@@ -311,6 +313,7 @@ class _LoginScreenState extends State<LoginScreen>
                                       Icons.lock_outline,
                                       color:
                                           Theme.of(context).colorScheme.primary,
+                                      size: ResponsiveHelper.getResponsiveIconSize(context),
                                     ),
                                     suffixIcon: IconButton(
                                       icon: Icon(
@@ -318,6 +321,7 @@ class _LoginScreenState extends State<LoginScreen>
                                             ? Icons.visibility_off
                                             : Icons.visibility,
                                         color: Colors.grey[600],
+                                        size: ResponsiveHelper.getResponsiveIconSize(context),
                                       ),
                                       onPressed: () {
                                         setState(() {
@@ -326,16 +330,16 @@ class _LoginScreenState extends State<LoginScreen>
                                       },
                                     ),
                                     border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(12),
+                                      borderRadius: BorderRadius.circular(ResponsiveHelper.getResponsiveBorderRadius(context, mobile: 12, tablet: 16, desktop: 20)),
                                     ),
                                     enabledBorder: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(12),
+                                      borderRadius: BorderRadius.circular(ResponsiveHelper.getResponsiveBorderRadius(context, mobile: 12, tablet: 16, desktop: 20)),
                                       borderSide: BorderSide(
                                         color: Colors.grey.shade300,
                                       ),
                                     ),
                                     focusedBorder: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(12),
+                                      borderRadius: BorderRadius.circular(ResponsiveHelper.getResponsiveBorderRadius(context, mobile: 12, tablet: 16, desktop: 20)),
                                       borderSide: BorderSide(
                                         color: Theme.of(context)
                                             .colorScheme
@@ -355,7 +359,7 @@ class _LoginScreenState extends State<LoginScreen>
                                   },
                                 ),
 
-                                const SizedBox(height: 16),
+                                SizedBox(height: ResponsiveHelper.getResponsiveSpacing(context, mobile: 16, tablet: 20, desktop: 24)),
 
                                 // Remember me and Forgot password row
                                 Row(
@@ -365,8 +369,8 @@ class _LoginScreenState extends State<LoginScreen>
                                     Row(
                                       children: [
                                         SizedBox(
-                                          width: 24,
-                                          height: 24,
+                                          width: ResponsiveHelper.getResponsiveIconSize(context, mobile: 24, tablet: 28, desktop: 32),
+                                          height: ResponsiveHelper.getResponsiveIconSize(context, mobile: 24, tablet: 28, desktop: 32),
                                           child: Checkbox(
                                             value: _rememberMe,
                                             onChanged: (value) {
@@ -383,12 +387,12 @@ class _LoginScreenState extends State<LoginScreen>
                                             ),
                                           ),
                                         ),
-                                        const SizedBox(width: 8),
+                                        SizedBox(width: ResponsiveHelper.getResponsiveSpacing(context, mobile: 8, tablet: 12, desktop: 16)),
                                         Text(
                                           'Remember me',
                                           style: TextStyle(
                                             color: Colors.grey[700],
-                                            fontSize: 14,
+                                            fontSize: ResponsiveHelper.getResponsiveFontSize(context, mobile: 14, tablet: 16, desktop: 18),
                                           ),
                                         ),
                                       ],
@@ -411,10 +415,10 @@ class _LoginScreenState extends State<LoginScreen>
                                         tapTargetSize:
                                             MaterialTapTargetSize.shrinkWrap,
                                       ),
-                                      child: const Text(
+                                      child: Text(
                                         'Forgot Password?',
                                         style: TextStyle(
-                                          fontSize: 14,
+                                          fontSize: ResponsiveHelper.getResponsiveFontSize(context, mobile: 14, tablet: 16, desktop: 18),
                                           fontWeight: FontWeight.w600,
                                         ),
                                       ),
@@ -422,12 +426,12 @@ class _LoginScreenState extends State<LoginScreen>
                                   ],
                                 ),
 
-                                const SizedBox(height: 30),
+                                SizedBox(height: ResponsiveHelper.getResponsiveSpacing(context, mobile: 30, tablet: 40, desktop: 50)),
 
                                 // Sign In button
                                 SizedBox(
                                   width: double.infinity,
-                                  height: 55,
+                                  height: ResponsiveHelper.isTablet(context) ? 65 : 55,
                                   child: ElevatedButton(
                                     onPressed: _isLoading ? null : _login,
                                     style: ElevatedButton.styleFrom(
@@ -436,7 +440,7 @@ class _LoginScreenState extends State<LoginScreen>
                                       foregroundColor: Colors.white,
                                       elevation: 3,
                                       shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(12),
+                                        borderRadius: BorderRadius.circular(ResponsiveHelper.getResponsiveBorderRadius(context, mobile: 12, tablet: 16, desktop: 20)),
                                       ),
                                     ),
                                     child: _isLoading
@@ -444,10 +448,10 @@ class _LoginScreenState extends State<LoginScreen>
                                             color: Colors.white,
                                             strokeWidth: 3,
                                           )
-                                        : const Text(
+                                        : Text(
                                             'Sign In',
                                             style: TextStyle(
-                                              fontSize: 18,
+                                              fontSize: ResponsiveHelper.getResponsiveFontSize(context, mobile: 18, tablet: 20, desktop: 22),
                                               fontWeight: FontWeight.bold,
                                               letterSpacing: 0.5,
                                             ),
@@ -455,7 +459,7 @@ class _LoginScreenState extends State<LoginScreen>
                                   ),
                                 ),
 
-                                const SizedBox(height: 20),
+                                SizedBox(height: ResponsiveHelper.getResponsiveSpacing(context, mobile: 20, tablet: 24, desktop: 28)),
 
                                 // Divider with "Or" text
                                 Row(
@@ -467,13 +471,13 @@ class _LoginScreenState extends State<LoginScreen>
                                       ),
                                     ),
                                     Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 16),
+                                      padding: EdgeInsets.symmetric(
+                                          horizontal: ResponsiveHelper.getResponsiveSpacing(context, mobile: 16, tablet: 20, desktop: 24)),
                                       child: Text(
                                         'Or',
                                         style: TextStyle(
                                           color: Colors.grey[600],
-                                          fontSize: 14,
+                                          fontSize: ResponsiveHelper.getResponsiveFontSize(context, mobile: 14, tablet: 16, desktop: 18),
                                         ),
                                       ),
                                     ),
@@ -486,7 +490,7 @@ class _LoginScreenState extends State<LoginScreen>
                                   ],
                                 ),
 
-                                const SizedBox(height: 20),
+                                SizedBox(height: ResponsiveHelper.getResponsiveSpacing(context, mobile: 20, tablet: 24, desktop: 28)),
 
                                 // Center the Google sign-in button
                                 Center(
@@ -517,7 +521,7 @@ class _LoginScreenState extends State<LoginScreen>
                         ),
                       ),
 
-                      const SizedBox(height: 30),
+                      SizedBox(height: ResponsiveHelper.getResponsiveSpacing(context, mobile: 30, tablet: 40, desktop: 50)),
 
                       // Sign up text
                       Center(
@@ -526,7 +530,7 @@ class _LoginScreenState extends State<LoginScreen>
                             text: "Don't have an account? ",
                             style: TextStyle(
                               color: Colors.white.withOpacity(0.9),
-                              fontSize: 16,
+                              fontSize: ResponsiveHelper.getResponsiveFontSize(context, mobile: 16, tablet: 18, desktop: 20),
                             ),
                             children: [
                               TextSpan(
@@ -551,7 +555,7 @@ class _LoginScreenState extends State<LoginScreen>
                           ),
                         ),
                       ),
-                      const SizedBox(height: 30),
+                      SizedBox(height: ResponsiveHelper.getResponsiveSpacing(context, mobile: 30, tablet: 40, desktop: 50)),
                     ],
                   ),
                 ),

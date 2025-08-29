@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import '../../utils/responsive_helper.dart';
 import 'login_screen.dart';
 import '../welcome_screen.dart';
 import '../owner/owner_dashboard_screen.dart';
@@ -47,9 +48,15 @@ class _AuthWrapperState extends State<AuthWrapper> {
               builder: (context, userTypeSnapshot) {
                 if (userTypeSnapshot.connectionState ==
                     ConnectionState.waiting) {
-                  return const Scaffold(
+                  return Scaffold(
                     body: Center(
-                      child: CircularProgressIndicator(),
+                      child: CircularProgressIndicator(
+                        strokeWidth: ResponsiveHelper.getResponsiveSpacing(
+                            context,
+                            mobile: 3,
+                            tablet: 4,
+                            desktop: 5),
+                      ),
                     ),
                   );
                 }
@@ -67,9 +74,12 @@ class _AuthWrapperState extends State<AuthWrapper> {
         }
 
         // While waiting for the state to be determined, show a loading indicator
-        return const Scaffold(
+        return Scaffold(
           body: Center(
-            child: CircularProgressIndicator(),
+            child: CircularProgressIndicator(
+              strokeWidth: ResponsiveHelper.getResponsiveSpacing(context,
+                  mobile: 3, tablet: 4, desktop: 5),
+            ),
           ),
         );
       },

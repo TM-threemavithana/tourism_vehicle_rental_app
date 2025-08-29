@@ -4,6 +4,7 @@ import '../welcome_screen.dart';
 import 'login_screen.dart';
 import '../../services/auth_service.dart';
 import '../../widgets/google_sign_in_button.dart'; // Add this import if it's not already there
+import '../../utils/responsive_helper.dart';
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
@@ -152,7 +153,7 @@ class _SignupScreenState extends State<SignupScreen>
             left: 0,
             right: 0,
             child: CustomPaint(
-              size: Size(MediaQuery.of(context).size.width, 80),
+              size: Size(MediaQuery.of(context).size.width, ResponsiveHelper.getResponsiveSpacing(context, mobile: 80, tablet: 100, desktop: 120)),
               painter: WavePainter(
                 color: Theme.of(context).colorScheme.tertiary.withOpacity(0.3),
               ),
@@ -163,7 +164,7 @@ class _SignupScreenState extends State<SignupScreen>
           SafeArea(
             child: SingleChildScrollView(
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                padding: ResponsiveHelper.getResponsiveHorizontalPadding(context),
                 child: FadeTransition(
                   opacity: _fadeAnimation,
                   child: Column(
@@ -171,55 +172,56 @@ class _SignupScreenState extends State<SignupScreen>
                     children: [
                       // Back button
                       Padding(
-                        padding: const EdgeInsets.only(top: 16.0),
+                        padding: EdgeInsets.only(top: ResponsiveHelper.getResponsiveSpacing(context, mobile: 16, tablet: 20, desktop: 24)),
                         child: IconButton(
                           onPressed: () => Navigator.pop(context),
-                          icon: const Icon(
+                          icon: Icon(
                             Icons.arrow_back_ios_rounded,
                             color: Colors.white,
+                            size: ResponsiveHelper.getResponsiveIconSize(context),
                           ),
                         ),
                       ),
-                      const SizedBox(height: 20),
+                      SizedBox(height: ResponsiveHelper.getResponsiveSpacing(context, mobile: 20, tablet: 24, desktop: 28)),
 
                       // Title text
                       Padding(
-                        padding: const EdgeInsets.only(left: 16.0),
+                        padding: EdgeInsets.only(left: ResponsiveHelper.getResponsiveSpacing(context, mobile: 16, tablet: 20, desktop: 24)),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text(
+                            Text(
                               'Create Account',
                               style: TextStyle(
                                 color: Colors.white,
-                                fontSize: 32,
+                                fontSize: ResponsiveHelper.getResponsiveFontSize(context, mobile: 32, tablet: 36, desktop: 40),
                                 fontWeight: FontWeight.bold,
                                 letterSpacing: 1.0,
                               ),
                             ),
-                            const SizedBox(height: 8),
+                            SizedBox(height: ResponsiveHelper.getResponsiveSpacing(context, mobile: 8, tablet: 12, desktop: 16)),
                             Text(
                               'Join Wayz.lk for amazing adventures',
                               style: TextStyle(
                                 color: Colors.white.withOpacity(0.9),
-                                fontSize: 16,
+                                fontSize: ResponsiveHelper.getResponsiveFontSize(context, mobile: 16, tablet: 18, desktop: 20),
                               ),
                             ),
                           ],
                         ),
                       ),
 
-                      const SizedBox(height: 30),
+                      SizedBox(height: ResponsiveHelper.getResponsiveSpacing(context, mobile: 30, tablet: 40, desktop: 50)),
 
                       // Signup Form Card
                       Card(
-                        elevation: 8,
+                        elevation: ResponsiveHelper.isTablet(context) ? 12 : 8,
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20),
+                          borderRadius: BorderRadius.circular(ResponsiveHelper.getResponsiveBorderRadius(context)),
                         ),
                         color: Colors.white.withOpacity(0.9),
                         child: Padding(
-                          padding: const EdgeInsets.all(24.0),
+                          padding: ResponsiveHelper.getResponsivePadding(context, mobile: 24, tablet: 32, desktop: 40),
                           child: Form(
                             key: _formKey,
                             child: Column(
@@ -235,18 +237,19 @@ class _SignupScreenState extends State<SignupScreen>
                                       Icons.person_outline,
                                       color:
                                           Theme.of(context).colorScheme.primary,
+                                      size: ResponsiveHelper.getResponsiveIconSize(context),
                                     ),
                                     border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(12),
+                                      borderRadius: BorderRadius.circular(ResponsiveHelper.getResponsiveBorderRadius(context, mobile: 12, tablet: 16, desktop: 20)),
                                     ),
                                     enabledBorder: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(12),
+                                      borderRadius: BorderRadius.circular(ResponsiveHelper.getResponsiveBorderRadius(context, mobile: 12, tablet: 16, desktop: 20)),
                                       borderSide: BorderSide(
                                         color: Colors.grey.shade300,
                                       ),
                                     ),
                                     focusedBorder: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(12),
+                                      borderRadius: BorderRadius.circular(ResponsiveHelper.getResponsiveBorderRadius(context, mobile: 12, tablet: 16, desktop: 20)),
                                       borderSide: BorderSide(
                                         color: Theme.of(context)
                                             .colorScheme
@@ -262,7 +265,7 @@ class _SignupScreenState extends State<SignupScreen>
                                     return null;
                                   },
                                 ),
-                                const SizedBox(height: 20),
+                                SizedBox(height: ResponsiveHelper.getResponsiveSpacing(context, mobile: 20, tablet: 24, desktop: 28)),
 
                                 // Email field
                                 TextFormField(
@@ -275,18 +278,19 @@ class _SignupScreenState extends State<SignupScreen>
                                       Icons.email_outlined,
                                       color:
                                           Theme.of(context).colorScheme.primary,
+                                      size: ResponsiveHelper.getResponsiveIconSize(context),
                                     ),
                                     border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(12),
+                                      borderRadius: BorderRadius.circular(ResponsiveHelper.getResponsiveBorderRadius(context, mobile: 12, tablet: 16, desktop: 20)),
                                     ),
                                     enabledBorder: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(12),
+                                      borderRadius: BorderRadius.circular(ResponsiveHelper.getResponsiveBorderRadius(context, mobile: 12, tablet: 16, desktop: 20)),
                                       borderSide: BorderSide(
                                         color: Colors.grey.shade300,
                                       ),
                                     ),
                                     focusedBorder: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(12),
+                                      borderRadius: BorderRadius.circular(ResponsiveHelper.getResponsiveBorderRadius(context, mobile: 12, tablet: 16, desktop: 20)),
                                       borderSide: BorderSide(
                                         color: Theme.of(context)
                                             .colorScheme
@@ -307,7 +311,7 @@ class _SignupScreenState extends State<SignupScreen>
                                     return null;
                                   },
                                 ),
-                                const SizedBox(height: 20),
+                                SizedBox(height: ResponsiveHelper.getResponsiveSpacing(context, mobile: 20, tablet: 24, desktop: 28)),
 
                                 // Password field
                                 TextFormField(
@@ -320,6 +324,7 @@ class _SignupScreenState extends State<SignupScreen>
                                       Icons.lock_outline,
                                       color:
                                           Theme.of(context).colorScheme.primary,
+                                      size: ResponsiveHelper.getResponsiveIconSize(context),
                                     ),
                                     suffixIcon: IconButton(
                                       icon: Icon(
@@ -327,6 +332,7 @@ class _SignupScreenState extends State<SignupScreen>
                                             ? Icons.visibility_off
                                             : Icons.visibility,
                                         color: Colors.grey[600],
+                                        size: ResponsiveHelper.getResponsiveIconSize(context),
                                       ),
                                       onPressed: () {
                                         setState(() {
@@ -335,16 +341,16 @@ class _SignupScreenState extends State<SignupScreen>
                                       },
                                     ),
                                     border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(12),
+                                      borderRadius: BorderRadius.circular(ResponsiveHelper.getResponsiveBorderRadius(context, mobile: 12, tablet: 16, desktop: 20)),
                                     ),
                                     enabledBorder: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(12),
+                                      borderRadius: BorderRadius.circular(ResponsiveHelper.getResponsiveBorderRadius(context, mobile: 12, tablet: 16, desktop: 20)),
                                       borderSide: BorderSide(
                                         color: Colors.grey.shade300,
                                       ),
                                     ),
                                     focusedBorder: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(12),
+                                      borderRadius: BorderRadius.circular(ResponsiveHelper.getResponsiveBorderRadius(context, mobile: 12, tablet: 16, desktop: 20)),
                                       borderSide: BorderSide(
                                         color: Theme.of(context)
                                             .colorScheme
@@ -363,7 +369,7 @@ class _SignupScreenState extends State<SignupScreen>
                                     return null;
                                   },
                                 ),
-                                const SizedBox(height: 20),
+                                SizedBox(height: ResponsiveHelper.getResponsiveSpacing(context, mobile: 20, tablet: 24, desktop: 28)),
 
                                 // Confirm password field
                                 TextFormField(
@@ -376,6 +382,7 @@ class _SignupScreenState extends State<SignupScreen>
                                       Icons.lock_outline,
                                       color:
                                           Theme.of(context).colorScheme.primary,
+                                      size: ResponsiveHelper.getResponsiveIconSize(context),
                                     ),
                                     suffixIcon: IconButton(
                                       icon: Icon(
@@ -383,6 +390,7 @@ class _SignupScreenState extends State<SignupScreen>
                                             ? Icons.visibility_off
                                             : Icons.visibility,
                                         color: Colors.grey[600],
+                                        size: ResponsiveHelper.getResponsiveIconSize(context),
                                       ),
                                       onPressed: () {
                                         setState(() {
@@ -392,16 +400,16 @@ class _SignupScreenState extends State<SignupScreen>
                                       },
                                     ),
                                     border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(12),
+                                      borderRadius: BorderRadius.circular(ResponsiveHelper.getResponsiveBorderRadius(context, mobile: 12, tablet: 16, desktop: 20)),
                                     ),
                                     enabledBorder: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(12),
+                                      borderRadius: BorderRadius.circular(ResponsiveHelper.getResponsiveBorderRadius(context, mobile: 12, tablet: 16, desktop: 20)),
                                       borderSide: BorderSide(
                                         color: Colors.grey.shade300,
                                       ),
                                     ),
                                     focusedBorder: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(12),
+                                      borderRadius: BorderRadius.circular(ResponsiveHelper.getResponsiveBorderRadius(context, mobile: 12, tablet: 16, desktop: 20)),
                                       borderSide: BorderSide(
                                         color: Theme.of(context)
                                             .colorScheme
@@ -421,15 +429,15 @@ class _SignupScreenState extends State<SignupScreen>
                                   },
                                 ),
 
-                                const SizedBox(height: 20),
+                                SizedBox(height: ResponsiveHelper.getResponsiveSpacing(context, mobile: 20, tablet: 24, desktop: 28)),
 
                                 // Terms and conditions
                                 Row(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     SizedBox(
-                                      width: 24,
-                                      height: 24,
+                                      width: ResponsiveHelper.getResponsiveIconSize(context, mobile: 24, tablet: 28, desktop: 32),
+                                      height: ResponsiveHelper.getResponsiveIconSize(context, mobile: 24, tablet: 28, desktop: 32),
                                       child: Checkbox(
                                         value: _agreeToTerms,
                                         onChanged: (value) {
@@ -446,14 +454,14 @@ class _SignupScreenState extends State<SignupScreen>
                                         ),
                                       ),
                                     ),
-                                    const SizedBox(width: 12),
+                                    SizedBox(width: ResponsiveHelper.getResponsiveSpacing(context, mobile: 12, tablet: 16, desktop: 20)),
                                     Expanded(
                                       child: RichText(
                                         text: TextSpan(
                                           text: 'I agree to the ',
                                           style: TextStyle(
                                             color: Colors.grey[700],
-                                            fontSize: 14,
+                                            fontSize: ResponsiveHelper.getResponsiveFontSize(context, mobile: 14, tablet: 16, desktop: 18),
                                           ),
                                           children: [
                                             TextSpan(
@@ -469,7 +477,7 @@ class _SignupScreenState extends State<SignupScreen>
                                                   // Navigate to Terms of Service
                                                 },
                                             ),
-                                            const TextSpan(
+                                            TextSpan(
                                               text: ' and ',
                                             ),
                                             TextSpan(
@@ -492,12 +500,12 @@ class _SignupScreenState extends State<SignupScreen>
                                   ],
                                 ),
 
-                                const SizedBox(height: 30),
+                                SizedBox(height: ResponsiveHelper.getResponsiveSpacing(context, mobile: 30, tablet: 40, desktop: 50)),
 
                                 // Sign Up button
                                 SizedBox(
                                   width: double.infinity,
-                                  height: 55,
+                                  height: ResponsiveHelper.isTablet(context) ? 65 : 55,
                                   child: ElevatedButton(
                                     onPressed: _isLoading ? null : _signup,
                                     style: ElevatedButton.styleFrom(
@@ -506,7 +514,7 @@ class _SignupScreenState extends State<SignupScreen>
                                       foregroundColor: Colors.white,
                                       elevation: 3,
                                       shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(12),
+                                        borderRadius: BorderRadius.circular(ResponsiveHelper.getResponsiveBorderRadius(context, mobile: 12, tablet: 16, desktop: 20)),
                                       ),
                                     ),
                                     child: _isLoading
@@ -514,10 +522,10 @@ class _SignupScreenState extends State<SignupScreen>
                                             color: Colors.white,
                                             strokeWidth: 3,
                                           )
-                                        : const Text(
+                                        : Text(
                                             'Create Account',
                                             style: TextStyle(
-                                              fontSize: 18,
+                                              fontSize: ResponsiveHelper.getResponsiveFontSize(context, mobile: 18, tablet: 20, desktop: 22),
                                               fontWeight: FontWeight.bold,
                                               letterSpacing: 0.5,
                                             ),
@@ -530,18 +538,19 @@ class _SignupScreenState extends State<SignupScreen>
                         ),
                       ),
 
-                      const SizedBox(height: 30),
+                      SizedBox(height: ResponsiveHelper.getResponsiveSpacing(context, mobile: 30, tablet: 40, desktop: 50)),
 
                       // Add the divider and Google sign-in button
                       Card(
-                        elevation: 8,
+                        elevation: ResponsiveHelper.isTablet(context) ? 12 : 8,
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20),
+                          borderRadius: BorderRadius.circular(ResponsiveHelper.getResponsiveBorderRadius(context)),
                         ),
                         color: Colors.white.withOpacity(0.9),
                         child: Padding(
-                          padding: const EdgeInsets.symmetric(
-                              vertical: 20.0, horizontal: 24.0),
+                          padding: EdgeInsets.symmetric(
+                              vertical: ResponsiveHelper.getResponsiveSpacing(context, mobile: 20, tablet: 24, desktop: 28), 
+                              horizontal: ResponsiveHelper.getResponsiveSpacing(context, mobile: 24, tablet: 32, desktop: 40)),
                           child: Column(
                             children: [
                               // Divider with "Or" text
@@ -554,13 +563,13 @@ class _SignupScreenState extends State<SignupScreen>
                                     ),
                                   ),
                                   Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 16),
+                                    padding: EdgeInsets.symmetric(
+                                        horizontal: ResponsiveHelper.getResponsiveSpacing(context, mobile: 16, tablet: 20, desktop: 24)),
                                     child: Text(
                                       'Or sign up with',
                                       style: TextStyle(
                                         color: Colors.grey[600],
-                                        fontSize: 14,
+                                        fontSize: ResponsiveHelper.getResponsiveFontSize(context, mobile: 14, tablet: 16, desktop: 18),
                                       ),
                                     ),
                                   ),
@@ -573,7 +582,7 @@ class _SignupScreenState extends State<SignupScreen>
                                 ],
                               ),
 
-                              const SizedBox(height: 20),
+                              SizedBox(height: ResponsiveHelper.getResponsiveSpacing(context, mobile: 20, tablet: 24, desktop: 28)),
 
                               // Google sign-in button
                               Center(
@@ -604,7 +613,7 @@ class _SignupScreenState extends State<SignupScreen>
                         ),
                       ),
 
-                      const SizedBox(height: 30),
+                      SizedBox(height: ResponsiveHelper.getResponsiveSpacing(context, mobile: 30, tablet: 40, desktop: 50)),
 
                       // Already have an account text
                       Center(
@@ -613,7 +622,7 @@ class _SignupScreenState extends State<SignupScreen>
                             text: 'Already have an account? ',
                             style: TextStyle(
                               color: Colors.white.withOpacity(0.9),
-                              fontSize: 16,
+                              fontSize: ResponsiveHelper.getResponsiveFontSize(context, mobile: 16, tablet: 18, desktop: 20),
                             ),
                             children: [
                               TextSpan(
@@ -638,7 +647,7 @@ class _SignupScreenState extends State<SignupScreen>
                           ),
                         ),
                       ),
-                      const SizedBox(height: 30),
+                      SizedBox(height: ResponsiveHelper.getResponsiveSpacing(context, mobile: 30, tablet: 40, desktop: 50)),
                     ],
                   ),
                 ),

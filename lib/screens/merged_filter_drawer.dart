@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../utils/app_colors.dart';
+import '../utils/responsive_helper.dart';
 
 class MergedFilterDrawer extends StatefulWidget {
   final Set<String> selectedVehicleTypes;
@@ -173,37 +174,35 @@ class _MergedFilterDrawerState extends State<MergedFilterDrawer> {
                   Container(
                     decoration: BoxDecoration(
                       color: Colors.grey[900],
-                      borderRadius: const BorderRadius.only(
-                        topLeft: Radius.circular(12),
-                        topRight: Radius.circular(12),
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(ResponsiveHelper.getResponsiveBorderRadius(context, mobile: 10, tablet: 12, desktop: 16)),
+                        topRight: Radius.circular(ResponsiveHelper.getResponsiveBorderRadius(context, mobile: 10, tablet: 12, desktop: 16)),
                       ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.08),
-                          blurRadius: 8,
-                          offset: const Offset(0, 2),
-                        ),
-                      ],
+                      boxShadow: ResponsiveHelper.getResponsiveShadow(context, mobile: 6, tablet: 8, desktop: 10),
                     ),
                     padding: EdgeInsets.only(
-                      left: 20,
-                      right: 8,
-                      top: MediaQuery.of(context).padding.top + 16,
-                      bottom: 12,
+                      left: ResponsiveHelper.getResponsiveSpacing(context, mobile: 16, tablet: 20, desktop: 24),
+                      right: ResponsiveHelper.getResponsiveSpacing(context, mobile: 6, tablet: 8, desktop: 10),
+                      top: MediaQuery.of(context).padding.top + ResponsiveHelper.getResponsiveSpacing(context, mobile: 12, tablet: 16, desktop: 20),
+                      bottom: ResponsiveHelper.getResponsiveSpacing(context, mobile: 8, tablet: 12, desktop: 16),
                     ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Text(
+                        Text(
                           'Search & Filter',
                           style: TextStyle(
                             color: Colors.white,
-                            fontSize: 20,
+                            fontSize: ResponsiveHelper.getResponsiveFontSize(context, mobile: 18, tablet: 20, desktop: 22),
                             fontWeight: FontWeight.bold,
                           ),
                         ),
                         IconButton(
-                          icon: const Icon(Icons.close, color: Colors.white),
+                          icon: Icon(
+                            Icons.close, 
+                            color: Colors.white,
+                            size: ResponsiveHelper.getResponsiveIconSize(context, mobile: 20, tablet: 24, desktop: 28),
+                          ),
                           padding: EdgeInsets.zero,
                           constraints: const BoxConstraints(),
                           onPressed: () => Navigator.pop(context),
@@ -217,21 +216,21 @@ class _MergedFilterDrawerState extends State<MergedFilterDrawer> {
                       top: false,
                       bottom: true,
                       child: SingleChildScrollView(
-                        padding: const EdgeInsets.all(20),
+                        padding: ResponsiveHelper.getResponsivePadding(context, mobile: 16, tablet: 20, desktop: 24),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             // Search Parameters Section
                             _buildSectionHeader(
                                 'Search Parameters', isDarkMode),
-                            const SizedBox(height: 16),
+                            SizedBox(height: ResponsiveHelper.getResponsiveSpacing(context, mobile: 12, tablet: 16, desktop: 20)),
 
                             // Vehicle Types
                             _buildSectionHeader('Vehicle Types', isDarkMode),
-                            const SizedBox(height: 8),
+                            SizedBox(height: ResponsiveHelper.getResponsiveSpacing(context, mobile: 6, tablet: 8, desktop: 10)),
                             Wrap(
-                              spacing: 8,
-                              runSpacing: 8,
+                              spacing: ResponsiveHelper.getResponsiveSpacing(context, mobile: 6, tablet: 8, desktop: 10),
+                              runSpacing: ResponsiveHelper.getResponsiveSpacing(context, mobile: 6, tablet: 8, desktop: 10),
                               children: _vehicleTypes.map((type) {
                                 final isSelected =
                                     _selectedVehicles.contains(type);
@@ -239,8 +238,9 @@ class _MergedFilterDrawerState extends State<MergedFilterDrawer> {
                                   onTap: () => _toggleVehicleSelection(type),
                                   child: AnimatedContainer(
                                     duration: const Duration(milliseconds: 200),
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 16, vertical: 8),
+                                    padding: EdgeInsets.symmetric(
+                                        horizontal: ResponsiveHelper.getResponsiveSpacing(context, mobile: 12, tablet: 16, desktop: 20),
+                                        vertical: ResponsiveHelper.getResponsiveSpacing(context, mobile: 6, tablet: 8, desktop: 10)),
                                     decoration: BoxDecoration(
                                       color: isSelected
                                           ? AppColors.primary
@@ -250,7 +250,7 @@ class _MergedFilterDrawerState extends State<MergedFilterDrawer> {
                                             ? AppColors.primary
                                             : Colors.grey,
                                       ),
-                                      borderRadius: BorderRadius.circular(20),
+                                      borderRadius: BorderRadius.circular(ResponsiveHelper.getResponsiveBorderRadius(context, mobile: 16, tablet: 20, desktop: 24)),
                                     ),
                                     child: Text(
                                       type,
@@ -261,17 +261,18 @@ class _MergedFilterDrawerState extends State<MergedFilterDrawer> {
                                         fontWeight: isSelected
                                             ? FontWeight.bold
                                             : FontWeight.normal,
+                                        fontSize: ResponsiveHelper.getResponsiveFontSize(context, mobile: 14, tablet: 16, desktop: 18),
                                       ),
                                     ),
                                   ),
                                 );
                               }).toList(),
                             ),
-                            const SizedBox(height: 20),
+                            SizedBox(height: ResponsiveHelper.getResponsiveSpacing(context, mobile: 16, tablet: 20, desktop: 24)),
 
                             // Location
                             _buildSectionHeader('Location', isDarkMode),
-                            const SizedBox(height: 8),
+                            SizedBox(height: ResponsiveHelper.getResponsiveSpacing(context, mobile: 6, tablet: 8, desktop: 10)),
                             TextField(
                               controller: _locationController,
                               focusNode: _focusNode,
@@ -282,10 +283,16 @@ class _MergedFilterDrawerState extends State<MergedFilterDrawer> {
                               },
                               decoration: InputDecoration(
                                 hintText: 'Enter location',
-                                prefixIcon: const Icon(Icons.location_on),
+                                prefixIcon: Icon(
+                                  Icons.location_on,
+                                  size: ResponsiveHelper.getResponsiveIconSize(context, mobile: 20, tablet: 24, desktop: 28),
+                                ),
                                 suffixIcon: _focusNode.hasFocus
                                     ? IconButton(
-                                        icon: const Icon(Icons.keyboard_hide),
+                                        icon: Icon(
+                                          Icons.keyboard_hide,
+                                          size: ResponsiveHelper.getResponsiveIconSize(context, mobile: 20, tablet: 24, desktop: 28),
+                                        ),
                                         onPressed: () {
                                           FocusScope.of(context).unfocus();
                                           // Add a small delay and then apply filters
@@ -298,89 +305,94 @@ class _MergedFilterDrawerState extends State<MergedFilterDrawer> {
                                       )
                                     : null,
                                 border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(8),
+                                  borderRadius: BorderRadius.circular(ResponsiveHelper.getResponsiveBorderRadius(context, mobile: 6, tablet: 8, desktop: 10)),
                                 ),
                               ),
                             ),
-                            const SizedBox(height: 12),
+                            SizedBox(height: ResponsiveHelper.getResponsiveSpacing(context, mobile: 8, tablet: 12, desktop: 16)),
                             Wrap(
-                              spacing: 8,
-                              runSpacing: 8,
+                              spacing: ResponsiveHelper.getResponsiveSpacing(context, mobile: 6, tablet: 8, desktop: 10),
+                              runSpacing: ResponsiveHelper.getResponsiveSpacing(context, mobile: 6, tablet: 8, desktop: 10),
                               children: _popularLocations.map((location) {
                                 return GestureDetector(
                                   onTap: () {
                                     _locationController.text = location;
                                   },
                                   child: Container(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 12, vertical: 6),
+                                    padding: EdgeInsets.symmetric(
+                                        horizontal: ResponsiveHelper.getResponsiveSpacing(context, mobile: 10, tablet: 12, desktop: 14),
+                                        vertical: ResponsiveHelper.getResponsiveSpacing(context, mobile: 4, tablet: 6, desktop: 8)),
                                     decoration: BoxDecoration(
                                       color: Colors.grey[200],
-                                      borderRadius: BorderRadius.circular(16),
+                                      borderRadius: BorderRadius.circular(ResponsiveHelper.getResponsiveBorderRadius(context, mobile: 12, tablet: 16, desktop: 20)),
                                     ),
                                     child: Text(
                                       location,
                                       style: TextStyle(
                                         color: Colors.grey[700],
-                                        fontSize: 12,
+                                        fontSize: ResponsiveHelper.getResponsiveFontSize(context, mobile: 11, tablet: 12, desktop: 13),
                                       ),
                                     ),
                                   ),
                                 );
                               }).toList(),
                             ),
-                            const SizedBox(height: 20),
+                            SizedBox(height: ResponsiveHelper.getResponsiveSpacing(context, mobile: 16, tablet: 20, desktop: 24)),
 
                             // Dates
                             _buildSectionHeader(
                                 'Pickup Date & Time', isDarkMode),
-                            const SizedBox(height: 8),
+                            SizedBox(height: ResponsiveHelper.getResponsiveSpacing(context, mobile: 6, tablet: 8, desktop: 10)),
                             Row(
                               children: [
                                 Expanded(
                                   child: GestureDetector(
                                     onTap: () => _selectDate(context, true),
                                     child: Container(
-                                      padding: const EdgeInsets.all(12),
+                                      padding: ResponsiveHelper.getResponsivePadding(context, mobile: 10, tablet: 12, desktop: 14),
                                       decoration: BoxDecoration(
                                         border: Border.all(color: Colors.grey),
-                                        borderRadius: BorderRadius.circular(8),
+                                        borderRadius: BorderRadius.circular(ResponsiveHelper.getResponsiveBorderRadius(context, mobile: 6, tablet: 8, desktop: 10)),
                                       ),
                                       child: Row(
                                         children: [
-                                          const Icon(Icons.calendar_today,
-                                              size: 16),
-                                          const SizedBox(width: 8),
+                                          Icon(
+                                            Icons.calendar_today,
+                                            size: ResponsiveHelper.getResponsiveIconSize(context, mobile: 14, tablet: 16, desktop: 18),
+                                          ),
+                                          SizedBox(width: ResponsiveHelper.getResponsiveSpacing(context, mobile: 6, tablet: 8, desktop: 10)),
                                           Text(
                                             DateFormat('MMM dd, yyyy')
                                                 .format(_pickupDate),
-                                            style:
-                                                const TextStyle(fontSize: 14),
+                                            style: TextStyle(
+                                                fontSize: ResponsiveHelper.getResponsiveFontSize(context, mobile: 12, tablet: 14, desktop: 16)),
                                           ),
                                         ],
                                       ),
                                     ),
                                   ),
                                 ),
-                                const SizedBox(width: 12),
+                                SizedBox(width: ResponsiveHelper.getResponsiveSpacing(context, mobile: 8, tablet: 12, desktop: 16)),
                                 Expanded(
                                   child: GestureDetector(
                                     onTap: () => _selectTime(context, true),
                                     child: Container(
-                                      padding: const EdgeInsets.all(12),
+                                      padding: ResponsiveHelper.getResponsivePadding(context, mobile: 10, tablet: 12, desktop: 14),
                                       decoration: BoxDecoration(
                                         border: Border.all(color: Colors.grey),
-                                        borderRadius: BorderRadius.circular(8),
+                                        borderRadius: BorderRadius.circular(ResponsiveHelper.getResponsiveBorderRadius(context, mobile: 6, tablet: 8, desktop: 10)),
                                       ),
                                       child: Row(
                                         children: [
-                                          const Icon(Icons.access_time,
-                                              size: 16),
-                                          const SizedBox(width: 8),
+                                          Icon(
+                                            Icons.access_time,
+                                            size: ResponsiveHelper.getResponsiveIconSize(context, mobile: 14, tablet: 16, desktop: 18),
+                                          ),
+                                          SizedBox(width: ResponsiveHelper.getResponsiveSpacing(context, mobile: 6, tablet: 8, desktop: 10)),
                                           Text(
                                             _pickupTime.format(context),
-                                            style:
-                                                const TextStyle(fontSize: 14),
+                                            style: TextStyle(
+                                                fontSize: ResponsiveHelper.getResponsiveFontSize(context, mobile: 12, tablet: 14, desktop: 16)),
                                           ),
                                         ],
                                       ),
@@ -389,57 +401,61 @@ class _MergedFilterDrawerState extends State<MergedFilterDrawer> {
                                 ),
                               ],
                             ),
-                            const SizedBox(height: 12),
+                            SizedBox(height: ResponsiveHelper.getResponsiveSpacing(context, mobile: 8, tablet: 12, desktop: 16)),
 
                             _buildSectionHeader(
                                 'Return Date & Time', isDarkMode),
-                            const SizedBox(height: 8),
+                            SizedBox(height: ResponsiveHelper.getResponsiveSpacing(context, mobile: 6, tablet: 8, desktop: 10)),
                             Row(
                               children: [
                                 Expanded(
                                   child: GestureDetector(
                                     onTap: () => _selectDate(context, false),
                                     child: Container(
-                                      padding: const EdgeInsets.all(12),
+                                      padding: ResponsiveHelper.getResponsivePadding(context, mobile: 10, tablet: 12, desktop: 14),
                                       decoration: BoxDecoration(
                                         border: Border.all(color: Colors.grey),
-                                        borderRadius: BorderRadius.circular(8),
+                                        borderRadius: BorderRadius.circular(ResponsiveHelper.getResponsiveBorderRadius(context, mobile: 6, tablet: 8, desktop: 10)),
                                       ),
                                       child: Row(
                                         children: [
-                                          const Icon(Icons.calendar_today,
-                                              size: 16),
-                                          const SizedBox(width: 8),
+                                          Icon(
+                                            Icons.calendar_today,
+                                            size: ResponsiveHelper.getResponsiveIconSize(context, mobile: 14, tablet: 16, desktop: 18),
+                                          ),
+                                          SizedBox(width: ResponsiveHelper.getResponsiveSpacing(context, mobile: 6, tablet: 8, desktop: 10)),
                                           Text(
                                             DateFormat('MMM dd, yyyy')
                                                 .format(_returnDate),
-                                            style:
-                                                const TextStyle(fontSize: 14),
+                                            style: TextStyle(
+                                                fontSize: ResponsiveHelper.getResponsiveFontSize(context, mobile: 12, tablet: 14, desktop: 16)),
                                           ),
                                         ],
                                       ),
                                     ),
                                   ),
                                 ),
-                                const SizedBox(width: 12),
+                                SizedBox(width: ResponsiveHelper.getResponsiveSpacing(context, mobile: 8, tablet: 12, desktop: 16)),
                                 Expanded(
                                   child: GestureDetector(
                                     onTap: () => _selectTime(context, false),
                                     child: Container(
-                                      padding: const EdgeInsets.all(12),
+                                      padding: ResponsiveHelper.getResponsivePadding(context, mobile: 10, tablet: 12, desktop: 14),
                                       decoration: BoxDecoration(
                                         border: Border.all(color: Colors.grey),
-                                        borderRadius: BorderRadius.circular(8),
+                                        borderRadius: BorderRadius.circular(ResponsiveHelper.getResponsiveBorderRadius(context, mobile: 6, tablet: 8, desktop: 10)),
                                       ),
                                       child: Row(
                                         children: [
-                                          const Icon(Icons.access_time,
-                                              size: 16),
-                                          const SizedBox(width: 8),
+                                          Icon(
+                                            Icons.access_time,
+                                            size: ResponsiveHelper.getResponsiveIconSize(context, mobile: 14, tablet: 16, desktop: 18),
+                                          ),
+                                          SizedBox(width: ResponsiveHelper.getResponsiveSpacing(context, mobile: 6, tablet: 8, desktop: 10)),
                                           Text(
                                             _returnTime.format(context),
-                                            style:
-                                                const TextStyle(fontSize: 14),
+                                            style: TextStyle(
+                                                fontSize: ResponsiveHelper.getResponsiveFontSize(context, mobile: 12, tablet: 14, desktop: 16)),
                                           ),
                                         ],
                                       ),
@@ -448,11 +464,11 @@ class _MergedFilterDrawerState extends State<MergedFilterDrawer> {
                                 ),
                               ],
                             ),
-                            const SizedBox(height: 20),
+                            SizedBox(height: ResponsiveHelper.getResponsiveSpacing(context, mobile: 16, tablet: 20, desktop: 24)),
 
                             // Filter Results Section
                             _buildSectionHeader('Filter Results', isDarkMode),
-                            const SizedBox(height: 16),
+                            SizedBox(height: ResponsiveHelper.getResponsiveSpacing(context, mobile: 12, tablet: 16, desktop: 20)),
 
                             // Active filters indicator
                             if (_selectedSortOption.isNotEmpty ||
@@ -461,27 +477,30 @@ class _MergedFilterDrawerState extends State<MergedFilterDrawer> {
                                 _selectedTransmissionTypes.isNotEmpty ||
                                 _selectedRentModes.isNotEmpty)
                               Container(
-                                padding: const EdgeInsets.all(8),
-                                margin: const EdgeInsets.only(bottom: 16),
+                                padding: ResponsiveHelper.getResponsivePadding(context, mobile: 6, tablet: 8, desktop: 10),
+                                margin: EdgeInsets.only(bottom: ResponsiveHelper.getResponsiveSpacing(context, mobile: 12, tablet: 16, desktop: 20)),
                                 decoration: BoxDecoration(
                                   color: AppColors.primary.withOpacity(0.1),
-                                  borderRadius: BorderRadius.circular(8),
+                                  borderRadius: BorderRadius.circular(ResponsiveHelper.getResponsiveBorderRadius(context, mobile: 6, tablet: 8, desktop: 10)),
                                   border: Border.all(
                                       color:
                                           AppColors.primary.withOpacity(0.3)),
                                 ),
                                 child: Row(
                                   children: [
-                                    Icon(Icons.filter_list,
-                                        color: AppColors.primary, size: 16),
-                                    const SizedBox(width: 8),
+                                    Icon(
+                                      Icons.filter_list,
+                                      color: AppColors.primary, 
+                                      size: ResponsiveHelper.getResponsiveIconSize(context, mobile: 14, tablet: 16, desktop: 18),
+                                    ),
+                                    SizedBox(width: ResponsiveHelper.getResponsiveSpacing(context, mobile: 6, tablet: 8, desktop: 10)),
                                     Expanded(
                                       child: Text(
                                         'Filters Active',
                                         style: TextStyle(
                                           color: AppColors.primary,
                                           fontWeight: FontWeight.w500,
-                                          fontSize: 12,
+                                          fontSize: ResponsiveHelper.getResponsiveFontSize(context, mobile: 11, tablet: 12, desktop: 13),
                                         ),
                                       ),
                                     ),
@@ -491,7 +510,7 @@ class _MergedFilterDrawerState extends State<MergedFilterDrawer> {
 
                             // Sort Options
                             _buildSectionHeader('Sort By', isDarkMode),
-                            const SizedBox(height: 8),
+                            SizedBox(height: ResponsiveHelper.getResponsiveSpacing(context, mobile: 6, tablet: 8, desktop: 10)),
                             SingleChildScrollView(
                               scrollDirection: Axis.horizontal,
                               child: Row(
@@ -506,11 +525,11 @@ class _MergedFilterDrawerState extends State<MergedFilterDrawer> {
                                 ],
                               ),
                             ),
-                            const SizedBox(height: 20),
+                            SizedBox(height: ResponsiveHelper.getResponsiveSpacing(context, mobile: 16, tablet: 20, desktop: 24)),
 
                             // Price Range
                             _buildSectionHeader('Price Range', isDarkMode),
-                            const SizedBox(height: 8),
+                            SizedBox(height: ResponsiveHelper.getResponsiveSpacing(context, mobile: 6, tablet: 8, desktop: 10)),
                             RangeSlider(
                               values: _priceRange,
                               min: _minPrice,
@@ -534,18 +553,18 @@ class _MergedFilterDrawerState extends State<MergedFilterDrawer> {
                             Text(
                               'Price Range: Rs. ${_priceRange.start.round()} - Rs. ${_priceRange.end.round()}',
                               style: TextStyle(
-                                fontSize: 12,
+                                fontSize: ResponsiveHelper.getResponsiveFontSize(context, mobile: 11, tablet: 12, desktop: 13),
                                 color: Colors.grey[600],
                               ),
                             ),
-                            const SizedBox(height: 20),
+                            SizedBox(height: ResponsiveHelper.getResponsiveSpacing(context, mobile: 16, tablet: 20, desktop: 24)),
 
                             // Features
                             _buildSectionHeader('Features', isDarkMode),
-                            const SizedBox(height: 8),
+                            SizedBox(height: ResponsiveHelper.getResponsiveSpacing(context, mobile: 6, tablet: 8, desktop: 10)),
                             Wrap(
-                              spacing: 8,
-                              runSpacing: 8,
+                              spacing: ResponsiveHelper.getResponsiveSpacing(context, mobile: 6, tablet: 8, desktop: 10),
+                              runSpacing: ResponsiveHelper.getResponsiveSpacing(context, mobile: 6, tablet: 8, desktop: 10),
                               children: _commonFeatures.map((feature) {
                                 return _buildFilterChip(
                                   feature,
@@ -554,14 +573,14 @@ class _MergedFilterDrawerState extends State<MergedFilterDrawer> {
                                 );
                               }).toList(),
                             ),
-                            const SizedBox(height: 20),
+                            SizedBox(height: ResponsiveHelper.getResponsiveSpacing(context, mobile: 16, tablet: 20, desktop: 24)),
 
                             // Fuel Types
                             _buildSectionHeader('Fuel Type', isDarkMode),
-                            const SizedBox(height: 8),
+                            SizedBox(height: ResponsiveHelper.getResponsiveSpacing(context, mobile: 6, tablet: 8, desktop: 10)),
                             Wrap(
-                              spacing: 8,
-                              runSpacing: 8,
+                              spacing: ResponsiveHelper.getResponsiveSpacing(context, mobile: 6, tablet: 8, desktop: 10),
+                              runSpacing: ResponsiveHelper.getResponsiveSpacing(context, mobile: 6, tablet: 8, desktop: 10),
                               children: [
                                 'Petrol',
                                 'Diesel',
@@ -575,14 +594,14 @@ class _MergedFilterDrawerState extends State<MergedFilterDrawer> {
                                 );
                               }).toList(),
                             ),
-                            const SizedBox(height: 20),
+                            SizedBox(height: ResponsiveHelper.getResponsiveSpacing(context, mobile: 16, tablet: 20, desktop: 24)),
 
                             // Transmission
                             _buildSectionHeader('Transmission', isDarkMode),
-                            const SizedBox(height: 8),
+                            SizedBox(height: ResponsiveHelper.getResponsiveSpacing(context, mobile: 6, tablet: 8, desktop: 10)),
                             Wrap(
-                              spacing: 8,
-                              runSpacing: 8,
+                              spacing: ResponsiveHelper.getResponsiveSpacing(context, mobile: 6, tablet: 8, desktop: 10),
+                              runSpacing: ResponsiveHelper.getResponsiveSpacing(context, mobile: 6, tablet: 8, desktop: 10),
                               children:
                                   ['Manual', 'Automatic'].map((transmission) {
                                 return _buildFilterChip(
@@ -592,14 +611,14 @@ class _MergedFilterDrawerState extends State<MergedFilterDrawer> {
                                 );
                               }).toList(),
                             ),
-                            const SizedBox(height: 20),
+                            SizedBox(height: ResponsiveHelper.getResponsiveSpacing(context, mobile: 16, tablet: 20, desktop: 24)),
 
                             // Rent Modes
                             _buildSectionHeader('Rent Mode', isDarkMode),
-                            const SizedBox(height: 8),
+                            SizedBox(height: ResponsiveHelper.getResponsiveSpacing(context, mobile: 6, tablet: 8, desktop: 10)),
                             Wrap(
-                              spacing: 8,
-                              runSpacing: 8,
+                              spacing: ResponsiveHelper.getResponsiveSpacing(context, mobile: 6, tablet: 8, desktop: 10),
+                              runSpacing: ResponsiveHelper.getResponsiveSpacing(context, mobile: 6, tablet: 8, desktop: 10),
                               children: [
                                 'With Driver',
                                 'Vehicle Only',
@@ -612,7 +631,7 @@ class _MergedFilterDrawerState extends State<MergedFilterDrawer> {
                                 );
                               }).toList(),
                             ),
-                            const SizedBox(height: 30),
+                            SizedBox(height: ResponsiveHelper.getResponsiveSpacing(context, mobile: 20, tablet: 30, desktop: 40)),
                           ],
                         ),
                       ),
@@ -620,16 +639,10 @@ class _MergedFilterDrawerState extends State<MergedFilterDrawer> {
                   ),
                   // Bottom buttons
                   Container(
-                    padding: const EdgeInsets.all(20),
+                    padding: ResponsiveHelper.getResponsivePadding(context, mobile: 16, tablet: 20, desktop: 24),
                     decoration: BoxDecoration(
                       color: isDarkMode ? Colors.grey[900] : Colors.white,
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.1),
-                          blurRadius: 4,
-                          offset: const Offset(0, -2),
-                        ),
-                      ],
+                      boxShadow: ResponsiveHelper.getResponsiveShadow(context, mobile: 3, tablet: 4, desktop: 5),
                     ),
                     child: Row(
                       children: [
@@ -639,29 +652,39 @@ class _MergedFilterDrawerState extends State<MergedFilterDrawer> {
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.black,
                               foregroundColor: Colors.white,
-                              padding: const EdgeInsets.symmetric(vertical: 14),
+                              padding: EdgeInsets.symmetric(vertical: ResponsiveHelper.getResponsiveSpacing(context, mobile: 12, tablet: 14, desktop: 16)),
                               shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8),
+                                borderRadius: BorderRadius.circular(ResponsiveHelper.getResponsiveBorderRadius(context, mobile: 6, tablet: 8, desktop: 10)),
                               ),
                             ),
-                            child: const Text('RESET',
-                                style: TextStyle(fontWeight: FontWeight.w600)),
+                            child: Text(
+                              'RESET',
+                              style: TextStyle(
+                                fontWeight: FontWeight.w600,
+                                fontSize: ResponsiveHelper.getResponsiveFontSize(context, mobile: 14, tablet: 16, desktop: 18),
+                              ),
+                            ),
                           ),
                         ),
-                        const SizedBox(width: 12),
+                        SizedBox(width: ResponsiveHelper.getResponsiveSpacing(context, mobile: 8, tablet: 12, desktop: 16)),
                         Expanded(
                           child: ElevatedButton(
                             onPressed: _applyMergedFilters,
                             style: ElevatedButton.styleFrom(
                               backgroundColor: const Color(0xFFFFC107),
                               foregroundColor: Colors.black,
-                              padding: const EdgeInsets.symmetric(vertical: 14),
+                              padding: EdgeInsets.symmetric(vertical: ResponsiveHelper.getResponsiveSpacing(context, mobile: 12, tablet: 14, desktop: 16)),
                               shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8),
+                                borderRadius: BorderRadius.circular(ResponsiveHelper.getResponsiveBorderRadius(context, mobile: 6, tablet: 8, desktop: 10)),
                               ),
                             ),
-                            child: const Text('APPLY',
-                                style: TextStyle(fontWeight: FontWeight.bold)),
+                            child: Text(
+                              'APPLY',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: ResponsiveHelper.getResponsiveFontSize(context, mobile: 14, tablet: 16, desktop: 18),
+                              ),
+                            ),
                           ),
                         ),
                       ],
@@ -675,22 +698,25 @@ class _MergedFilterDrawerState extends State<MergedFilterDrawer> {
         // Done & Apply button
         if (_isKeyboardVisible)
           Positioned(
-            bottom: 80, // Adjust this value to position the button
-            left: 20,
-            right: 20,
+            bottom: ResponsiveHelper.getResponsiveSpacing(context, mobile: 60, tablet: 80, desktop: 100),
+            left: ResponsiveHelper.getResponsiveSpacing(context, mobile: 16, tablet: 20, desktop: 24),
+            right: ResponsiveHelper.getResponsiveSpacing(context, mobile: 16, tablet: 20, desktop: 24),
             child: ElevatedButton(
               onPressed: _applyMergedFilters,
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.primary,
                 foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: 14),
+                padding: EdgeInsets.symmetric(vertical: ResponsiveHelper.getResponsiveSpacing(context, mobile: 12, tablet: 14, desktop: 16)),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(ResponsiveHelper.getResponsiveBorderRadius(context, mobile: 6, tablet: 8, desktop: 10)),
                 ),
               ),
-              child: const Text(
+              child: Text(
                 'DONE & APPLY',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                style: TextStyle(
+                  fontWeight: FontWeight.bold, 
+                  fontSize: ResponsiveHelper.getResponsiveFontSize(context, mobile: 14, tablet: 16, desktop: 18),
+                ),
               ),
             ),
           ),
@@ -703,7 +729,7 @@ class _MergedFilterDrawerState extends State<MergedFilterDrawer> {
     return Text(
       title,
       style: TextStyle(
-        fontSize: 16,
+        fontSize: ResponsiveHelper.getResponsiveFontSize(context, mobile: 14, tablet: 16, desktop: 18),
         fontWeight: FontWeight.bold,
         color: isDarkMode ? Colors.white : Colors.black87,
       ),
@@ -717,20 +743,24 @@ class _MergedFilterDrawerState extends State<MergedFilterDrawer> {
       onTap: () => _changeSortOption(value),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
-        margin: const EdgeInsets.only(right: 8),
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        margin: EdgeInsets.only(right: ResponsiveHelper.getResponsiveSpacing(context, mobile: 6, tablet: 8, desktop: 10)),
+        padding: EdgeInsets.symmetric(
+          horizontal: ResponsiveHelper.getResponsiveSpacing(context, mobile: 10, tablet: 12, desktop: 14),
+          vertical: ResponsiveHelper.getResponsiveSpacing(context, mobile: 6, tablet: 8, desktop: 10),
+        ),
         decoration: BoxDecoration(
           color: isSelected ? AppColors.primary : Colors.transparent,
           border: Border.all(
             color: isSelected ? AppColors.primary : Colors.grey,
           ),
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(ResponsiveHelper.getResponsiveBorderRadius(context, mobile: 12, tablet: 16, desktop: 20)),
         ),
         child: Text(
           label,
           style: TextStyle(
             color: isSelected ? Colors.white : Colors.grey[700],
             fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+            fontSize: ResponsiveHelper.getResponsiveFontSize(context, mobile: 13, tablet: 14, desktop: 15),
           ),
         ),
       ),
@@ -749,19 +779,23 @@ class _MergedFilterDrawerState extends State<MergedFilterDrawer> {
         style: TextStyle(
           color: isSelected ? Colors.white : Colors.black87,
           fontWeight: isSelected ? FontWeight.w500 : FontWeight.normal,
+          fontSize: ResponsiveHelper.getResponsiveFontSize(context, mobile: 12, tablet: 13, desktop: 14),
         ),
       ),
       onSelected: (_) => onToggle(label),
       selectedColor: AppColors.primary,
       backgroundColor: isDarkMode ? Colors.grey[900] : Colors.grey[100],
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(ResponsiveHelper.getResponsiveBorderRadius(context, mobile: 6, tablet: 8, desktop: 10)),
         side: BorderSide(
           color: isSelected ? AppColors.primary : Colors.grey[300]!,
           width: 1.5,
         ),
       ),
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 0),
+      padding: EdgeInsets.symmetric(
+        horizontal: ResponsiveHelper.getResponsiveSpacing(context, mobile: 6, tablet: 8, desktop: 10),
+        vertical: 0,
+      ),
       visualDensity: VisualDensity.compact,
     );
   }

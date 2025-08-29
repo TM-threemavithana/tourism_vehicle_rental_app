@@ -8,6 +8,7 @@ import '../services/auth_service.dart';
 import '../screens/auth/auth_wrapper.dart';
 import '../widgets/side_menu.dart';
 import '../utils/app_colors.dart';
+import '../utils/responsive_helper.dart';
 import 'welcome_screen.dart';
 import 'owner/owner_dashboard_screen.dart';
 import '../widgets/not_logged_in_widget.dart';
@@ -601,18 +602,12 @@ class _ProfileScreenState extends State<ProfileScreen>
                             ],
                           )
                         : AppColors.profileHeaderGradient,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.1),
-                        blurRadius: 10,
-                        spreadRadius: 0,
-                        offset: const Offset(0, 5),
-                      ),
-                    ],
+                    boxShadow: ResponsiveHelper.getResponsiveShadow(context),
                   ),
                   child: SafeArea(
                     child: Padding(
-                      padding: const EdgeInsets.fromLTRB(20, 80, 20, 30),
+                      padding: ResponsiveHelper.getResponsivePadding(context,
+                          mobile: 20, tablet: 32, desktop: 48),
                       child: Column(
                         children: [
                           // Profile picture with edit button
@@ -621,13 +616,15 @@ class _ProfileScreenState extends State<ProfileScreen>
                               // Profile picture
                               _isUploadingImage
                                   ? Container(
-                                      width: 140,
-                                      height: 140,
+                                      width: ResponsiveHelper
+                                          .getResponsiveProfileSize(context),
+                                      height: ResponsiveHelper
+                                          .getResponsiveProfileSize(context),
                                       decoration: BoxDecoration(
                                         shape: BoxShape.circle,
                                         color: Colors.white.withOpacity(0.2),
                                       ),
-                                      child: const Center(
+                                      child: Center(
                                         child: CircularProgressIndicator(
                                           color: Colors.white,
                                           strokeWidth: 3,
@@ -635,7 +632,8 @@ class _ProfileScreenState extends State<ProfileScreen>
                                       ),
                                     )
                                   : CircleAvatar(
-                                      radius: 70,
+                                      radius: ResponsiveHelper
+                                          .getResponsiveProfileSize(context),
                                       backgroundColor:
                                           Colors.white.withOpacity(0.3),
                                       backgroundImage:
@@ -646,8 +644,13 @@ class _ProfileScreenState extends State<ProfileScreen>
                                       child: widget.user?.photoURL == null
                                           ? Text(
                                               _getInitials(),
-                                              style: const TextStyle(
-                                                fontSize: 42,
+                                              style: TextStyle(
+                                                fontSize: ResponsiveHelper
+                                                    .getResponsiveFontSize(
+                                                        context,
+                                                        mobile: 42,
+                                                        tablet: 60,
+                                                        desktop: 72),
                                                 fontWeight: FontWeight.bold,
                                                 color: Colors.white,
                                               ),
@@ -657,47 +660,77 @@ class _ProfileScreenState extends State<ProfileScreen>
 
                               // Edit button
                               Positioned(
-                                bottom: 5,
-                                right: 5,
+                                bottom: ResponsiveHelper.getResponsiveSpacing(
+                                    context,
+                                    mobile: 5,
+                                    tablet: 8,
+                                    desktop: 10),
+                                right: ResponsiveHelper.getResponsiveSpacing(
+                                    context,
+                                    mobile: 5,
+                                    tablet: 8,
+                                    desktop: 10),
                                 child: Container(
                                   decoration: BoxDecoration(
                                     color: Colors.white,
                                     shape: BoxShape.circle,
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.black.withOpacity(0.2),
-                                        blurRadius: 5,
-                                        spreadRadius: 1,
-                                      ),
-                                    ],
+                                    boxShadow:
+                                        ResponsiveHelper.getResponsiveShadow(
+                                            context),
                                   ),
                                   child: IconButton(
                                     icon: Icon(
                                       Icons.camera_alt,
                                       color: theme.colorScheme.primary,
-                                      size: 20,
+                                      size: ResponsiveHelper
+                                          .getResponsiveIconSize(context,
+                                              mobile: 20,
+                                              tablet: 24,
+                                              desktop: 28),
                                     ),
                                     onPressed: _isUploadingImage || _isLoading
                                         ? null
                                         : _updateProfilePicture,
-                                    constraints: const BoxConstraints(
-                                      minWidth: 40,
-                                      minHeight: 40,
+                                    constraints: BoxConstraints(
+                                      minWidth: ResponsiveHelper
+                                          .getResponsiveIconSize(context,
+                                              mobile: 40,
+                                              tablet: 48,
+                                              desktop: 56),
+                                      minHeight: ResponsiveHelper
+                                          .getResponsiveIconSize(context,
+                                              mobile: 40,
+                                              tablet: 48,
+                                              desktop: 56),
                                     ),
-                                    padding: const EdgeInsets.all(8),
+                                    padding:
+                                        ResponsiveHelper.getResponsivePadding(
+                                            context,
+                                            mobile: 8,
+                                            tablet: 12,
+                                            desktop: 16),
                                   ),
                                 ),
                               ),
                             ],
                           ),
 
-                          const SizedBox(height: 20),
+                          SizedBox(
+                              height: ResponsiveHelper.getResponsiveSpacing(
+                                  context,
+                                  mobile: 20,
+                                  tablet: 24,
+                                  desktop: 32)),
 
                           // User name
                           Text(
                             widget.user?.displayName ?? 'User',
-                            style: const TextStyle(
-                              fontSize: 24,
+                            style: TextStyle(
+                              fontSize: ResponsiveHelper.getResponsiveFontSize(
+                                  context,
+                                  mobile: 24,
+                                  tablet: 32,
+                                  desktop: 40),
                               fontWeight: FontWeight.bold,
                               color: Colors.white,
                             ),
@@ -707,12 +740,21 @@ class _ProfileScreenState extends State<ProfileScreen>
                           Text(
                             widget.user?.email ?? '',
                             style: TextStyle(
-                              fontSize: 16,
+                              fontSize: ResponsiveHelper.getResponsiveFontSize(
+                                  context,
+                                  mobile: 16,
+                                  tablet: 20,
+                                  desktop: 24),
                               color: Colors.white.withOpacity(0.8),
                             ),
                           ),
 
-                          const SizedBox(height: 30),
+                          SizedBox(
+                              height: ResponsiveHelper.getResponsiveSpacing(
+                                  context,
+                                  mobile: 30,
+                                  tablet: 40,
+                                  desktop: 50)),
                         ],
                       ),
                     ),
@@ -721,28 +763,37 @@ class _ProfileScreenState extends State<ProfileScreen>
 
                 // Content area
                 Padding(
-                  padding: const EdgeInsets.all(20),
+                  padding: ResponsiveHelper.getResponsivePadding(context),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       // Personal Information Section
-                      const Text(
+                      Text(
                         'Personal Information',
                         style: TextStyle(
-                          fontSize: 18,
+                          fontSize: ResponsiveHelper.getResponsiveFontSize(
+                              context,
+                              mobile: 18,
+                              tablet: 22,
+                              desktop: 26),
                           fontWeight: FontWeight.bold,
                           color: Colors.black87,
                         ),
                       ),
-                      const SizedBox(height: 16),
+                      SizedBox(
+                          height: ResponsiveHelper.getResponsiveSpacing(context,
+                              mobile: 16, tablet: 20, desktop: 24)),
 
                       Card(
                         elevation: 2,
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(15),
+                          borderRadius: BorderRadius.circular(
+                              ResponsiveHelper.getResponsiveBorderRadius(
+                                  context)),
                         ),
                         child: Padding(
-                          padding: const EdgeInsets.all(16),
+                          padding:
+                              ResponsiveHelper.getResponsivePadding(context),
                           child: Column(
                             children: [
                               _buildInfoField(
@@ -755,7 +806,12 @@ class _ProfileScreenState extends State<ProfileScreen>
                                   _showEditNameDialog(context);
                                 },
                               ),
-                              const Divider(height: 24),
+                              Divider(
+                                  height: ResponsiveHelper.getResponsiveSpacing(
+                                      context,
+                                      mobile: 24,
+                                      tablet: 32,
+                                      desktop: 40)),
                               _buildInfoField(
                                 label: 'Email',
                                 value: widget.user?.email ?? 'No email',
@@ -763,7 +819,12 @@ class _ProfileScreenState extends State<ProfileScreen>
                                 color: theme.colorScheme.primary,
                                 verified: widget.user?.emailVerified ?? false,
                               ),
-                              const Divider(height: 24),
+                              Divider(
+                                  height: ResponsiveHelper.getResponsiveSpacing(
+                                      context,
+                                      mobile: 24,
+                                      tablet: 32,
+                                      desktop: 40)),
                               _buildInfoField(
                                 label: 'Contact Info',
                                 value: 'Add your phone number',
@@ -779,23 +840,33 @@ class _ProfileScreenState extends State<ProfileScreen>
                         ),
                       ),
 
-                      const SizedBox(height: 24),
+                      SizedBox(
+                          height: ResponsiveHelper.getResponsiveSpacing(context,
+                              mobile: 24, tablet: 32, desktop: 40)),
 
                       // Account & Security Section
-                      const Text(
+                      Text(
                         'Account & Security',
                         style: TextStyle(
-                          fontSize: 18,
+                          fontSize: ResponsiveHelper.getResponsiveFontSize(
+                              context,
+                              mobile: 18,
+                              tablet: 22,
+                              desktop: 26),
                           fontWeight: FontWeight.bold,
                           color: Colors.black87,
                         ),
                       ),
-                      const SizedBox(height: 16),
+                      SizedBox(
+                          height: ResponsiveHelper.getResponsiveSpacing(context,
+                              mobile: 16, tablet: 20, desktop: 24)),
 
                       Card(
                         elevation: 2,
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(15),
+                          borderRadius: BorderRadius.circular(
+                              ResponsiveHelper.getResponsiveBorderRadius(
+                                  context)),
                         ),
                         child: Column(
                           children: [
@@ -810,13 +881,17 @@ class _ProfileScreenState extends State<ProfileScreen>
                         ),
                       ),
 
-                      const SizedBox(height: 24),
+                      SizedBox(
+                          height: ResponsiveHelper.getResponsiveSpacing(context,
+                              mobile: 24, tablet: 32, desktop: 40)),
 
                       // Delete Account Option
                       Card(
                         elevation: 2,
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(15),
+                          borderRadius: BorderRadius.circular(
+                              ResponsiveHelper.getResponsiveBorderRadius(
+                                  context)),
                         ),
                         child: _buildMenuOption(
                           icon: Icons.delete_outline,
@@ -828,7 +903,9 @@ class _ProfileScreenState extends State<ProfileScreen>
                         ),
                       ),
 
-                      const SizedBox(height: 30),
+                      SizedBox(
+                          height: ResponsiveHelper.getResponsiveSpacing(context,
+                              mobile: 30, tablet: 40, desktop: 50)),
                     ],
                   ),
                 ),
@@ -1202,68 +1279,84 @@ class _ProfileScreenState extends State<ProfileScreen>
   }) {
     return InkWell(
       onTap: isEditable ? onTap : null,
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: color.withOpacity(0.1),
-              shape: BoxShape.circle,
-            ),
-            child: Icon(
-              icon,
-              color: color,
-              size: 24,
-            ),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  label,
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Colors.grey[600],
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  value,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          if (verified)
-            const Icon(
-              Icons.verified,
-              color: Colors.green,
-              size: 20,
-            )
-          else if (showVerify)
-            TextButton(
-              onPressed: () {
-                // Show verification dialog
-              },
-              child: const Text(
-                'Verify',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                ),
+      child: Padding(
+        padding: ResponsiveHelper.getResponsivePadding(context,
+            mobile: 12, tablet: 16, desktop: 20),
+        child: Row(
+          children: [
+            Container(
+              padding: ResponsiveHelper.getResponsivePadding(context,
+                  mobile: 10, tablet: 12, desktop: 16),
+              decoration: BoxDecoration(
+                color: color.withOpacity(0.1),
+                shape: BoxShape.circle,
               ),
-            )
-          else if (isEditable)
-            const Icon(
-              Icons.edit,
-              color: Colors.grey,
-              size: 20,
+              child: Icon(
+                icon,
+                color: color,
+                size: ResponsiveHelper.getResponsiveIconSize(context,
+                    mobile: 24, tablet: 28, desktop: 32),
+              ),
             ),
-        ],
+            SizedBox(
+                width: ResponsiveHelper.getResponsiveSpacing(context,
+                    mobile: 16, tablet: 20, desktop: 24)),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    label,
+                    style: TextStyle(
+                      fontSize: ResponsiveHelper.getResponsiveFontSize(context,
+                          mobile: 12, tablet: 14, desktop: 16),
+                      color: Colors.grey[600],
+                    ),
+                  ),
+                  SizedBox(
+                      height: ResponsiveHelper.getResponsiveSpacing(context,
+                          mobile: 4, tablet: 6, desktop: 8)),
+                  Text(
+                    value,
+                    style: TextStyle(
+                      fontSize: ResponsiveHelper.getResponsiveFontSize(context,
+                          mobile: 16, tablet: 18, desktop: 20),
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            if (verified)
+              Icon(
+                Icons.verified,
+                color: Colors.green,
+                size: ResponsiveHelper.getResponsiveIconSize(context,
+                    mobile: 20, tablet: 24, desktop: 28),
+              )
+            else if (showVerify)
+              TextButton(
+                onPressed: () {
+                  // Show verification dialog
+                },
+                child: Text(
+                  'Verify',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: ResponsiveHelper.getResponsiveFontSize(context,
+                        mobile: 14, tablet: 16, desktop: 18),
+                  ),
+                ),
+              )
+            else if (isEditable)
+              Icon(
+                Icons.edit,
+                color: Colors.grey,
+                size: ResponsiveHelper.getResponsiveIconSize(context,
+                    mobile: 20, tablet: 24, desktop: 28),
+              ),
+          ],
+        ),
       ),
     );
   }
@@ -1304,13 +1397,15 @@ class _ProfileScreenState extends State<ProfileScreen>
     return InkWell(
       onTap: onTap,
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+        padding: ResponsiveHelper.getResponsivePadding(context,
+            mobile: 12, tablet: 16, desktop: 20),
         child: Row(
           children: [
             Stack(
               children: [
                 Container(
-                  padding: const EdgeInsets.all(10),
+                  padding: ResponsiveHelper.getResponsivePadding(context,
+                      mobile: 10, tablet: 12, desktop: 16),
                   decoration: BoxDecoration(
                     color: iconColor.withOpacity(0.1),
                     shape: BoxShape.circle,
@@ -1318,7 +1413,8 @@ class _ProfileScreenState extends State<ProfileScreen>
                   child: Icon(
                     icon,
                     color: iconColor,
-                    size: 24,
+                    size: ResponsiveHelper.getResponsiveIconSize(context,
+                        mobile: 24, tablet: 28, desktop: 32),
                   ),
                 ),
                 if (showBadge)
@@ -1326,21 +1422,26 @@ class _ProfileScreenState extends State<ProfileScreen>
                     right: 0,
                     top: 0,
                     child: Container(
-                      width: 16,
-                      height: 16,
+                      width: ResponsiveHelper.getResponsiveIconSize(context,
+                          mobile: 16, tablet: 20, desktop: 24),
+                      height: ResponsiveHelper.getResponsiveIconSize(context,
+                          mobile: 16, tablet: 20, desktop: 24),
                       decoration: BoxDecoration(
                         color: theme.colorScheme.secondary,
                         shape: BoxShape.circle,
                         border: Border.all(
                           color: Colors.white,
-                          width: 1.5,
+                          width: ResponsiveHelper.getResponsiveSpacing(context,
+                              mobile: 1.5, tablet: 2, desktop: 2.5),
                         ),
                       ),
                     ),
                   ),
               ],
             ),
-            const SizedBox(width: 16),
+            SizedBox(
+                width: ResponsiveHelper.getResponsiveSpacing(context,
+                    mobile: 16, tablet: 20, desktop: 24)),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -1348,26 +1449,31 @@ class _ProfileScreenState extends State<ProfileScreen>
                   Text(
                     title,
                     style: TextStyle(
-                      fontSize: 16,
+                      fontSize: ResponsiveHelper.getResponsiveFontSize(context,
+                          mobile: 16, tablet: 18, desktop: 20),
                       fontWeight: FontWeight.w500,
                       color: isDanger ? Colors.red : Colors.black87,
                     ),
                   ),
-                  const SizedBox(height: 2),
+                  SizedBox(
+                      height: ResponsiveHelper.getResponsiveSpacing(context,
+                          mobile: 2, tablet: 4, desktop: 6)),
                   Text(
                     subtitle,
                     style: TextStyle(
-                      fontSize: 13,
+                      fontSize: ResponsiveHelper.getResponsiveFontSize(context,
+                          mobile: 13, tablet: 15, desktop: 17),
                       color: Colors.grey[600],
                     ),
                   ),
                 ],
               ),
             ),
-            const Icon(
+            Icon(
               Icons.arrow_forward_ios,
               color: Colors.grey,
-              size: 16,
+              size: ResponsiveHelper.getResponsiveIconSize(context,
+                  mobile: 16, tablet: 18, desktop: 20),
             ),
           ],
         ),

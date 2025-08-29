@@ -8,6 +8,7 @@ import 'package:flutter/services.dart';
 import '../utils/app_colors.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
 import 'welcome_screen.dart';
+import '../utils/responsive_helper.dart';
 
 class RequestVehicleScreen extends StatefulWidget {
   const RequestVehicleScreen({super.key});
@@ -164,12 +165,13 @@ class _RequestVehicleScreenState extends State<RequestVehicleScreen> {
           icon: const Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () => Navigator.pop(context),
         ),
-        title: const Text(
+        title: Text(
           'Request a Vehicle',
           style: TextStyle(
             color: Colors.black,
             fontWeight: FontWeight.bold,
-            fontSize: 18,
+            fontSize: ResponsiveHelper.getResponsiveFontSize(context,
+                mobile: 18, tablet: 20, desktop: 22),
           ),
         ),
         centerTitle: true,
@@ -177,27 +179,47 @@ class _RequestVehicleScreenState extends State<RequestVehicleScreen> {
       backgroundColor: Colors.white,
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(16),
+          padding: ResponsiveHelper.getResponsivePadding(context),
           child: Form(
             key: _formKey,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const SizedBox(height: 8),
+                SizedBox(
+                    height: ResponsiveHelper.getResponsiveSpacing(context,
+                        mobile: 8, tablet: 12, desktop: 16)),
                 // Vehicle Type Dropdown
                 Container(
                   decoration: BoxDecoration(
                     color: const Color(0xFFF6F9E7),
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(
+                        ResponsiveHelper.getResponsiveBorderRadius(context,
+                            mobile: 8, tablet: 12, desktop: 16)),
                   ),
                   child: DropdownButtonFormField<String>(
                     value: _selectedVehicleType,
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
                       border: InputBorder.none,
-                      contentPadding:
-                          EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                      contentPadding: EdgeInsets.symmetric(
+                          horizontal: ResponsiveHelper.getResponsiveSpacing(
+                              context,
+                              mobile: 16,
+                              tablet: 20,
+                              desktop: 24),
+                          vertical: ResponsiveHelper.getResponsiveSpacing(
+                              context,
+                              mobile: 14,
+                              tablet: 18,
+                              desktop: 22)),
                       hintText: 'Select Vehicle Type',
-                      hintStyle: TextStyle(color: Colors.black54),
+                      hintStyle: TextStyle(
+                        color: Colors.black54,
+                        fontSize: ResponsiveHelper.getResponsiveFontSize(
+                            context,
+                            mobile: 14,
+                            tablet: 16,
+                            desktop: 18),
+                      ),
                     ),
                     items: _vehicleTypes
                         .map((type) => DropdownMenuItem(
@@ -214,7 +236,9 @@ class _RequestVehicleScreenState extends State<RequestVehicleScreen> {
                         value == null ? 'Please select a vehicle type' : null,
                   ),
                 ),
-                const SizedBox(height: 16),
+                SizedBox(
+                    height: ResponsiveHelper.getResponsiveSpacing(context,
+                        mobile: 16, tablet: 20, desktop: 24)),
                 // Date & Time Picker
                 TextFormField(
                   controller: _dateTimeController,
@@ -225,19 +249,30 @@ class _RequestVehicleScreenState extends State<RequestVehicleScreen> {
                     filled: true,
                     fillColor: const Color(0xFFF6F9E7),
                     border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: BorderRadius.circular(
+                          ResponsiveHelper.getResponsiveBorderRadius(context,
+                              mobile: 8, tablet: 12, desktop: 16)),
                       borderSide: BorderSide.none,
                     ),
                     hintText: 'Tap to select date and time',
-                    hintStyle: const TextStyle(color: Colors.black54),
-                    prefixIcon: const Icon(Icons.calendar_today,
-                        color: Color(0xFFB6E23A)),
+                    hintStyle: TextStyle(
+                      color: Colors.black54,
+                      fontSize: ResponsiveHelper.getResponsiveFontSize(context,
+                          mobile: 14, tablet: 16, desktop: 18),
+                    ),
+                    prefixIcon: Icon(
+                      Icons.calendar_today,
+                      color: const Color(0xFFB6E23A),
+                      size: ResponsiveHelper.getResponsiveIconSize(context),
+                    ),
                   ),
                   validator: (value) => _selectedDateTime == null
                       ? 'Please select date & time'
                       : null,
                 ),
-                const SizedBox(height: 16),
+                SizedBox(
+                    height: ResponsiveHelper.getResponsiveSpacing(context,
+                        mobile: 16, tablet: 20, desktop: 24)),
                 // Location Input
                 TextFormField(
                   controller: _locationController,
@@ -246,17 +281,25 @@ class _RequestVehicleScreenState extends State<RequestVehicleScreen> {
                     filled: true,
                     fillColor: const Color(0xFFF6F9E7),
                     border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: BorderRadius.circular(
+                          ResponsiveHelper.getResponsiveBorderRadius(context,
+                              mobile: 8, tablet: 12, desktop: 16)),
                       borderSide: BorderSide.none,
                     ),
                     hintText: 'Enter Location',
-                    hintStyle: const TextStyle(color: Colors.black54),
+                    hintStyle: TextStyle(
+                      color: Colors.black54,
+                      fontSize: ResponsiveHelper.getResponsiveFontSize(context,
+                          mobile: 14, tablet: 16, desktop: 18),
+                    ),
                   ),
                   validator: (value) => value == null || value.isEmpty
                       ? 'Please enter a location'
                       : null,
                 ),
-                const SizedBox(height: 16),
+                SizedBox(
+                    height: ResponsiveHelper.getResponsiveSpacing(context,
+                        mobile: 16, tablet: 20, desktop: 24)),
                 // Contact Number Input (Mandatory)
                 IntlPhoneField(
                   decoration: InputDecoration(
@@ -264,11 +307,17 @@ class _RequestVehicleScreenState extends State<RequestVehicleScreen> {
                     filled: true,
                     fillColor: const Color(0xFFF6F9E7),
                     border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: BorderRadius.circular(
+                          ResponsiveHelper.getResponsiveBorderRadius(context,
+                              mobile: 8, tablet: 12, desktop: 16)),
                       borderSide: BorderSide.none,
                     ),
                     hintText: 'Enter Contact Number',
-                    hintStyle: const TextStyle(color: Colors.black54),
+                    hintStyle: TextStyle(
+                      color: Colors.black54,
+                      fontSize: ResponsiveHelper.getResponsiveFontSize(context,
+                          mobile: 14, tablet: 16, desktop: 18),
+                    ),
                   ),
                   initialCountryCode: 'LK', // Sri Lanka by default
                   onChanged: (phone) {
@@ -284,7 +333,9 @@ class _RequestVehicleScreenState extends State<RequestVehicleScreen> {
                     return null;
                   },
                 ),
-                const SizedBox(height: 16),
+                SizedBox(
+                    height: ResponsiveHelper.getResponsiveSpacing(context,
+                        mobile: 16, tablet: 20, desktop: 24)),
                 // Email Input (Optional)
                 TextFormField(
                   controller: _emailController,
@@ -294,11 +345,17 @@ class _RequestVehicleScreenState extends State<RequestVehicleScreen> {
                     filled: true,
                     fillColor: const Color(0xFFF6F9E7),
                     border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: BorderRadius.circular(
+                          ResponsiveHelper.getResponsiveBorderRadius(context,
+                              mobile: 8, tablet: 12, desktop: 16)),
                       borderSide: BorderSide.none,
                     ),
                     hintText: 'Enter Email (optional)',
-                    hintStyle: const TextStyle(color: Colors.black54),
+                    hintStyle: TextStyle(
+                      color: Colors.black54,
+                      fontSize: ResponsiveHelper.getResponsiveFontSize(context,
+                          mobile: 14, tablet: 16, desktop: 18),
+                    ),
                   ),
                   validator: (value) {
                     if (value != null && value.isNotEmpty) {
@@ -311,7 +368,9 @@ class _RequestVehicleScreenState extends State<RequestVehicleScreen> {
                     return null;
                   },
                 ),
-                const SizedBox(height: 16),
+                SizedBox(
+                    height: ResponsiveHelper.getResponsiveSpacing(context,
+                        mobile: 16, tablet: 20, desktop: 24)),
                 // Details Text Area
                 TextFormField(
                   controller: _detailsController,
@@ -322,47 +381,78 @@ class _RequestVehicleScreenState extends State<RequestVehicleScreen> {
                     filled: true,
                     fillColor: const Color(0xFFF6F9E7),
                     border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: BorderRadius.circular(
+                          ResponsiveHelper.getResponsiveBorderRadius(context,
+                              mobile: 8, tablet: 12, desktop: 16)),
                       borderSide: BorderSide.none,
                     ),
                     hintText: 'Enter Details',
-                    hintStyle: const TextStyle(color: Colors.black54),
+                    hintStyle: TextStyle(
+                      color: Colors.black54,
+                      fontSize: ResponsiveHelper.getResponsiveFontSize(context,
+                          mobile: 14, tablet: 16, desktop: 18),
+                    ),
                   ),
                 ),
-                const SizedBox(height: 24),
+                SizedBox(
+                    height: ResponsiveHelper.getResponsiveSpacing(context,
+                        mobile: 24, tablet: 32, desktop: 40)),
                 // Send Request Button
                 SizedBox(
-                  height: 48,
+                  height: ResponsiveHelper.isTablet(context) ? 56 : 48,
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFFDBFF3B),
                       foregroundColor: Colors.black,
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
+                        borderRadius: BorderRadius.circular(
+                            ResponsiveHelper.getResponsiveBorderRadius(context,
+                                mobile: 8, tablet: 12, desktop: 16)),
                       ),
-                      textStyle: const TextStyle(
-                          fontWeight: FontWeight.bold, fontSize: 16),
+                      textStyle: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: ResponsiveHelper.getResponsiveFontSize(
+                              context,
+                              mobile: 16,
+                              tablet: 18,
+                              desktop: 20)),
                       elevation: 0,
                     ),
                     onPressed: _isSubmitting ? null : _submit,
                     child: _isSubmitting
-                        ? const SizedBox(
-                            width: 24,
-                            height: 24,
+                        ? SizedBox(
+                            width: ResponsiveHelper.getResponsiveIconSize(
+                                context,
+                                mobile: 24,
+                                tablet: 28,
+                                desktop: 32),
+                            height: ResponsiveHelper.getResponsiveIconSize(
+                                context,
+                                mobile: 24,
+                                tablet: 28,
+                                desktop: 32),
                             child: CircularProgressIndicator(
                               strokeWidth: 2,
                               valueColor:
                                   AlwaysStoppedAnimation<Color>(Colors.black),
                             ),
                           )
-                        : const Text('Send Request'),
+                        : Text('Send Request'),
                   ),
                 ),
-                const SizedBox(height: 12),
-                const Center(
+                SizedBox(
+                    height: ResponsiveHelper.getResponsiveSpacing(context,
+                        mobile: 12, tablet: 16, desktop: 20)),
+                Center(
                   child: Text(
                     'Our team will get back to you shortly!',
-                    style: TextStyle(color: Colors.black54, fontSize: 13),
+                    style: TextStyle(
+                        color: Colors.black54,
+                        fontSize: ResponsiveHelper.getResponsiveFontSize(
+                            context,
+                            mobile: 13,
+                            tablet: 14,
+                            desktop: 16)),
                   ),
                 ),
               ],

@@ -14,6 +14,7 @@ import 'sections/extras_section.dart';
 import 'sections/insurance_section.dart';
 import 'sections/vehicle_images_section.dart';
 import 'sections/owner_details_section.dart';
+import '../../utils/responsive_helper.dart';
 
 class NonOwnerVehicleForm extends StatefulWidget {
   const NonOwnerVehicleForm({super.key});
@@ -413,14 +414,26 @@ class _NonOwnerVehicleFormState extends State<NonOwnerVehicleForm> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Register Non-Owned Vehicle'),
+        title: Text(
+          'Register Non-Owned Vehicle',
+          style: TextStyle(
+            fontSize: ResponsiveHelper.getResponsiveFontSize(context,
+                mobile: 18, tablet: 20, desktop: 22),
+          ),
+        ),
         backgroundColor: theme.colorScheme.primary,
         foregroundColor: Colors.white,
       ),
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
+          ? Center(
+              child: CircularProgressIndicator(
+                strokeWidth: ResponsiveHelper.getResponsiveSpacing(context,
+                    mobile: 3, tablet: 4, desktop: 5),
+              ),
+            )
           : SingleChildScrollView(
-              padding: const EdgeInsets.all(16.0),
+              padding: ResponsiveHelper.getResponsivePadding(context,
+                  mobile: 12, tablet: 16, desktop: 20),
               child: Form(
                 key: _formKey,
                 child: Column(
@@ -429,31 +442,52 @@ class _NonOwnerVehicleFormState extends State<NonOwnerVehicleForm> {
                     // Non-ownership status indicator
                     Container(
                       width: double.infinity,
-                      padding: const EdgeInsets.all(16),
+                      padding: ResponsiveHelper.getResponsivePadding(context,
+                          mobile: 12, tablet: 16, desktop: 20),
                       decoration: BoxDecoration(
                         color: Colors.orange.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(8),
+                        borderRadius: BorderRadius.circular(
+                            ResponsiveHelper.getResponsiveBorderRadius(context,
+                                mobile: 6, tablet: 8, desktop: 10)),
                         border: Border.all(color: Colors.orange),
                       ),
                       child: Row(
                         children: [
-                          const Icon(
+                          Icon(
                             Icons.info_outline,
                             color: Colors.orange,
+                            size: ResponsiveHelper.getResponsiveIconSize(
+                                context,
+                                mobile: 20,
+                                tablet: 24,
+                                desktop: 28),
                           ),
-                          const SizedBox(width: 12),
-                          const Expanded(
+                          SizedBox(
+                              width: ResponsiveHelper.getResponsiveSpacing(
+                                  context,
+                                  mobile: 8,
+                                  tablet: 12,
+                                  desktop: 16)),
+                          Expanded(
                             child: Text(
                               "You've indicated you are not the registered owner. Please provide additional information and documentation.",
                               style: TextStyle(
                                 color: Colors.orange,
+                                fontSize:
+                                    ResponsiveHelper.getResponsiveFontSize(
+                                        context,
+                                        mobile: 14,
+                                        tablet: 16,
+                                        desktop: 18),
                               ),
                             ),
                           ),
                         ],
                       ),
                     ),
-                    const SizedBox(height: 20),
+                    SizedBox(
+                        height: ResponsiveHelper.getResponsiveSpacing(context,
+                            mobile: 16, tablet: 20, desktop: 24)),
 
                     // Owner Details Section - new section for registered owner details
                     OwnerDetailsSection(
@@ -464,7 +498,9 @@ class _NonOwnerVehicleFormState extends State<NonOwnerVehicleForm> {
                         });
                       },
                     ),
-                    const SizedBox(height: 24),
+                    SizedBox(
+                        height: ResponsiveHelper.getResponsiveSpacing(context,
+                            mobile: 20, tablet: 24, desktop: 28)),
 
                     // Vehicle Details Section (this comes next after removing the relationship section)
                     VehicleDetailsSection(
@@ -475,7 +511,9 @@ class _NonOwnerVehicleFormState extends State<NonOwnerVehicleForm> {
                         });
                       },
                     ),
-                    const SizedBox(height: 24),
+                    SizedBox(
+                        height: ResponsiveHelper.getResponsiveSpacing(context,
+                            mobile: 20, tablet: 24, desktop: 28)),
 
                     // Collection Point Section
                     CollectionPointSection(
@@ -486,7 +524,9 @@ class _NonOwnerVehicleFormState extends State<NonOwnerVehicleForm> {
                         });
                       },
                     ),
-                    const SizedBox(height: 24),
+                    SizedBox(
+                        height: ResponsiveHelper.getResponsiveSpacing(context,
+                            mobile: 20, tablet: 24, desktop: 28)),
 
                     // Rental Conditions Section
                     RentalConditionsSection(
@@ -497,7 +537,9 @@ class _NonOwnerVehicleFormState extends State<NonOwnerVehicleForm> {
                         });
                       },
                     ),
-                    const SizedBox(height: 24),
+                    SizedBox(
+                        height: ResponsiveHelper.getResponsiveSpacing(context,
+                            mobile: 20, tablet: 24, desktop: 28)),
 
                     // Driver Details Section (always shown)
                     DriverDetailsSection(
@@ -509,7 +551,9 @@ class _NonOwnerVehicleFormState extends State<NonOwnerVehicleForm> {
                       },
                       rentMode: _rentalConditions.rentMode,
                     ),
-                    const SizedBox(height: 24),
+                    SizedBox(
+                        height: ResponsiveHelper.getResponsiveSpacing(context,
+                            mobile: 20, tablet: 24, desktop: 28)),
 
                     // Pricing Section
                     PricingSection(
@@ -521,7 +565,9 @@ class _NonOwnerVehicleFormState extends State<NonOwnerVehicleForm> {
                       },
                       rentMode: _rentalConditions.rentMode,
                     ),
-                    const SizedBox(height: 24),
+                    SizedBox(
+                        height: ResponsiveHelper.getResponsiveSpacing(context,
+                            mobile: 20, tablet: 24, desktop: 28)),
 
                     // Extras Section
                     ExtrasSection(
@@ -533,7 +579,9 @@ class _NonOwnerVehicleFormState extends State<NonOwnerVehicleForm> {
                       },
                       vehicleDetails: _vehicleDetails,
                     ),
-                    const SizedBox(height: 24),
+                    SizedBox(
+                        height: ResponsiveHelper.getResponsiveSpacing(context,
+                            mobile: 20, tablet: 24, desktop: 28)),
 
                     // Insurance Section
                     InsuranceSection(
@@ -545,7 +593,9 @@ class _NonOwnerVehicleFormState extends State<NonOwnerVehicleForm> {
                       },
                       rentMode: _rentalConditions.rentMode,
                     ),
-                    const SizedBox(height: 24),
+                    SizedBox(
+                        height: ResponsiveHelper.getResponsiveSpacing(context,
+                            mobile: 20, tablet: 24, desktop: 28)),
 
                     // Vehicle Images Section
                     VehicleImagesSection(
@@ -556,7 +606,9 @@ class _NonOwnerVehicleFormState extends State<NonOwnerVehicleForm> {
                         });
                       },
                     ),
-                    const SizedBox(height: 24),
+                    SizedBox(
+                        height: ResponsiveHelper.getResponsiveSpacing(context,
+                            mobile: 20, tablet: 24, desktop: 28)),
 
                     // Registration Documents Section
                     Column(
@@ -564,31 +616,75 @@ class _NonOwnerVehicleFormState extends State<NonOwnerVehicleForm> {
                       children: [
                         FormWidgets.buildSectionHeader(
                             'Vehicle Registration Documents'),
-                        const SizedBox(height: 8),
-                        const Text(
+                        SizedBox(
+                            height: ResponsiveHelper.getResponsiveSpacing(
+                                context,
+                                mobile: 6,
+                                tablet: 8,
+                                desktop: 10)),
+                        Text(
                           'Upload clear images of the vehicle registration certificate',
                           style: TextStyle(
-                            fontSize: 14,
+                            fontSize: ResponsiveHelper.getResponsiveFontSize(
+                                context,
+                                mobile: 13,
+                                tablet: 14,
+                                desktop: 15),
                             color: Colors.grey,
                           ),
                         ),
-                        const SizedBox(height: 16),
+                        SizedBox(
+                            height: ResponsiveHelper.getResponsiveSpacing(
+                                context,
+                                mobile: 12,
+                                tablet: 16,
+                                desktop: 20)),
                         GestureDetector(
                           onTap: _pickRegistrationDocImages,
                           child: Container(
-                            height: 120,
+                            height: ResponsiveHelper.getResponsiveSpacing(
+                                context,
+                                mobile: 100,
+                                tablet: 120,
+                                desktop: 140),
                             decoration: BoxDecoration(
                               border: Border.all(color: Colors.grey),
-                              borderRadius: BorderRadius.circular(8),
+                              borderRadius: BorderRadius.circular(
+                                  ResponsiveHelper.getResponsiveBorderRadius(
+                                      context,
+                                      mobile: 6,
+                                      tablet: 8,
+                                      desktop: 10)),
                             ),
                             alignment: Alignment.center,
                             child: _registrationDocImages.isEmpty
-                                ? const Column(
+                                ? Column(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
-                                      Icon(Icons.upload_file, size: 40),
-                                      SizedBox(height: 8),
-                                      Text('Upload Registration Documents'),
+                                      Icon(
+                                        Icons.upload_file,
+                                        size: ResponsiveHelper
+                                            .getResponsiveIconSize(context,
+                                                mobile: 32,
+                                                tablet: 40,
+                                                desktop: 48),
+                                      ),
+                                      SizedBox(
+                                          height: ResponsiveHelper
+                                              .getResponsiveSpacing(context,
+                                                  mobile: 6,
+                                                  tablet: 8,
+                                                  desktop: 10)),
+                                      Text(
+                                        'Upload Registration Documents',
+                                        style: TextStyle(
+                                          fontSize: ResponsiveHelper
+                                              .getResponsiveFontSize(context,
+                                                  mobile: 14,
+                                                  tablet: 16,
+                                                  desktop: 18),
+                                        ),
+                                      ),
                                     ],
                                   )
                                 : ListView.builder(
@@ -598,12 +694,24 @@ class _NonOwnerVehicleFormState extends State<NonOwnerVehicleForm> {
                                       return Stack(
                                         children: [
                                           Padding(
-                                            padding: const EdgeInsets.all(4.0),
+                                            padding: ResponsiveHelper
+                                                .getResponsivePadding(context,
+                                                    mobile: 3,
+                                                    tablet: 4,
+                                                    desktop: 5),
                                             child: Image.file(
                                               File(_registrationDocImages[index]
                                                   .path),
-                                              height: 100,
-                                              width: 100,
+                                              height: ResponsiveHelper
+                                                  .getResponsiveSpacing(context,
+                                                      mobile: 80,
+                                                      tablet: 100,
+                                                      desktop: 120),
+                                              width: ResponsiveHelper
+                                                  .getResponsiveSpacing(context,
+                                                      mobile: 80,
+                                                      tablet: 100,
+                                                      desktop: 120),
                                               fit: BoxFit.cover,
                                             ),
                                           ),
@@ -622,10 +730,15 @@ class _NonOwnerVehicleFormState extends State<NonOwnerVehicleForm> {
                                                   color: Colors.red,
                                                   shape: BoxShape.circle,
                                                 ),
-                                                child: const Icon(
+                                                child: Icon(
                                                   Icons.close,
                                                   color: Colors.white,
-                                                  size: 18,
+                                                  size: ResponsiveHelper
+                                                      .getResponsiveIconSize(
+                                                          context,
+                                                          mobile: 14,
+                                                          tablet: 18,
+                                                          desktop: 22),
                                                 ),
                                               ),
                                             ),
@@ -638,16 +751,21 @@ class _NonOwnerVehicleFormState extends State<NonOwnerVehicleForm> {
                         ),
                       ],
                     ),
-                    const SizedBox(height: 24),
+                    SizedBox(
+                        height: ResponsiveHelper.getResponsiveSpacing(context,
+                            mobile: 20, tablet: 24, desktop: 28)),
 
                     // Agreement Checkbox
                     Container(
                       decoration: BoxDecoration(
                         color: Colors.grey[100],
-                        borderRadius: BorderRadius.circular(8),
+                        borderRadius: BorderRadius.circular(
+                            ResponsiveHelper.getResponsiveBorderRadius(context,
+                                mobile: 6, tablet: 8, desktop: 10)),
                         border: Border.all(color: Colors.grey[300]!),
                       ),
-                      padding: const EdgeInsets.all(16),
+                      padding: ResponsiveHelper.getResponsivePadding(context,
+                          mobile: 12, tablet: 16, desktop: 20),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -663,19 +781,33 @@ class _NonOwnerVehicleFormState extends State<NonOwnerVehicleForm> {
                                 },
                                 activeColor: theme.colorScheme.primary,
                               ),
-                              const SizedBox(width: 8),
+                              SizedBox(
+                                  width: ResponsiveHelper.getResponsiveSpacing(
+                                      context,
+                                      mobile: 6,
+                                      tablet: 8,
+                                      desktop: 10)),
                               Expanded(
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    const Text(
+                                    Text(
                                       'I have read and agree to the vehicle owners agreement.',
                                       style: TextStyle(
-                                        fontSize: 16,
+                                        fontSize: ResponsiveHelper
+                                            .getResponsiveFontSize(context,
+                                                mobile: 14,
+                                                tablet: 16,
+                                                desktop: 18),
                                         fontWeight: FontWeight.w500,
                                       ),
                                     ),
-                                    const SizedBox(height: 4),
+                                    SizedBox(
+                                        height: ResponsiveHelper
+                                            .getResponsiveSpacing(context,
+                                                mobile: 3,
+                                                tablet: 4,
+                                                desktop: 5)),
                                     GestureDetector(
                                       onTap: () {
                                         // Show the full agreement
@@ -686,6 +818,11 @@ class _NonOwnerVehicleFormState extends State<NonOwnerVehicleForm> {
                                         style: TextStyle(
                                           color: theme.colorScheme.primary,
                                           decoration: TextDecoration.underline,
+                                          fontSize: ResponsiveHelper
+                                              .getResponsiveFontSize(context,
+                                                  mobile: 13,
+                                                  tablet: 14,
+                                                  desktop: 15),
                                         ),
                                       ),
                                     ),
@@ -697,12 +834,15 @@ class _NonOwnerVehicleFormState extends State<NonOwnerVehicleForm> {
                         ],
                       ),
                     ),
-                    const SizedBox(height: 24),
+                    SizedBox(
+                        height: ResponsiveHelper.getResponsiveSpacing(context,
+                            mobile: 20, tablet: 24, desktop: 28)),
 
                     // Submit Button
                     SizedBox(
                       width: double.infinity,
-                      height: 50,
+                      height: ResponsiveHelper.getResponsiveSpacing(context,
+                          mobile: 45, tablet: 50, desktop: 55),
                       child: ElevatedButton(
                         onPressed: (_isLoading || !_agreementChecked)
                             ? null
@@ -712,44 +852,78 @@ class _NonOwnerVehicleFormState extends State<NonOwnerVehicleForm> {
                           foregroundColor: Colors.white,
                           disabledBackgroundColor: Colors.grey[300],
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
+                            borderRadius: BorderRadius.circular(
+                                ResponsiveHelper.getResponsiveBorderRadius(
+                                    context,
+                                    mobile: 6,
+                                    tablet: 8,
+                                    desktop: 10)),
                           ),
                         ),
-                        child: const Text(
+                        child: Text(
                           'SUBMIT FOR VERIFICATION',
                           style: TextStyle(
-                            fontSize: 16,
+                            fontSize: ResponsiveHelper.getResponsiveFontSize(
+                                context,
+                                mobile: 14,
+                                tablet: 16,
+                                desktop: 18),
                             fontWeight: FontWeight.bold,
                           ),
                         ),
                       ),
                     ),
-                    const SizedBox(height: 20),
+                    SizedBox(
+                        height: ResponsiveHelper.getResponsiveSpacing(context,
+                            mobile: 16, tablet: 20, desktop: 24)),
 
                     // Note about verification
                     Container(
-                      padding: const EdgeInsets.all(12),
+                      padding: ResponsiveHelper.getResponsivePadding(context,
+                          mobile: 10, tablet: 12, desktop: 14),
                       decoration: BoxDecoration(
                         color: Colors.grey.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(8),
+                        borderRadius: BorderRadius.circular(
+                            ResponsiveHelper.getResponsiveBorderRadius(context,
+                                mobile: 6, tablet: 8, desktop: 10)),
                       ),
-                      child: const Row(
+                      child: Row(
                         children: [
-                          Icon(Icons.info_outline, color: Colors.grey),
-                          SizedBox(width: 8),
+                          Icon(
+                            Icons.info_outline,
+                            color: Colors.grey,
+                            size: ResponsiveHelper.getResponsiveIconSize(
+                                context,
+                                mobile: 18,
+                                tablet: 20,
+                                desktop: 22),
+                          ),
+                          SizedBox(
+                              width: ResponsiveHelper.getResponsiveSpacing(
+                                  context,
+                                  mobile: 6,
+                                  tablet: 8,
+                                  desktop: 10)),
                           Expanded(
                             child: Text(
                               'Vehicles listed by non-owners require additional verification which may take 1-2 business days.',
                               style: TextStyle(
                                 color: Colors.grey,
-                                fontSize: 12,
+                                fontSize:
+                                    ResponsiveHelper.getResponsiveFontSize(
+                                        context,
+                                        mobile: 11,
+                                        tablet: 12,
+                                        desktop: 13),
                               ),
                             ),
                           ),
                         ],
                       ),
                     ),
-                    const SizedBox(height: 24),
+                    SizedBox(
+                        height: ResponsiveHelper.getResponsiveSpacing(context,
+                            mobile: 20, tablet: 24, desktop: 28)),
                   ],
                 ),
               ),
