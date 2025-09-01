@@ -41,12 +41,39 @@
 	<string>921265432897-u63q4rp3c2vbifj8pithijlae312ln3u.apps.googleusercontent.com</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>UIDeviceFamily</key>
+	<array>
+		<integer>1</integer>
+		<integer>2</integer>
+	</array>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	
+	<!-- iPad Full Screen Support -->
+	<key>UIRequiresFullScreen</key>
+	<false/>
+	<key>UISupportsDocumentBrowser</key>
+	<false/>
+	<key>UIStatusBarStyle</key>
+	<string>UIStatusBarStyleLightContent</string>
+	
+	<!-- Launch Screen Configuration -->
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>
 	<string>Main</string>
+	<key>UIMainStoryboardFile~ipad</key>
+	<string>Main</string>
+	
+	<!-- Multitasking Support for iPad -->
+	<key>UISupportsMultipleDisplayModes</key>
+	<true/>
+	<key>UIApplicationSupportsMultipleScenes</key>
+	<false/>
+	<key>UIRequiredDeviceCapabilities</key>
+	<array>
+		<string>armv7</string>
+	</array>
 	<key>UIStatusBarHidden</key>
 	<true/>
 	<key>UISupportedInterfaceOrientations</key>

@@ -57,6 +57,67 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
     );
   }
 
+  // Add iPad Pro specific helper method for optimized spacing
+  double _getOptimizedSpacing(
+    BuildContext context, {
+    required double mobile,
+    required double tablet,
+    required double ipad,
+    required double ipadPro,
+    required double desktop,
+  }) {
+    final screenHeight = MediaQuery.of(context).size.height;
+    final screenWidth = MediaQuery.of(context).size.width;
+
+    // Enhanced detection for iPad Pro landscape mode where overflow typically occurs
+    if (ResponsiveHelper.isIPadPro(context)) {
+      // In landscape mode (width > height), reduce spacing more aggressively
+      if (screenWidth > screenHeight) {
+        return ResponsiveHelper.getResponsiveSpacingIPad(context,
+            mobile: mobile,
+            tablet: tablet,
+            ipad: ipad,
+            ipadPro: ipadPro * 0.5, // Reduce by 50% in landscape
+            desktop: desktop);
+      }
+      // In portrait mode, moderate reduction
+      else {
+        return ResponsiveHelper.getResponsiveSpacingIPad(context,
+            mobile: mobile,
+            tablet: tablet,
+            ipad: ipad,
+            ipadPro: ipadPro * 0.7, // Reduce by 30% in portrait
+            desktop: desktop);
+      }
+    }
+
+    return ResponsiveHelper.getResponsiveSpacingIPad(context,
+        mobile: mobile,
+        tablet: tablet,
+        ipad: ipad,
+        ipadPro: ipadPro,
+        desktop: desktop);
+  }
+
+  // Helper method to get dynamic card height based on available screen space
+  double _getCardHeight(BuildContext context) {
+    final screenHeight = MediaQuery.of(context).size.height;
+    final isIPadPro = ResponsiveHelper.isIPadPro(context);
+
+    if (isIPadPro) {
+      // Calculate available height after headers and navigation
+      final availableHeight = screenHeight -
+          MediaQuery.of(context).padding.top - // Status bar
+          kBottomNavigationBarHeight - // Bottom nav
+          100; // Header space
+
+      // Return appropriate height for cards (accounting for 2 cards + spacing)
+      return (availableHeight - 60) / 2; // 60 for spacing between cards
+    }
+
+    return double.infinity; // Default behavior for other devices
+  }
+
   @override
   Widget build(BuildContext context) {
     final isTablet = ResponsiveHelper.isTablet(context);
@@ -84,175 +145,224 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
             color: const Color(0xFFFFC107),
           ),
           SafeArea(
-            child: Padding(
-              padding: ResponsiveHelper.getResponsiveHorizontalPadding(
-                context,
-                mobile: 16,
-                tablet: 24,
-                ipad: 40,
-                ipadPro: 60,
-                desktop: 80,
-              ),
-              child: Column(
-                children: [
-                  // Responsive spacing
-                  SizedBox(
-                      height: ResponsiveHelper.getResponsiveSpacingIPad(context,
-                          mobile: 12,
-                          tablet: 20,
-                          ipad: 24,
-                          ipadPro: 32,
-                          desktop: 40)),
-
-                  // Side menu button and centered title in a row
-                  Row(
-                    children: [
-                      IconButton(
-                        icon: Icon(
-                          Icons.menu,
-                          color: Colors.black,
-                          size: ResponsiveHelper.getResponsiveIconSize(context,
-                              mobile: 24,
-                              tablet: 28,
-                              ipad: 32,
-                              ipadPro: 36,
-                              desktop: 40),
-                        ),
-                        onPressed: () =>
-                            _scaffoldKey.currentState?.openDrawer(),
-                      ),
-                      Expanded(
-                        child: Center(
-                          child: Text(
-                            'Wayz',
-                            style: TextStyle(
-                              fontSize:
-                                  ResponsiveHelper.getResponsiveFontSizeIPad(
-                                      context,
-                                      mobile: 20,
-                                      tablet: 28,
-                                      ipad: 32,
-                                      ipadPro: 36,
-                                      desktop: 40),
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black.withOpacity(0.8),
-                            ),
-                          ),
-                        ),
-                      ),
-                      SizedBox(
-                          width: ResponsiveHelper.getResponsiveIconSize(context,
-                                  mobile: 24,
-                                  tablet: 28,
-                                  ipad: 32,
-                                  ipadPro: 36,
-                                  desktop: 40) +
-                              20), // Responsive spacer
-                    ],
-                  ),
-
-                  SizedBox(
-                      height: ResponsiveHelper.getResponsiveSpacingIPad(context,
-                          mobile: 12,
-                          tablet: 20,
-                          ipad: 24,
-                          ipadPro: 32,
-                          desktop: 40)),
-
-                  // Responsive layout for tablets and iPads
-                  if (isTablet || isLargeTablet || isIPad || isIPadPro) ...[
-                    // Tablet/iPad layout - side by side cards with better spacing
-                    Expanded(
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: _FeatureCard(
-                              image: 'assets/images/browse_vehicle.png',
-                              title: 'Browse Vehicles',
-                              description:
-                                  "Explore our diverse fleet of vehicles, from scooters to luxury cars, perfect for your Sri Lankan adventure.",
-                              buttonText: 'Browse',
-                              onPressed: _isLoading
-                                  ? null
-                                  : () => _navigateToBrowse(context),
-                              isLoading: _isLoading,
-                            ),
-                          ),
-                          SizedBox(
-                              width: ResponsiveHelper.getResponsiveSpacingIPad(
-                                  context,
-                                  mobile: 12,
-                                  tablet: 20,
-                                  ipad: 24,
-                                  ipadPro: 28,
-                                  desktop: 32)),
-                          Expanded(
-                            child: _FeatureCard(
-                              image: 'assets/images/request_vehicle.png',
-                              title: 'Request a Vehicle',
-                              description:
-                                  "Can't find what you're looking for? Post a request and let our network of providers find the perfect vehicle for you.",
-                              buttonText: 'Request',
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) =>
-                                        const RequestVehicleScreen(),
-                                  ),
-                                );
-                              },
-                            ),
-                          ),
-                        ],
-                      ),
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                return SingleChildScrollView(
+                  physics: const ClampingScrollPhysics(),
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(
+                      minHeight: constraints.maxHeight * 0.95,
                     ),
-                  ] else ...[
-                    // Mobile layout - stacked cards
-                  Expanded(
-                    flex: 1,
-                    child: _FeatureCard(
-                      image: 'assets/images/browse_vehicle.png',
-                      title: 'Browse Vehicles',
-                      description:
-                          "Explore our diverse fleet of vehicles, from scooters to luxury cars, perfect for your Sri Lankan adventure.",
-                      buttonText: 'Browse',
-                        onPressed: _isLoading
-                            ? null
-                            : () => _navigateToBrowse(context),
-                      isLoading: _isLoading,
-                    ),
-                  ),
-                    SizedBox(
-                        height: ResponsiveHelper.getResponsiveSpacingIPad(
-                            context,
-                            mobile: 12,
-                            tablet: 16,
-                            ipad: 20,
-                            ipadPro: 24,
-                            desktop: 28)),
-                  Expanded(
-                    flex: 1,
-                    child: _FeatureCard(
-                      image: 'assets/images/request_vehicle.png',
-                      title: 'Request a Vehicle',
-                      description:
-                          "Can't find what you're looking for? Post a request and let our network of providers find the perfect vehicle for you.",
-                      buttonText: 'Request',
-                      onPressed: () {
-                        Navigator.push(
+                    child: IntrinsicHeight(
+                      child: Padding(
+                        padding:
+                            ResponsiveHelper.getResponsiveHorizontalPadding(
                           context,
-                          MaterialPageRoute(
-                              builder: (context) =>
-                                  const RequestVehicleScreen(),
-                          ),
-                        );
-                      },
+                          mobile: 16,
+                          tablet: 24,
+                          ipad: 40,
+                          ipadPro: 60,
+                          desktop: 80,
+                        ),
+                        child: Column(
+                          children: [
+                            // Responsive spacing
+                            SizedBox(
+                                height: _getOptimizedSpacing(context,
+                                    mobile: 12,
+                                    tablet: 20,
+                                    ipad: 24,
+                                    ipadPro: 8,
+                                    desktop: 40)),
+
+                            // Side menu button and centered title in a row
+                            Row(
+                              children: [
+                                IconButton(
+                                  icon: Icon(
+                                    Icons.menu,
+                                    color: Colors.black,
+                                    size:
+                                        ResponsiveHelper.getResponsiveIconSize(
+                                            context,
+                                            mobile: 24,
+                                            tablet: 28,
+                                            ipad: 32,
+                                            ipadPro: 32,
+                                            desktop: 40),
+                                  ),
+                                  onPressed: () =>
+                                      _scaffoldKey.currentState?.openDrawer(),
+                                ),
+                                Expanded(
+                                  child: Center(
+                                    child: Text(
+                                      'Wayz',
+                                      style: TextStyle(
+                                        fontSize: ResponsiveHelper
+                                            .getResponsiveFontSizeIPad(context,
+                                                mobile: 20,
+                                                tablet: 28,
+                                                ipad: 32,
+                                                ipadPro: 32,
+                                                desktop: 40),
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.black.withOpacity(0.8),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                SizedBox(
+                                    width:
+                                        ResponsiveHelper.getResponsiveIconSize(
+                                                context,
+                                                mobile: 24,
+                                                tablet: 28,
+                                                ipad: 32,
+                                                ipadPro: 32,
+                                                desktop: 40) +
+                                            20),
+                              ],
+                            ),
+
+                            SizedBox(
+                                height: _getOptimizedSpacing(context,
+                                    mobile: 12,
+                                    tablet: 20,
+                                    ipad: 24,
+                                    ipadPro: 8,
+                                    desktop: 40)),
+
+                            // Responsive layout for tablets and iPads
+                            if (isTablet ||
+                                isLargeTablet ||
+                                isIPad ||
+                                isIPadPro) ...[
+                              // Tablet/iPad layout - side by side cards with better spacing
+                              Expanded(
+                                child: Row(
+                                  children: [
+                                    Expanded(
+                                      child: ConstrainedBox(
+                                        constraints: BoxConstraints(
+                                          maxHeight: isIPadPro
+                                              ? _getCardHeight(context)
+                                              : double.infinity,
+                                        ),
+                                        child: _FeatureCard(
+                                          image:
+                                              'assets/images/browse_vehicle.png',
+                                          title: 'Browse Vehicles',
+                                          description:
+                                              "Explore our diverse fleet of vehicles, from scooters to luxury cars, perfect for your Sri Lankan adventure.",
+                                          buttonText: 'Browse',
+                                          onPressed: _isLoading
+                                              ? null
+                                              : () =>
+                                                  _navigateToBrowse(context),
+                                          isLoading: _isLoading,
+                                          isCompact: isIPadPro,
+                                        ),
+                                      ),
+                                    ),
+                                    SizedBox(
+                                        width: ResponsiveHelper
+                                            .getResponsiveSpacingIPad(context,
+                                                mobile: 12,
+                                                tablet: 20,
+                                                ipad: 24,
+                                                ipadPro: 16,
+                                                desktop: 32)),
+                                    Expanded(
+                                      child: ConstrainedBox(
+                                        constraints: BoxConstraints(
+                                          maxHeight: isIPadPro
+                                              ? _getCardHeight(context)
+                                              : double.infinity,
+                                        ),
+                                        child: _FeatureCard(
+                                          image:
+                                              'assets/images/request_vehicle.png',
+                                          title: 'Request a Vehicle',
+                                          description:
+                                              "Can't find what you're looking for? Post a request and let our network of providers find the perfect vehicle for you.",
+                                          buttonText: 'Request',
+                                          onPressed: () {
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (context) =>
+                                                    const RequestVehicleScreen(),
+                                              ),
+                                            );
+                                          },
+                                          isCompact: isIPadPro,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ] else ...[
+                              // Mobile layout - stacked cards
+                              Expanded(
+                                flex: 1,
+                                child: _FeatureCard(
+                                  image: 'assets/images/browse_vehicle.png',
+                                  title: 'Browse Vehicles',
+                                  description:
+                                      "Explore our diverse fleet of vehicles, from scooters to luxury cars, perfect for your Sri Lankan adventure.",
+                                  buttonText: 'Browse',
+                                  onPressed: _isLoading
+                                      ? null
+                                      : () => _navigateToBrowse(context),
+                                  isLoading: _isLoading,
+                                ),
+                              ),
+                              SizedBox(
+                                  height:
+                                      ResponsiveHelper.getResponsiveSpacingIPad(
+                                          context,
+                                          mobile: 12,
+                                          tablet: 16,
+                                          ipad: 20,
+                                          ipadPro: 16,
+                                          desktop: 28)),
+                              Expanded(
+                                flex: 1,
+                                child: _FeatureCard(
+                                  image: 'assets/images/request_vehicle.png',
+                                  title: 'Request a Vehicle',
+                                  description:
+                                      "Can't find what you're looking for? Post a request and let our network of providers find the perfect vehicle for you.",
+                                  buttonText: 'Request',
+                                  onPressed: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            const RequestVehicleScreen(),
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ),
+                            ],
+                            // Add bottom spacing for overflow prevention
+                            SizedBox(
+                                height: _getOptimizedSpacing(context,
+                                    mobile: 16,
+                                    tablet: 20,
+                                    ipad: 24,
+                                    ipadPro: 8,
+                                    desktop: 32)),
+                          ],
+                        ),
+                      ),
                     ),
                   ),
-                  ],
-                ],
-              ),
+                );
+              },
             ),
           ),
         ],
@@ -286,8 +396,8 @@ class _FeatureCard extends StatelessWidget {
   final String description;
   final String buttonText;
   final VoidCallback? onPressed;
-  final Color? buttonColor;
   final bool isLoading;
+  final bool isCompact; // Add compact mode for better space utilization
 
   const _FeatureCard({
     required this.image,
@@ -295,8 +405,8 @@ class _FeatureCard extends StatelessWidget {
     required this.description,
     required this.buttonText,
     required this.onPressed,
-    this.buttonColor,
     this.isLoading = false,
+    this.isCompact = false, // Default to false
   });
 
   @override
@@ -330,14 +440,16 @@ class _FeatureCard extends StatelessWidget {
                   desktop: 28)),
             ),
             child: AspectRatio(
-              aspectRatio: ResponsiveHelper.getResponsiveAspectRatio(
-                context,
-                mobile: 2.0,
-                tablet: 2.2,
-                ipad: 1.8,
-                ipadPro: 1.6,
-                desktop: 2.5,
-              ),
+              aspectRatio: isCompact
+                  ? 2.5 // More compact ratio for iPad Pro
+                  : ResponsiveHelper.getResponsiveAspectRatio(
+                      context,
+                      mobile: 2.0,
+                      tablet: 2.2,
+                      ipad: 2.0,
+                      ipadPro: 2.2,
+                      desktop: 2.5,
+                    ),
               child: Stack(
                 children: [
                   // Background Image
@@ -346,7 +458,7 @@ class _FeatureCard extends StatelessWidget {
                       decoration: BoxDecoration(
                         image: DecorationImage(
                           image: AssetImage(image),
-                fit: BoxFit.cover,
+                          fit: BoxFit.cover,
                           alignment: Alignment.center,
                         ),
                       ),
@@ -373,68 +485,80 @@ class _FeatureCard extends StatelessWidget {
             ),
           ),
           Padding(
-            padding: ResponsiveHelper.getResponsivePaddingIPad(
-              context,
-              mobile: 16,
-              tablet: 20,
-              ipad: 24,
-              ipadPro: 28,
-              desktop: 32,
-            ),
+            padding: isCompact
+                ? EdgeInsets.all(12) // Compact padding for iPad Pro
+                : ResponsiveHelper.getResponsivePaddingIPad(
+                    context,
+                    mobile: 16,
+                    tablet: 20,
+                    ipad: 24,
+                    ipadPro: 20,
+                    desktop: 32,
+                  ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   title,
                   style: TextStyle(
-                    fontSize: ResponsiveHelper.getResponsiveFontSizeIPad(
-                      context,
-                      mobile: 16,
-                      tablet: 20,
-                      ipad: 24,
-                      ipadPro: 28,
-                      desktop: 32,
-                    ),
+                    fontSize: isCompact
+                        ? 22 // Fixed size for compact mode
+                        : ResponsiveHelper.getResponsiveFontSizeIPad(
+                            context,
+                            mobile: 16,
+                            tablet: 20,
+                            ipad: 24,
+                            ipadPro: 28,
+                            desktop: 32,
+                          ),
                     fontWeight: FontWeight.bold,
                   ),
                 ),
                 SizedBox(
-                    height: ResponsiveHelper.getResponsiveSpacingIPad(context,
-                        mobile: 4,
-                        tablet: 6,
-                        ipad: 8,
-                        ipadPro: 10,
-                        desktop: 12)),
+                    height: isCompact
+                        ? 4 // Compact spacing
+                        : ResponsiveHelper.getResponsiveSpacingIPad(context,
+                            mobile: 4,
+                            tablet: 6,
+                            ipad: 8,
+                            ipadPro: 6,
+                            desktop: 12)),
                 Text(
                   description,
                   style: TextStyle(
-                    fontSize: ResponsiveHelper.getResponsiveFontSizeIPad(
-                      context,
-                      mobile: 13,
-                      tablet: 15,
-                      ipad: 17,
-                      ipadPro: 19,
-                      desktop: 21,
-                    ),
+                    fontSize: isCompact
+                        ? 14 // Fixed size for compact mode
+                        : ResponsiveHelper.getResponsiveFontSizeIPad(
+                            context,
+                            mobile: 13,
+                            tablet: 15,
+                            ipad: 17,
+                            ipadPro: 19,
+                            desktop: 21,
+                          ),
                     color: Colors.grey[700],
                   ),
-                  maxLines: (isTablet || isLargeTablet || isIPad || isIPadPro)
-                      ? 4
-                      : 2, // More lines for tablets and iPads
+                  maxLines: isCompact
+                      ? 2 // Fewer lines for compact mode
+                      : (isTablet || isLargeTablet || isIPad || isIPadPro)
+                          ? 4
+                          : 2, // More lines for tablets and iPads
                   overflow: TextOverflow.ellipsis,
                 ),
                 SizedBox(
-                    height: ResponsiveHelper.getResponsiveSpacingIPad(context,
-                        mobile: 8,
-                        tablet: 10,
-                        ipad: 12,
-                        ipadPro: 14,
-                        desktop: 16)),
+                    height: isCompact
+                        ? 6 // Compact spacing
+                        : ResponsiveHelper.getResponsiveSpacingIPad(context,
+                            mobile: 8,
+                            tablet: 10,
+                            ipad: 12,
+                            ipadPro: 10,
+                            desktop: 16)),
                 Align(
                   alignment: Alignment.centerRight,
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: buttonColor ?? const Color(0xFFB6E23A),
+                      backgroundColor: const Color(0xFFB6E23A),
                       foregroundColor: Colors.black,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(

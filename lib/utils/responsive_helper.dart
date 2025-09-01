@@ -19,6 +19,40 @@ class ResponsiveHelper {
   static bool isLargeDesktop(BuildContext context) =>
       MediaQuery.of(context).size.width >= 1600;
 
+  // Specific iPad resolution detection
+  static bool isIPadPro12_9(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+    final width = size.width;
+    final height = size.height;
+
+    // iPad Pro 12.9" (2048x2732 logical pixels)
+    return (width == 1024 && height == 1366) ||
+        (width == 1366 && height == 1024) ||
+        (width == 2048 && height == 2732) ||
+        (width == 2732 && height == 2048);
+  }
+
+  static bool isIPadPro11(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+    final width = size.width;
+    final height = size.height;
+
+    // iPad Pro 11" and similar (2360x1640 logical pixels)
+    return (width == 834 && height == 1194) ||
+        (width == 1194 && height == 834) ||
+        (width == 2360 && height == 1640) ||
+        (width == 1640 && height == 2360);
+  }
+
+  static bool isIPadMini(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+    final width = size.width;
+    final height = size.height;
+
+    // iPad Mini (2048x1536)
+    return (width == 768 && height == 1024) || (width == 1024 && height == 768);
+  }
+
   // Enhanced device detection methods
   static bool isIPad(BuildContext context) {
     final size = MediaQuery.of(context).size;
@@ -54,6 +88,9 @@ class ResponsiveHelper {
 
   // Get current device type as string for debugging
   static String getDeviceType(BuildContext context) {
+    if (isIPadPro12_9(context)) return 'iPad Pro 12.9"';
+    if (isIPadPro11(context)) return 'iPad Pro 11"';
+    if (isIPadMini(context)) return 'iPad Mini';
     if (isIPadPro(context)) return 'iPad Pro';
     if (isIPadAir(context)) return 'iPad Air';
     if (isIPad(context)) return 'iPad';
@@ -920,5 +957,113 @@ class ResponsiveHelper {
     final screenHeight = MediaQuery.of(context).size.height;
     final dynamicSpacing = screenHeight * screenSizeRatio;
     return dynamicSpacing.clamp(minSpacing, maxSpacing);
+  }
+
+  // iPad-specific overflow-safe methods
+  static double getIPadSafeHeight(
+    BuildContext context, {
+    double defaultHeight = 56,
+    double maxHeight = 120,
+  }) {
+    if (isIPadPro(context)) {
+      // iPad Pro (2732px tall) - more space available
+      return (defaultHeight * 1.4).clamp(defaultHeight, maxHeight);
+    } else if (isIPad(context)) {
+      // Standard iPad (2048px tall)
+      return (defaultHeight * 1.2).clamp(defaultHeight, maxHeight);
+    }
+
+    return defaultHeight;
+  }
+
+  static EdgeInsets getIPadSafePadding(
+    BuildContext context, {
+    double mobile = 8,
+    double ipad = 12,
+    double ipadPro = 16,
+  }) {
+    if (isIPadPro(context)) {
+      return EdgeInsets.all(ipadPro);
+    } else if (isIPad(context)) {
+      return EdgeInsets.all(ipad);
+    }
+    return EdgeInsets.all(mobile);
+  }
+
+  static double getIPadSafeIconSize(
+    BuildContext context, {
+    double mobile = 20,
+    double ipad = 28,
+    double ipadPro = 32,
+  }) {
+    if (isIPadPro(context)) {
+      return ipadPro;
+    } else if (isIPad(context)) {
+      return ipad;
+    }
+    return mobile;
+  }
+
+  static double getIPadSafeFontSize(
+    BuildContext context, {
+    double mobile = 12,
+    double ipad = 14,
+    double ipadPro = 16,
+  }) {
+    if (isIPadPro(context)) {
+      return ipadPro;
+    } else if (isIPad(context)) {
+      return ipad;
+    }
+    return mobile;
+  }
+
+  static BoxConstraints getIPadSafeConstraints(
+    BuildContext context, {
+    double minHeight = 56,
+    double maxHeight = 120,
+  }) {
+    final safeHeight = getIPadSafeHeight(context,
+        defaultHeight: minHeight, maxHeight: maxHeight);
+
+    return BoxConstraints(
+      minHeight: safeHeight * 0.8,
+      maxHeight: safeHeight,
+      minWidth: 0,
+      maxWidth: double.infinity,
+    );
+  }
+
+  // Enhanced overflow-safe flex system
+  static Widget buildOverflowSafeColumn({
+    required List<Widget> children,
+    MainAxisAlignment mainAxisAlignment = MainAxisAlignment.center,
+    CrossAxisAlignment crossAxisAlignment = CrossAxisAlignment.center,
+    MainAxisSize mainAxisSize = MainAxisSize.min,
+  }) {
+    return Flexible(
+      child: Column(
+        mainAxisAlignment: mainAxisAlignment,
+        crossAxisAlignment: crossAxisAlignment,
+        mainAxisSize: mainAxisSize,
+        children: children.map((child) => Flexible(child: child)).toList(),
+      ),
+    );
+  }
+
+  static Widget buildOverflowSafeRow({
+    required List<Widget> children,
+    MainAxisAlignment mainAxisAlignment = MainAxisAlignment.center,
+    CrossAxisAlignment crossAxisAlignment = CrossAxisAlignment.center,
+    MainAxisSize mainAxisSize = MainAxisSize.min,
+  }) {
+    return Flexible(
+      child: Row(
+        mainAxisAlignment: mainAxisAlignment,
+        crossAxisAlignment: crossAxisAlignment,
+        mainAxisSize: mainAxisSize,
+        children: children.map((child) => Flexible(child: child)).toList(),
+      ),
+    );
   }
 }

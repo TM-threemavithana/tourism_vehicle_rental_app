@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../utils/responsive_helper.dart';
+import 'ipad_optimized_bottom_nav.dart';
 
 class CustomBottomNavBar extends StatelessWidget {
   final int currentIndex;
@@ -13,6 +14,17 @@ class CustomBottomNavBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Use iPad-optimized version for iPads to prevent overflow
+    if (ResponsiveHelper.isIPad(context) ||
+        ResponsiveHelper.isIPadPro(context) ||
+        ResponsiveHelper.isIPadPro11(context) ||
+        ResponsiveHelper.isIPadPro12_9(context)) {
+      return IPadOptimizedBottomNavBar(
+        currentIndex: currentIndex,
+        onTap: onTap,
+      );
+    }
+
     return Container(
       decoration: BoxDecoration(
         color: const Color(0xFFFCFDF7),
@@ -35,8 +47,8 @@ class CustomBottomNavBar extends StatelessWidget {
               width: ResponsiveHelper.getResponsiveStrokeWidth(context)),
         ),
       ),
-      padding: ResponsiveHelper.getResponsivePadding(context,
-          mobile: 8, tablet: 12, desktop: 16),
+      padding: ResponsiveHelper.getResponsivePaddingIPad(context,
+          mobile: 8, tablet: 12, ipad: 16, ipadPro: 20, desktop: 16),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
@@ -83,9 +95,9 @@ class CustomBottomNavBar extends StatelessWidget {
         child: ConstrainedBox(
           constraints: BoxConstraints(
             minHeight: ResponsiveHelper.getResponsiveButtonHeight(context,
-                mobile: 50, tablet: 60, desktop: 70),
+                mobile: 56, tablet: 64, ipad: 72, ipadPro: 80, desktop: 70),
             maxHeight: ResponsiveHelper.getResponsiveButtonHeight(context,
-                mobile: 70, tablet: 80, desktop: 90),
+                mobile: 80, tablet: 88, ipad: 96, ipadPro: 104, desktop: 90),
           ),
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 250),
@@ -104,46 +116,62 @@ class CustomBottomNavBar extends StatelessWidget {
                     ),
                     borderRadius: BorderRadius.circular(
                         ResponsiveHelper.getResponsiveBorderRadius(context,
-                            mobile: 16, tablet: 20, desktop: 24)),
+                            mobile: 16,
+                            tablet: 20,
+                            ipad: 24,
+                            ipadPro: 28,
+                            desktop: 24)),
                     boxShadow: ResponsiveHelper.getResponsiveShadow(context,
-                        mobile: 4, tablet: 6, desktop: 8),
+                        mobile: 4, tablet: 6, ipad: 8, ipadPro: 10, desktop: 8),
                   )
                 : null,
             margin: selected
-                ? ResponsiveHelper.getResponsivePadding(context,
-                    mobile: 2, tablet: 4, desktop: 6)
+                ? ResponsiveHelper.getResponsivePaddingIPad(context,
+                    mobile: 2, tablet: 4, ipad: 6, ipadPro: 8, desktop: 6)
                 : EdgeInsets.zero,
             child: Padding(
               padding: selected
-                  ? ResponsiveHelper.getResponsivePadding(context,
-                      mobile: 4, tablet: 6, desktop: 8)
-                  : ResponsiveHelper.getResponsivePadding(context,
-                      mobile: 2, tablet: 3, desktop: 4),
+                  ? ResponsiveHelper.getResponsivePaddingIPad(context,
+                      mobile: 6, tablet: 8, ipad: 10, ipadPro: 12, desktop: 8)
+                  : ResponsiveHelper.getResponsivePaddingIPad(context,
+                      mobile: 4, tablet: 6, ipad: 8, ipadPro: 10, desktop: 6),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Flexible(
+                    flex: 2,
                     child: Icon(
                       icon,
                       size: ResponsiveHelper.getResponsiveIconSize(context,
-                          mobile: 20, tablet: 24, desktop: 28),
+                          mobile: 18,
+                          tablet: 22,
+                          ipad: 26,
+                          ipadPro: 30,
+                          desktop: 26),
                       color: selected ? selectedColor : unselectedColor,
                     ),
                   ),
                   SizedBox(
-                      height: ResponsiveHelper.getResponsiveSpacing(context,
-                          mobile: 1, tablet: 2, desktop: 3)),
+                      height: ResponsiveHelper.getResponsiveSpacingIPad(context,
+                          mobile: 2,
+                          tablet: 3,
+                          ipad: 4,
+                          ipadPro: 5,
+                          desktop: 4)),
                   Flexible(
+                    flex: 1,
                     child: AnimatedDefaultTextStyle(
                       duration: const Duration(milliseconds: 200),
                       style: TextStyle(
-                        fontSize: ResponsiveHelper.getResponsiveFontSize(
+                        fontSize: ResponsiveHelper.getResponsiveFontSizeIPad(
                             context,
-                            mobile: 11,
-                            tablet: 12,
-                            desktop: 13),
+                            mobile: 10,
+                            tablet: 11,
+                            ipad: 12,
+                            ipadPro: 13,
+                            desktop: 12),
                         fontWeight: FontWeight.w600,
                         color: selected ? selectedColor : unselectedColor,
                       ),

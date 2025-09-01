@@ -9,9 +9,21 @@ import 'screens/favorites_screen.dart';
 import 'screens/vehicle_detail_page.dart';
 import 'screens/notifications_screen.dart';
 import 'package:flutter/services.dart';
+import 'utils/responsive_helper.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Configure system UI for iPad full screen support
+  SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+
+  // Set preferred orientations for iPad support
+  await SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+    DeviceOrientation.landscapeLeft,
+    DeviceOrientation.landscapeRight,
+  ]);
 
   try {
     // Initialize Firebase first with detailed error logging
@@ -98,12 +110,31 @@ class _MyAppState extends State<MyApp> {
             const NotificationsScreen(), // Add the new route
       },
       builder: (context, child) {
-        return AnnotatedRegion<SystemUiOverlayStyle>(
-          value: const SystemUiOverlayStyle(
-            statusBarColor: Color(0xFFFFC107), // Yellow
-            statusBarIconBrightness: Brightness.dark,
+        // iPad-specific responsive adjustments
+        return MediaQuery(
+          data: MediaQuery.of(context).copyWith(
+            // Ensure proper text scaling for iPad
+            textScaler: TextScaler.linear(
+              ResponsiveHelper.isIPadPro12_9(context)
+                  ? 1.1
+                  : ResponsiveHelper.isIPadPro11(context)
+                      ? 1.05
+                      : ResponsiveHelper.isIPad(context)
+                          ? 1.0
+                          : 1.0,
+            ),
           ),
-          child: child!,
+          child: AnnotatedRegion<SystemUiOverlayStyle>(
+            value: SystemUiOverlayStyle(
+              statusBarColor: Colors.transparent,
+              statusBarIconBrightness: ResponsiveHelper.isIPad(context)
+                  ? Brightness.dark
+                  : Brightness.dark,
+              systemNavigationBarColor: Colors.transparent,
+              systemNavigationBarIconBrightness: Brightness.dark,
+            ),
+            child: child!,
+          ),
         );
       },
     );
