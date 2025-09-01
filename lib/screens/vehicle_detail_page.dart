@@ -7,7 +7,7 @@ import '../widgets/vehicle_detail/vehicle_info_header.dart';
 import '../widgets/vehicle_detail/vehicle_specifications_section.dart';
 import '../widgets/vehicle_detail/vehicle_features_section.dart';
 import '../widgets/vehicle_detail/rental_info_section.dart';
-// import '../widgets/vehicle_detail/booking_form_section.dart'; // Commented out booking form
+import '../widgets/vehicle_detail/booking_form_section.dart';
 import '../widgets/vehicle_detail/full_screen_image_viewer.dart';
 import '../utils/app_colors.dart';
 import '../utils/responsive_helper.dart';
@@ -173,8 +173,14 @@ class _VehicleDetailPageState extends State<VehicleDetailPage> {
                     // Divider
                     const Divider(height: 1),
 
-                    // Booking form section - COMMENTED OUT
-                    // BookingFormSection(vehicleDetails: _vehicleDetails),
+                    // Booking form section
+                    BookingFormSection(vehicleDetails: _vehicleDetails),
+
+                    // Divider
+                    const Divider(height: 1),
+
+                    // Negotiable price notice
+                    _buildNegotiablePriceNotice(),
 
                     // Divider
                     const Divider(height: 1),
@@ -183,7 +189,14 @@ class _VehicleDetailPageState extends State<VehicleDetailPage> {
                     _buildContactButtonsSection(),
 
                     // Bottom padding
-                    SizedBox(height: ResponsiveHelper.getResponsiveSpacingIPad(context, mobile: 24, tablet: 32, ipad: 40, ipadPro: 48, desktop: 56)),
+                    SizedBox(
+                        height: ResponsiveHelper.getResponsiveSpacingIPad(
+                            context,
+                            mobile: 24,
+                            tablet: 32,
+                            ipad: 40,
+                            ipadPro: 48,
+                            desktop: 56)),
                   ],
                 ),
               ),
@@ -208,19 +221,23 @@ class _VehicleDetailPageState extends State<VehicleDetailPage> {
     }
 
     return Container(
-      padding: ResponsiveHelper.getResponsivePaddingIPad(context, mobile: 16, tablet: 20, ipad: 24, ipadPro: 32, desktop: 40),
+      padding: ResponsiveHelper.getResponsivePaddingIPad(context,
+          mobile: 16, tablet: 20, ipad: 24, ipadPro: 32, desktop: 40),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             'Contact Vehicle Owner',
             style: TextStyle(
-              fontSize: ResponsiveHelper.getResponsiveFontSizeIPad(context, mobile: 20, tablet: 22, ipad: 24, ipadPro: 28, desktop: 32),
+              fontSize: ResponsiveHelper.getResponsiveFontSizeIPad(context,
+                  mobile: 20, tablet: 22, ipad: 24, ipadPro: 28, desktop: 32),
               fontWeight: FontWeight.bold,
               color: Colors.black,
             ),
           ),
-          SizedBox(height: ResponsiveHelper.getResponsiveSpacingIPad(context, mobile: 16, tablet: 20, ipad: 24, ipadPro: 32, desktop: 40)),
+          SizedBox(
+              height: ResponsiveHelper.getResponsiveSpacingIPad(context,
+                  mobile: 16, tablet: 20, ipad: 24, ipadPro: 32, desktop: 40)),
           Row(
             children: [
               Expanded(
@@ -231,7 +248,13 @@ class _VehicleDetailPageState extends State<VehicleDetailPage> {
                   () => _makePhoneCall(contactNumber),
                 ),
               ),
-              SizedBox(width: ResponsiveHelper.getResponsiveSpacingIPad(context, mobile: 12, tablet: 16, ipad: 20, ipadPro: 24, desktop: 28)),
+              SizedBox(
+                  width: ResponsiveHelper.getResponsiveSpacingIPad(context,
+                      mobile: 12,
+                      tablet: 16,
+                      ipad: 20,
+                      ipadPro: 24,
+                      desktop: 28)),
               Expanded(
                 child: _buildContactButton(
                   'WhatsApp',
@@ -254,25 +277,71 @@ class _VehicleDetailPageState extends State<VehicleDetailPage> {
     return ElevatedButton.icon(
       onPressed: onPressed,
       icon: isFaIcon
-          ? FaIcon(icon as IconData, color: Colors.white, size: ResponsiveHelper.getResponsiveIconSize(context, mobile: 18, tablet: 20, ipad: 22, ipadPro: 24, desktop: 26))
-          : Icon(icon as IconData, color: Colors.white, size: ResponsiveHelper.getResponsiveIconSize(context, mobile: 18, tablet: 20, ipad: 22, ipadPro: 24, desktop: 26)),
+          ? FaIcon(icon as IconData,
+              color: Colors.white,
+              size: ResponsiveHelper.getResponsiveIconSize(context,
+                  mobile: 12,
+                  tablet: 14,
+                  ipad: 16,
+                  ipadPro: 18,
+                  desktop: 20)) // Smaller icon for compact buttons
+          : Icon(icon as IconData,
+              color: Colors.white,
+              size: ResponsiveHelper.getResponsiveIconSize(context,
+                  mobile: 12,
+                  tablet: 14,
+                  ipad: 16,
+                  ipadPro: 18,
+                  desktop: 20)), // Smaller icon for compact buttons
       label: Text(
         text,
         style: TextStyle(
           fontWeight: FontWeight.w600,
-          fontSize: ResponsiveHelper.getResponsiveFontSizeIPad(context, mobile: 14, tablet: 16, ipad: 18, ipadPro: 20, desktop: 22),
+          fontSize: ResponsiveHelper.getResponsiveFontSizeIPad(context,
+              mobile: 12,
+              tablet: 13,
+              ipad: 14,
+              ipadPro: 15,
+              desktop: 16), // Optimized font size
           color: Colors.white,
         ),
+        maxLines: 1, // Force single line
+        overflow: TextOverflow.clip, // Ensure no overflow
       ),
       style: ElevatedButton.styleFrom(
         backgroundColor: color,
         foregroundColor: Colors.white,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(ResponsiveHelper.getResponsiveBorderRadius(context, mobile: 20, tablet: 24, ipad: 28, ipadPro: 32, desktop: 36)),
+          borderRadius: BorderRadius.circular(
+              ResponsiveHelper.getResponsiveBorderRadius(context,
+                  mobile: 20, tablet: 24, ipad: 28, ipadPro: 32, desktop: 36)),
         ),
         elevation: 2,
-        padding: ResponsiveHelper.getResponsiveButtonPadding(context),
+        padding: ResponsiveHelper.getResponsiveButtonPadding(
+          context,
+          mobile: const EdgeInsets.symmetric(
+              horizontal: 10, vertical: 8), // More compact padding
+          tablet: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          ipad: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+          ipadPro: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          desktop: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
+        ),
         textStyle: const TextStyle(fontWeight: FontWeight.w600),
+        minimumSize: Size(
+          ResponsiveHelper.getResponsiveSpacingIPad(context,
+              mobile: 100,
+              tablet: 110,
+              ipad: 120,
+              ipadPro: 125,
+              desktop:
+                  130), // Optimized width for WhatsApp text with smaller font
+          ResponsiveHelper.getResponsiveSpacingIPad(context,
+              mobile: 46,
+              tablet: 50,
+              ipad: 54,
+              ipadPro: 58,
+              desktop: 62), // Perfect height for compact buttons
+        ),
       ),
     );
   }
@@ -344,5 +413,43 @@ class _VehicleDetailPageState extends State<VehicleDetailPage> {
         );
       }
     }
+  }
+
+  Widget _buildNegotiablePriceNotice() {
+    return Container(
+      padding: ResponsiveHelper.getResponsivePaddingIPad(context,
+          mobile: 16, tablet: 20, ipad: 24, ipadPro: 32, desktop: 40),
+      child: Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(
+            color: Theme.of(context).colorScheme.primary.withOpacity(0.5),
+            width: 2,
+          ),
+        ),
+        child: Row(
+          children: [
+            Icon(
+              Icons.info_outline,
+              color: Theme.of(context).colorScheme.primary,
+              size: 18,
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                'All prices are negotiable - Contact owner for best rates!',
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.primary,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 15,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }

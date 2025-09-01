@@ -339,6 +339,7 @@ class PeriodPricing {
 class VehiclePricing {
   String vehicleValue;
   Map<String, bool> rentalPeriods; // Moving this from RentalConditions to here
+  bool isNegotiable; // New field for negotiable pricing
   PeriodPricing? hourly;
   PeriodPricing? daily;
   PeriodPricing? weekly;
@@ -347,6 +348,7 @@ class VehiclePricing {
   VehiclePricing({
     this.vehicleValue = '',
     Map<String, bool>? rentalPeriods,
+    this.isNegotiable = false,
     this.hourly,
     this.daily,
     this.weekly,

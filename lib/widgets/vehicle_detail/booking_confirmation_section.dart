@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import '../../services/onesignal_service.dart';
 
 class BookingConfirmationSection extends StatefulWidget {
   final Map<String, dynamic> vehicleDetails;
@@ -34,7 +33,7 @@ class _BookingConfirmationSectionState
   bool _isRequesting = false;
   bool _requestSent = false;
   String _requestStatus = ""; // "pending", "approved", "rejected"
-  String? _requestId;
+  // String? _requestId; // COMMENTED OUT - Not used since booking is disabled
 
   @override
   void initState() {
@@ -63,7 +62,7 @@ class _BookingConfirmationSectionState
 
         setState(() {
           _requestSent = true;
-          _requestId = latestRequest.id;
+          // _requestId = latestRequest.id; // COMMENTED OUT - Not used
           _requestStatus = data['status'];
         });
       }
@@ -81,16 +80,16 @@ class _BookingConfirmationSectionState
     // Calculate rental details
     final rentalDetails = _calculateRentalDetails();
 
-    // Helper to check login and redirect
-    Future<void> handleRequestBooking() async {
-      final currentUser = FirebaseAuth.instance.currentUser;
-      if (currentUser == null) {
-        // Not logged in, navigate to login
-        Navigator.pushNamed(context, '/auth');
-        return;
-      }
-      _sendBookingRequest();
-    }
+    // Helper to check login and redirect - COMMENTED OUT
+    // Future<void> handleRequestBooking() async {
+    //   final currentUser = FirebaseAuth.instance.currentUser;
+    //   if (currentUser == null) {
+    //     // Not logged in, navigate to login
+    //     Navigator.pushNamed(context, '/auth');
+    //     return;
+    //   }
+    //   _sendBookingRequest();
+    // }
 
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 8),
@@ -100,14 +99,19 @@ class _BookingConfirmationSectionState
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+          BoxShadow(
             color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 5),
+            blurRadius: 4,
+            offset: const Offset(0, 1),
           ),
         ],
         border: Border.all(
           color: _getBorderColor(theme),
-          width: widget.hasApplied ? 2.0 : 1.0,
+          width: widget.hasApplied ? 2.0 : 1.5,
         ),
       ),
       child: Column(
@@ -175,119 +179,177 @@ class _BookingConfirmationSectionState
               ),
             ),
 
-          const Divider(height: 24),
+          const Divider(
+            height: 24,
+            thickness: 1,
+            color: Colors.grey,
+          ),
 
           // Cost breakdown section
-          Text(
-            'Trip Cost',
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-              color: theme.colorScheme.secondary,
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: isDarkMode
+                  ? Colors.grey.shade800.withOpacity(0.8)
+                  : Colors.grey.shade100,
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(
+                color: isDarkMode ? Colors.grey.shade600 : Colors.grey.shade300,
+                width: 2,
+              ),
             ),
-          ),
-          const SizedBox(height: 12),
-
-          // Rate x duration
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Expanded(
-                child: Text(
-                  'Rs ${currencyFormat.format(rentalDetails['unitRate'])}/Day x ${rentalDetails['unitCount']} ${rentalDetails['unitLabel'].toLowerCase()}(s)',
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Trip Cost',
                   style: TextStyle(
-                    color: isDarkMode
-                        ? Colors.grey.shade300
-                        : Colors.grey.shade800,
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: theme.colorScheme.secondary,
                   ),
                 ),
-              ),
-              Text(
-                'Rs. ${currencyFormat.format(rentalDetails['tripCost'])}',
-                style: TextStyle(
-                  fontWeight: FontWeight.w500,
-                  color: isDarkMode ? Colors.white : Colors.black,
+                const SizedBox(height: 12),
+
+                // Rate x duration
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Text(
+                        'Rs ${currencyFormat.format(rentalDetails['unitRate'])}/Day x ${rentalDetails['unitCount']} ${rentalDetails['unitLabel'].toLowerCase()}(s)',
+                        style: TextStyle(
+                          color: isDarkMode
+                              ? Colors.grey.shade300
+                              : Colors.grey.shade800,
+                        ),
+                      ),
+                    ),
+                    Text(
+                      'Rs. ${currencyFormat.format(rentalDetails['tripCost'])}',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w500,
+                        color: isDarkMode ? Colors.white : Colors.black,
+                      ),
+                    ),
+                  ],
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
 
           const SizedBox(height: 16),
 
           // Handling fee
-          Text(
-            'Handling Fee',
-            style: TextStyle(
-              fontSize: 13,
-              fontWeight: FontWeight.w500,
-              color: theme.colorScheme.secondary,
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: isDarkMode
+                  ? Colors.blue.shade900.withOpacity(0.8)
+                  : Colors.blue.shade50,
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(
+                color: isDarkMode ? Colors.blue.shade600 : Colors.blue.shade300,
+                width: 2,
+              ),
             ),
-          ),
-          const SizedBox(height: 4),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Expanded(
-                child: Text(
-                  'Will be charged at booking confirmation',
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Handling Fee',
                   style: TextStyle(
                     fontSize: 13,
-                    color: isDarkMode
-                        ? Colors.grey.shade400
-                        : Colors.grey.shade600,
+                    fontWeight: FontWeight.w500,
+                    color: theme.colorScheme.secondary,
                   ),
                 ),
-              ),
-              Text(
-                'Rs. ${currencyFormat.format(1000.00)}',
-                style: TextStyle(
-                  fontWeight: FontWeight.w500,
-                  color: isDarkMode ? Colors.white : Colors.black,
+                const SizedBox(height: 4),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Text(
+                        'Will be charged at booking confirmation',
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: isDarkMode
+                              ? Colors.grey.shade400
+                              : Colors.grey.shade600,
+                        ),
+                      ),
+                    ),
+                    Text(
+                      'Rs. ${currencyFormat.format(1000.00)}',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w500,
+                        color: isDarkMode ? Colors.white : Colors.black,
+                      ),
+                    ),
+                  ],
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
 
           const SizedBox(height: 16),
-          const Divider(),
+          const Divider(
+            thickness: 2,
+            color: Colors.grey,
+          ),
           const SizedBox(height: 16),
 
           // Total rental cost
-          Row(
-            children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Rental Cost',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: theme.colorScheme.secondary,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    'Rental Cost for Trip',
-                    style: TextStyle(
-                      fontSize: 13,
-                      color: isDarkMode
-                          ? Colors.grey.shade400
-                          : Colors.grey.shade600,
-                    ),
-                  ),
-                ],
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: isDarkMode
+                  ? Colors.green.shade900.withOpacity(0.8)
+                  : Colors.green.shade50,
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(
+                color: isDarkMode
+                    ? Colors.green.shade600
+                    : theme.colorScheme.primary,
+                width: 2,
               ),
-              const Spacer(),
-              Text(
-                'Rs. ${currencyFormat.format(rentalDetails['rentalCost'])}',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: theme.colorScheme.primary,
+            ),
+            child: Row(
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Rental Cost',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: theme.colorScheme.secondary,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Rental Cost for Trip',
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: isDarkMode
+                            ? Colors.grey.shade400
+                            : Colors.grey.shade600,
+                      ),
+                    ),
+                  ],
                 ),
-              ),
-            ],
+                const Spacer(),
+                Text(
+                  'Rs. ${currencyFormat.format(rentalDetails['rentalCost'])}',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: theme.colorScheme.primary,
+                  ),
+                ),
+              ],
+            ),
           ),
 
           // Trip duration info
@@ -329,29 +391,29 @@ class _BookingConfirmationSectionState
 
           const SizedBox(height: 24),
 
-          // Request button (if not already sent)
-          if (!_requestSent && !_isRequesting)
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: widget.hasApplied ? handleRequestBooking : null,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: theme.colorScheme.primary,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  textStyle: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
-                  disabledBackgroundColor:
-                      isDarkMode ? Colors.grey.shade700 : Colors.grey.shade300,
-                  disabledForegroundColor:
-                      isDarkMode ? Colors.grey.shade500 : Colors.grey.shade600,
-                ),
-                child: Text(
-                    widget.hasApplied ? 'Request Booking' : 'Apply to Confirm'),
-              ),
-            ),
+          // Request button (if not already sent) - COMMENTED OUT
+          // if (!_requestSent && !_isRequesting)
+          //   SizedBox(
+          //     width: double.infinity,
+          //     child: ElevatedButton(
+          //       onPressed: widget.hasApplied ? handleRequestBooking : null,
+          //       style: ElevatedButton.styleFrom(
+          //         backgroundColor: theme.colorScheme.primary,
+          //         foregroundColor: Colors.white,
+          //         padding: const EdgeInsets.symmetric(vertical: 16),
+          //         textStyle: const TextStyle(
+          //           fontSize: 16,
+          //           fontWeight: FontWeight.bold,
+          //         ),
+          //         disabledBackgroundColor:
+          //             isDarkMode ? Colors.grey.shade700 : Colors.grey.shade300,
+          //         disabledForegroundColor:
+          //             isDarkMode ? Colors.grey.shade500 : Colors.grey.shade600,
+          //       ),
+          //       child: Text(
+          //           widget.hasApplied ? 'Request Booking' : 'Apply to Confirm'),
+          //     ),
+          //   ),
 
           // Loading indicator while sending request
           if (_isRequesting)
@@ -418,7 +480,7 @@ class _BookingConfirmationSectionState
               padding: const EdgeInsets.only(top: 8.0),
               child: Center(
                 child: Text(
-                  'Click Apply to update booking details',
+                  'Click Apply to update price details',
                   style: TextStyle(
                     fontSize: 12,
                     fontStyle: FontStyle.italic,
@@ -566,7 +628,8 @@ class _BookingConfirmationSectionState
     };
   }
 
-  Future<void> _sendBookingRequest() async {
+  // COMMENTED OUT - Not used since request booking button is disabled
+  /*Future<void> _sendBookingRequest() async {
     // Set state to show loading
     setState(() {
       _isRequesting = true;
@@ -688,10 +751,10 @@ class _BookingConfirmationSectionState
         ),
       );
     }
-  }
+  }*/
 
-  // Send push notification to vehicle owner
-  Future<void> _sendOwnerNotification(
+  // COMMENTED OUT - Send push notification to vehicle owner
+  /*Future<void> _sendOwnerNotification(
       String ownerOneSignalId, String userName, String vehicleName) async {
     try {
       // Get the OneSignalService instance
@@ -708,7 +771,7 @@ class _BookingConfirmationSectionState
     } catch (e) {
       print('Error sending OneSignal notification: $e');
     }
-  }
+  }*/
 
   // Helper methods for UI elements
   Color _getBorderColor(ThemeData theme) {
@@ -720,10 +783,10 @@ class _BookingConfirmationSectionState
       return Colors.orange;
     } else {
       return widget.hasApplied
-          ? theme.colorScheme.primary.withOpacity(0.5)
+          ? theme.colorScheme.primary.withOpacity(0.7)
           : (theme.brightness == Brightness.dark
-              ? Colors.grey.shade700
-              : Colors.grey.shade200);
+              ? Colors.grey.shade600
+              : Colors.grey.shade400);
     }
   }
 
@@ -763,7 +826,7 @@ class _BookingConfirmationSectionState
     } else if (_requestStatus == "pending") {
       return "Request Pending";
     } else {
-      return "Booking Confirmation";
+      return "Cost Summary";
     }
   }
 

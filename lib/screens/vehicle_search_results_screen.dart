@@ -263,7 +263,7 @@ class _VehicleSearchResultsScreenState
                 padding: ResponsiveHelper.getResponsiveButtonPadding(
                   context,
                   mobile:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   tablet:
                       const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                   desktop:
@@ -490,9 +490,6 @@ class _VehicleSearchResultsScreenState
         .where((e) => e.isNotEmpty)
         .join(', ');
 
-    final isTablet = ResponsiveHelper.isTablet(context);
-    final isLargeTablet = ResponsiveHelper.isLargeTablet(context);
-
     return InkWell(
       borderRadius: BorderRadius.circular(
           ResponsiveHelper.getResponsiveBorderRadius(context)),
@@ -518,7 +515,7 @@ class _VehicleSearchResultsScreenState
         color: isDarkMode ? AppColors.neutralDark : Colors.white,
         child: Padding(
           padding: ResponsiveHelper.getResponsivePadding(context,
-              mobile: 10, tablet: 16, desktop: 20),
+              mobile: 10, tablet: 12, ipad: 8, ipadPro: 8, desktop: 16),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -535,25 +532,33 @@ class _VehicleSearchResultsScreenState
                             width: ResponsiveHelper.getResponsiveImageSize(
                                 context,
                                 mobile: 140,
-                                tablet: 180,
-                                desktop: 220),
+                                tablet: 120,
+                                ipad: 100,
+                                ipadPro: 100,
+                                desktop: 140),
                             height: ResponsiveHelper.getResponsiveImageSize(
                                 context,
                                 mobile: 150,
-                                tablet: 200,
-                                desktop: 250),
+                                tablet: 140,
+                                ipad: 120,
+                                ipadPro: 120,
+                                desktop: 160),
                             fit: BoxFit.cover,
                             placeholder: (context, url) => Container(
                               width: ResponsiveHelper.getResponsiveImageSize(
                                   context,
                                   mobile: 140,
-                                  tablet: 180,
-                                  desktop: 220),
+                                  tablet: 120,
+                                  ipad: 100,
+                                  ipadPro: 100,
+                                  desktop: 140),
                               height: ResponsiveHelper.getResponsiveImageSize(
                                   context,
                                   mobile: 150,
-                                  tablet: 200,
-                                  desktop: 250),
+                                  tablet: 140,
+                                  ipad: 120,
+                                  ipadPro: 120,
+                                  desktop: 160),
                               color: Colors.grey[300],
                               child: Center(
                                   child: CircularProgressIndicator(
@@ -563,13 +568,17 @@ class _VehicleSearchResultsScreenState
                               width: ResponsiveHelper.getResponsiveImageSize(
                                   context,
                                   mobile: 140,
-                                  tablet: 180,
-                                  desktop: 220),
+                                  tablet: 120,
+                                  ipad: 100,
+                                  ipadPro: 100,
+                                  desktop: 140),
                               height: ResponsiveHelper.getResponsiveImageSize(
                                   context,
                                   mobile: 150,
-                                  tablet: 200,
-                                  desktop: 250),
+                                  tablet: 140,
+                                  ipad: 120,
+                                  ipadPro: 120,
+                                  desktop: 160),
                               color: Colors.grey[200],
                               child: Icon(
                                 Icons.car_rental,
@@ -941,6 +950,287 @@ class _VehicleSearchResultsScreenState
     );
   }
 
+  // Grid layout optimized card for tablets and iPads
+  Widget _buildGridVehicleCard(
+      BuildContext context, Map<String, dynamic> vehicle, bool isDarkMode) {
+    final String make = vehicle['make'] ?? 'Unknown';
+    final String model = vehicle['model'] ?? '';
+    final String? year = vehicle['year']?.toString();
+    final String? contactNumber =
+        vehicle['driverDetails']?['whatsappNumber'] ?? vehicle['contactNumber'];
+    final String? imageUrl = vehicle['images']?['primaryImageUrl'];
+    final String? city = vehicle['collectionPoint']?['city'];
+    final String? district = vehicle['collectionPoint']?['district'];
+    final String? price =
+        vehicle['pricing']?['daily']?['vehicleOnly']?['price']?.toString();
+    final String locationString = [city, district]
+        .map((e) => e?.toString() ?? '')
+        .where((e) => e.isNotEmpty)
+        .join(', ');
+
+    return InkWell(
+      borderRadius: BorderRadius.circular(12),
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => VehicleDetailPage(vehicle: vehicle),
+          ),
+        );
+      },
+      child: Card(
+        elevation: 3,
+        margin: EdgeInsets.zero,
+        clipBehavior: Clip.antiAlias,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        color: isDarkMode ? AppColors.neutralDark : Colors.white,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Image section - Fixed height
+            Container(
+              height: 120,
+              width: double.infinity,
+              child: Stack(
+                children: [
+                  imageUrl != null
+                      ? CachedNetworkImage(
+                          imageUrl: imageUrl,
+                          width: double.infinity,
+                          height: double.infinity,
+                          fit: BoxFit.cover,
+                          placeholder: (context, url) => Container(
+                            color: Colors.grey[300],
+                            child: Center(
+                                child:
+                                    CircularProgressIndicator(strokeWidth: 2)),
+                          ),
+                          errorWidget: (context, url, error) => Container(
+                            color: Colors.grey[200],
+                            child: Icon(
+                              Icons.car_rental,
+                              size: 40,
+                              color: Colors.grey,
+                            ),
+                          ),
+                        )
+                      : Container(
+                          color: Colors.grey[200],
+                          child: Icon(
+                            Icons.car_rental,
+                            size: 40,
+                            color: Colors.grey,
+                          ),
+                        ),
+                  if ((price ?? '').isNotEmpty)
+                    Positioned(
+                      left: 8,
+                      right: 8,
+                      bottom: 8,
+                      child: Container(
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: Color(0xFFFFC107).withOpacity(0.95),
+                          borderRadius: BorderRadius.circular(6),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.2),
+                              blurRadius: 4,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: Text(
+                          'Rs. ${price ?? ''}/Day',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 11,
+                          ),
+                          textAlign: TextAlign.center,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+            ),
+
+            // Content section - Fixed height and scrollable if needed
+            Container(
+              height: 100,
+              padding: EdgeInsets.all(12),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Make/Model and Brand Logo
+                  Row(
+                    children: [
+                      // Brand logo
+                      Container(
+                        margin: EdgeInsets.only(right: 8),
+                        width: 24,
+                        height: 24,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(6),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.1),
+                              blurRadius: 2,
+                              offset: const Offset(0, 1),
+                            ),
+                          ],
+                        ),
+                        padding: EdgeInsets.all(2),
+                        child: CarLogoHelper.getCarLogo(make),
+                      ),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              '$make $model',
+                              style: TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.bold,
+                                color: isDarkMode
+                                    ? Colors.white
+                                    : AppColors.neutralDark,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            if (year != null && year.isNotEmpty)
+                              Text(
+                                year,
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  color: isDarkMode
+                                      ? Colors.grey[400]
+                                      : AppColors.neutralMedium,
+                                ),
+                              ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  SizedBox(height: 6),
+
+                  // Location
+                  if (locationString.isNotEmpty)
+                    Row(
+                      children: [
+                        Icon(Icons.location_on,
+                            color: AppColors.primary, size: 12),
+                        SizedBox(width: 4),
+                        Expanded(
+                          child: Text(
+                            locationString,
+                            style: TextStyle(
+                              color: isDarkMode
+                                  ? Colors.grey[300]
+                                  : AppColors.neutralMedium,
+                              fontSize: 10,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
+                    ),
+
+                  Spacer(),
+
+                  // Action buttons
+                  Row(
+                    children: [
+                      Expanded(
+                        flex: 2,
+                        child: ElevatedButton(
+                          onPressed: () async {
+                            if (contactNumber != null &&
+                                contactNumber.isNotEmpty) {
+                              final uri =
+                                  Uri(scheme: 'tel', path: contactNumber);
+                              if (await canLaunchUrl(uri)) {
+                                await launchUrl(uri);
+                              }
+                            }
+                          },
+                          child: Icon(Icons.phone, size: 12),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppColors.secondary,
+                            foregroundColor: Colors.white,
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 4, vertical: 6),
+                            minimumSize: Size(0, 26),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
+                        ),
+                      ),
+                      SizedBox(width: 4),
+                      Expanded(
+                        flex: 3,
+                        child: ElevatedButton(
+                          onPressed: () async {
+                            if (contactNumber != null &&
+                                contactNumber.isNotEmpty) {
+                              final cleanedNumber =
+                                  cleanPhoneNumber(contactNumber);
+                              final whatsappUrl =
+                                  Uri.parse('https://wa.me/$cleanedNumber');
+                              if (await canLaunchUrl(whatsappUrl)) {
+                                await launchUrl(whatsappUrl,
+                                    mode: LaunchMode.externalApplication);
+                              }
+                            }
+                          },
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              FaIcon(FontAwesomeIcons.whatsapp, size: 10),
+                              SizedBox(width: 4),
+                              Text(
+                                'WhatsApp',
+                                style: TextStyle(fontSize: 8),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ],
+                          ),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppColors.tertiary,
+                            foregroundColor: Colors.white,
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 4, vertical: 6),
+                            minimumSize: Size(0, 26),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   String _buildSearchTitle() {
     if (widget.selectedVehicleTypes.isEmpty) {
       return 'All Vehicles in ${widget.location.isEmpty ? "All Locations" : widget.location}';
@@ -985,38 +1275,39 @@ class _VehicleSearchResultsScreenState
             context,
             mobile: 1,
             tablet: 2,
-            ipad: 3,
-            ipadPro: 3,
-            desktop: 4,
+            ipad: 2,
+            ipadPro: 2,
+            desktop: 3,
           ),
           childAspectRatio: ResponsiveHelper.getResponsiveAspectRatio(
             context,
             mobile: 1.2,
-            tablet: 1.4,
-            ipad: 1.6,
-            ipadPro: 1.8,
-            desktop: 2.0,
+            tablet: 0.75,
+            ipad: 0.75,
+            ipadPro: 0.75,
+            desktop: 0.8,
           ),
           crossAxisSpacing: ResponsiveHelper.getResponsiveSpacingIPad(
             context,
             mobile: 16,
-            tablet: 20,
-            ipad: 24,
-            ipadPro: 32,
-            desktop: 40,
+            tablet: 16,
+            ipad: 20,
+            ipadPro: 24,
+            desktop: 28,
           ),
           mainAxisSpacing: ResponsiveHelper.getResponsiveSpacingIPad(
             context,
             mobile: 16,
-            tablet: 20,
-            ipad: 24,
-            ipadPro: 32,
-            desktop: 40,
+            tablet: 16,
+            ipad: 20,
+            ipadPro: 24,
+            desktop: 28,
           ),
         ),
         itemCount: _searchResults.length,
         itemBuilder: (context, index) {
-          return _buildVehicleCard(context, _searchResults[index], isDarkMode);
+          return _buildGridVehicleCard(
+              context, _searchResults[index], isDarkMode);
         },
       );
     }

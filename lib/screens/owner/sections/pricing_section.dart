@@ -43,6 +43,7 @@ class _PricingSectionState extends State<PricingSection> {
     final updatedPricing = VehiclePricing(
       vehicleValue: _vehicleValueController.text,
       rentalPeriods: widget.pricing.rentalPeriods,
+      isNegotiable: widget.pricing.isNegotiable,
       hourly: widget.pricing.hourly,
       daily: widget.pricing.daily,
       weekly: widget.pricing.weekly,
@@ -66,6 +67,21 @@ class _PricingSectionState extends State<PricingSection> {
     final updatedPricing = VehiclePricing(
       vehicleValue: widget.pricing.vehicleValue,
       rentalPeriods: updatedPeriods,
+      isNegotiable: widget.pricing.isNegotiable,
+      hourly: widget.pricing.hourly,
+      daily: widget.pricing.daily,
+      weekly: widget.pricing.weekly,
+      monthly: widget.pricing.monthly,
+    );
+
+    widget.onPricingChanged(updatedPricing);
+  }
+
+  void _toggleNegotiable(bool value) {
+    final updatedPricing = VehiclePricing(
+      vehicleValue: widget.pricing.vehicleValue,
+      rentalPeriods: widget.pricing.rentalPeriods,
+      isNegotiable: value,
       hourly: widget.pricing.hourly,
       daily: widget.pricing.daily,
       weekly: widget.pricing.weekly,
@@ -134,6 +150,33 @@ class _PricingSectionState extends State<PricingSection> {
               return null;
             },
           ),
+          const SizedBox(height: 16),
+
+          // Negotiable checkbox
+          CheckboxListTile(
+            title: const Text(
+              'Prices are negotiable',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            subtitle: const Text(
+              'Check this box if you\'re open to price negotiations',
+              style: TextStyle(
+                fontSize: 14,
+                color: Colors.grey,
+              ),
+            ),
+            value: widget.pricing.isNegotiable,
+            onChanged: (bool? value) {
+              if (value != null) {
+                _toggleNegotiable(value);
+              }
+            },
+            controlAffinity: ListTileControlAffinity.leading,
+            contentPadding: EdgeInsets.zero,
+          ),
           const SizedBox(height: 24),
 
           // Rental Period Selection section
@@ -194,6 +237,7 @@ class _PricingSectionState extends State<PricingSection> {
                   final updatedPricing = VehiclePricing(
                     vehicleValue: widget.pricing.vehicleValue,
                     rentalPeriods: widget.pricing.rentalPeriods,
+                    isNegotiable: widget.pricing.isNegotiable,
                     hourly: pricing,
                     daily: widget.pricing.daily,
                     weekly: widget.pricing.weekly,
@@ -213,6 +257,7 @@ class _PricingSectionState extends State<PricingSection> {
                   final updatedPricing = VehiclePricing(
                     vehicleValue: widget.pricing.vehicleValue,
                     rentalPeriods: widget.pricing.rentalPeriods,
+                    isNegotiable: widget.pricing.isNegotiable,
                     hourly: widget.pricing.hourly,
                     daily: pricing,
                     weekly: widget.pricing.weekly,
@@ -232,6 +277,7 @@ class _PricingSectionState extends State<PricingSection> {
                   final updatedPricing = VehiclePricing(
                     vehicleValue: widget.pricing.vehicleValue,
                     rentalPeriods: widget.pricing.rentalPeriods,
+                    isNegotiable: widget.pricing.isNegotiable,
                     hourly: widget.pricing.hourly,
                     daily: widget.pricing.daily,
                     weekly: pricing,
@@ -251,6 +297,7 @@ class _PricingSectionState extends State<PricingSection> {
                   final updatedPricing = VehiclePricing(
                     vehicleValue: widget.pricing.vehicleValue,
                     rentalPeriods: widget.pricing.rentalPeriods,
+                    isNegotiable: widget.pricing.isNegotiable,
                     hourly: widget.pricing.hourly,
                     daily: widget.pricing.daily,
                     weekly: widget.pricing.weekly,
