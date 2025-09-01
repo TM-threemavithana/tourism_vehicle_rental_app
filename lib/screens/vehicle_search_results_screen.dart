@@ -831,10 +831,10 @@ class _VehicleSearchResultsScreenState
                     const SizedBox(height: 12),
                     // Action row
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
                         if (contactNumber != null && contactNumber.isNotEmpty)
-                          Expanded(
+                          Flexible(
+                            flex: 3,
                             child: _buildActionButton(
                               context,
                               icon: Icons.phone,
@@ -858,7 +858,8 @@ class _VehicleSearchResultsScreenState
                         if (contactNumber != null && contactNumber.isNotEmpty)
                           const SizedBox(width: 8),
                         if (contactNumber != null && contactNumber.isNotEmpty)
-                          Expanded(
+                          Flexible(
+                            flex: 4,
                             child: _buildActionButton(
                               context,
                               icon: FontAwesomeIcons.whatsapp,
@@ -935,6 +936,8 @@ class _VehicleSearchResultsScreenState
         label,
         style: const TextStyle(
             fontWeight: FontWeight.w600, fontSize: 12, color: Colors.white),
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
       ),
       style: ElevatedButton.styleFrom(
         backgroundColor: color,
@@ -946,6 +949,7 @@ class _VehicleSearchResultsScreenState
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         textStyle: const TextStyle(fontWeight: FontWeight.w600),
         minimumSize: const Size(0, 36),
+        maximumSize: const Size(double.infinity, 36),
       ),
     );
   }
@@ -1152,7 +1156,7 @@ class _VehicleSearchResultsScreenState
                   Row(
                     children: [
                       Expanded(
-                        flex: 2,
+                        flex: 3,
                         child: ElevatedButton(
                           onPressed: () async {
                             if (contactNumber != null &&
@@ -1164,7 +1168,22 @@ class _VehicleSearchResultsScreenState
                               }
                             }
                           },
-                          child: Icon(Icons.phone, size: 12),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.phone, size: 10),
+                              SizedBox(width: 4),
+                              Flexible(
+                                child: Text(
+                                  'Call',
+                                  style: TextStyle(fontSize: 8),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            ],
+                          ),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: AppColors.secondary,
                             foregroundColor: Colors.white,
@@ -1179,7 +1198,7 @@ class _VehicleSearchResultsScreenState
                       ),
                       SizedBox(width: 4),
                       Expanded(
-                        flex: 3,
+                        flex: 4,
                         child: ElevatedButton(
                           onPressed: () async {
                             if (contactNumber != null &&
@@ -1200,11 +1219,13 @@ class _VehicleSearchResultsScreenState
                             children: [
                               FaIcon(FontAwesomeIcons.whatsapp, size: 10),
                               SizedBox(width: 4),
-                              Text(
-                                'WhatsApp',
-                                style: TextStyle(fontSize: 8),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
+                              Flexible(
+                                child: Text(
+                                  'WhatsApp',
+                                  style: TextStyle(fontSize: 8),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
                               ),
                             ],
                           ),
