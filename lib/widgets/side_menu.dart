@@ -147,21 +147,8 @@ class _SideMenuState extends State<SideMenu> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Top row with menu icon
-          Padding(
-            padding: const EdgeInsets.only(top: 20.0, left: 8.0, bottom: 8.0),
-            child: Container(
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                shape: BoxShape.circle,
-              ),
-              child: IconButton(
-                icon: const Icon(Icons.menu, color: Colors.black, size: 28),
-                onPressed: () => widget.onClose(),
-                tooltip: 'Close Menu',
-              ),
-            ),
-          ),
+          // Top spacing
+          const SizedBox(height: 20),
 
           // User Profile Section
           Container(
@@ -358,38 +345,23 @@ class _SideMenuState extends State<SideMenu> {
       return [
         _buildMenuItem(context, Icons.dashboard_outlined, 'Dashboard',
             isActive: widget.currentTab == 'Dashboard'),
-        _buildMenuItem(context, Icons.directions_car_outlined, 'My Vehicles',
-            isActive: widget.currentTab == 'My Vehicles'),
-        _buildMenuItem(context, Icons.calendar_today_outlined, 'Bookings',
-            isActive: widget.currentTab == 'Bookings'),
-        _buildMenuItem(context, Icons.analytics_outlined, 'Analytics',
-            isActive: widget.currentTab == 'Analytics'),
-        _buildMenuItem(
-            context, Icons.account_balance_wallet_outlined, 'Earnings',
-            isActive: widget.currentTab == 'Earnings'),
+        _buildMenuItem(context, Icons.favorite_outline, 'Favorites',
+            isActive: widget.currentTab == 'Favorites'),
         _buildMenuItem(context, Icons.notifications_outlined, 'Notifications',
             isActive: widget.currentTab == 'Notifications'),
-        _buildMenuItem(context, Icons.settings_outlined, 'Settings',
-            isActive: widget.currentTab == 'Settings'),
         _buildMenuItem(context, Icons.help_outline, 'Help & Support',
             isActive: widget.currentTab == 'Help & Support'),
       ];
     } else {
       return [
-        _buildMenuItem(context, Icons.history_outlined, 'My Rentals',
-            isActive: widget.currentTab == 'My Rentals'),
         _buildMenuItem(context, Icons.favorite_outline, 'Favorites',
             isActive: widget.currentTab == 'Favorites'),
         _buildMenuItem(context, Icons.notifications_outlined, 'Notifications',
             isActive: widget.currentTab == 'Notifications'),
-        _buildMenuItem(context, Icons.payment_outlined, 'Payment Methods',
-            isActive: widget.currentTab == 'Payment Methods'),
-        _buildMenuItem(context, Icons.help_outline, 'Help & Support',
-            isActive: widget.currentTab == 'Help & Support'),
-        _buildMenuItem(context, Icons.info_outline, 'About',
-            isActive: widget.currentTab == 'About'),
         _buildMenuItem(context, Icons.book_online, 'My Booking Requests',
             isActive: widget.currentTab == 'My Booking Requests'),
+        _buildMenuItem(context, Icons.help_outline, 'Help & Support',
+            isActive: widget.currentTab == 'Help & Support'),
       ];
     }
   }
@@ -399,11 +371,13 @@ class _SideMenuState extends State<SideMenu> {
     return InkWell(
       onTap: () {
         widget.onClose();
+
+        // Update current tab if callback is provided
         if (widget.onTabChange != null) {
           widget.onTabChange!(title);
         }
 
-        // Add navigation for specific menu items
+        // Handle navigation for specific menu items
         switch (title) {
           case 'Favorites':
             Navigator.pushReplacementNamed(context, '/favorites');
@@ -411,7 +385,20 @@ class _SideMenuState extends State<SideMenu> {
           case 'Notifications':
             Navigator.pushReplacementNamed(context, '/notifications');
             break;
-          // Add other cases as needed
+          case 'My Booking Requests':
+            // Navigate to booking requests screen
+            Navigator.pushReplacementNamed(context, '/my-booking-requests');
+            break;
+          case 'Help & Support':
+            // Show help dialog or navigate to help screen
+            _showHelpDialog(context);
+            break;
+          case 'Dashboard':
+            // For owner dashboard, this is handled by the parent screen
+            break;
+          default:
+            // For other items, let the parent handle navigation
+            break;
         }
       },
       child: Container(
@@ -452,6 +439,29 @@ class _SideMenuState extends State<SideMenu> {
           ],
         ),
       ),
+    );
+  }
+
+  void _showHelpDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Help & Support'),
+          content: const Text(
+            'For support, please contact us at:\n\n'
+            'Email: support@wayz.lk\n'
+            'Phone: +94 11 123 4567\n\n'
+            'We\'re here to help you with any questions or issues.',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Close'),
+            ),
+          ],
+        );
+      },
     );
   }
 }

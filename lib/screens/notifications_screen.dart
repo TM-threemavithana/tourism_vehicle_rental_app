@@ -532,6 +532,9 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                 onClose: _closeMenu,
                 onSignOut: _signOut,
                 onTabChange: _updateCurrentTab,
+                onProfileTap: () {
+                  Navigator.pushNamed(context, '/profile');
+                },
                 width: 0.7,
                 user: FirebaseAuth.instance.currentUser,
                 currentTab: _currentTab,

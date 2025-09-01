@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'firebase_options.dart';
 import 'services/onesignal_service.dart';
@@ -8,6 +9,8 @@ import 'screens/auth/auth_wrapper.dart';
 import 'screens/favorites_screen.dart';
 import 'screens/vehicle_detail_page.dart';
 import 'screens/notifications_screen.dart';
+import 'screens/renter/my_booking_requests_screen.dart';
+import 'screens/profile_screen.dart';
 import 'package:flutter/services.dart';
 import 'utils/responsive_helper.dart';
 
@@ -106,8 +109,12 @@ class _MyAppState extends State<MyApp> {
               as Map<String, dynamic>?;
           return VehicleDetailPage(vehicle: args ?? {});
         },
-        '/notifications': (context) =>
-            const NotificationsScreen(), // Add the new route
+        '/notifications': (context) => const NotificationsScreen(),
+        '/my-booking-requests': (context) => const MyBookingRequestsScreen(),
+        '/profile': (context) {
+          final user = FirebaseAuth.instance.currentUser;
+          return ProfileScreen(user: user);
+        },
       },
       builder: (context, child) {
         // iPad-specific responsive adjustments

@@ -134,6 +134,9 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
           await FirebaseAuth.instance.signOut();
           if (mounted) Navigator.pushReplacementNamed(context, '/auth');
         },
+        onProfileTap: () {
+          Navigator.pushNamed(context, '/profile');
+        },
         user: FirebaseAuth.instance.currentUser,
         currentTab: '',
       ),
