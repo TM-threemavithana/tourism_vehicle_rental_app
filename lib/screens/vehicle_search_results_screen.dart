@@ -993,9 +993,16 @@ class _VehicleSearchResultsScreenState
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Image section - Fixed height
+            // Image section - Responsive height
             Container(
-              height: 120,
+              height: ResponsiveHelper.getResponsiveImageSize(
+                context,
+                mobile: 100,
+                tablet: 120,
+                ipad: 140,
+                ipadPro: 160,
+                desktop: 180,
+              ),
               width: double.infinity,
               child: Stack(
                 children: [
@@ -1015,7 +1022,14 @@ class _VehicleSearchResultsScreenState
                             color: Colors.grey[200],
                             child: Icon(
                               Icons.car_rental,
-                              size: 40,
+                              size: ResponsiveHelper.getResponsiveIconSize(
+                                context,
+                                mobile: 30,
+                                tablet: 35,
+                                ipad: 40,
+                                ipadPro: 45,
+                                desktop: 50,
+                              ),
                               color: Colors.grey,
                             ),
                           ),
@@ -1024,21 +1038,64 @@ class _VehicleSearchResultsScreenState
                           color: Colors.grey[200],
                           child: Icon(
                             Icons.car_rental,
-                            size: 40,
+                            size: ResponsiveHelper.getResponsiveIconSize(
+                              context,
+                              mobile: 30,
+                              tablet: 35,
+                              ipad: 40,
+                              ipadPro: 45,
+                              desktop: 50,
+                            ),
                             color: Colors.grey,
                           ),
                         ),
                   if ((price ?? '').isNotEmpty)
                     Positioned(
-                      left: 8,
-                      right: 8,
-                      bottom: 8,
+                      left: ResponsiveHelper.getResponsiveSpacing(
+                        context,
+                        mobile: 6,
+                        tablet: 8,
+                        ipad: 10,
+                        ipadPro: 12,
+                        desktop: 14,
+                      ),
+                      right: ResponsiveHelper.getResponsiveSpacing(
+                        context,
+                        mobile: 6,
+                        tablet: 8,
+                        ipad: 10,
+                        ipadPro: 12,
+                        desktop: 14,
+                      ),
+                      bottom: ResponsiveHelper.getResponsiveSpacing(
+                        context,
+                        mobile: 6,
+                        tablet: 8,
+                        ipad: 10,
+                        ipadPro: 12,
+                        desktop: 14,
+                      ),
                       child: Container(
-                        padding:
-                            EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        padding: ResponsiveHelper.getResponsivePadding(
+                          context,
+                          mobile: 6,
+                          tablet: 8,
+                          ipad: 10,
+                          ipadPro: 12,
+                          desktop: 14,
+                        ),
                         decoration: BoxDecoration(
                           color: Color(0xFFFFC107).withOpacity(0.95),
-                          borderRadius: BorderRadius.circular(6),
+                          borderRadius: BorderRadius.circular(
+                            ResponsiveHelper.getResponsiveBorderRadius(
+                              context,
+                              mobile: 4,
+                              tablet: 5,
+                              ipad: 6,
+                              ipadPro: 7,
+                              desktop: 8,
+                            ),
+                          ),
                           boxShadow: [
                             BoxShadow(
                               color: Colors.black.withOpacity(0.2),
@@ -1052,7 +1109,14 @@ class _VehicleSearchResultsScreenState
                           style: TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.bold,
-                            fontSize: 11,
+                            fontSize: ResponsiveHelper.getResponsiveFontSize(
+                              context,
+                              mobile: 10,
+                              tablet: 11,
+                              ipad: 12,
+                              ipadPro: 13,
+                              desktop: 14,
+                            ),
                           ),
                           textAlign: TextAlign.center,
                           maxLines: 1,
@@ -1064,24 +1128,64 @@ class _VehicleSearchResultsScreenState
               ),
             ),
 
-            // Content section - Fixed height and scrollable if needed
-            Container(
-              height: 100,
-              padding: EdgeInsets.all(12),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
+            // Content section - Responsive height and flexible layout
+            Expanded(
+              child: Padding(
+                padding: ResponsiveHelper.getResponsivePadding(
+                  context,
+                  mobile: 8,
+                  tablet: 10,
+                  ipad: 12,
+                  ipadPro: 14,
+                  desktop: 16,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
                   // Make/Model and Brand Logo
                   Row(
                     children: [
                       // Brand logo
                       Container(
-                        margin: EdgeInsets.only(right: 8),
-                        width: 24,
-                        height: 24,
+                        margin: EdgeInsets.only(
+                          right: ResponsiveHelper.getResponsiveSpacing(
+                            context,
+                            mobile: 6,
+                            tablet: 8,
+                            ipad: 10,
+                            ipadPro: 12,
+                            desktop: 14,
+                          ),
+                        ),
+                        width: ResponsiveHelper.getResponsiveIconSize(
+                          context,
+                          mobile: 20,
+                          tablet: 24,
+                          ipad: 28,
+                          ipadPro: 32,
+                          desktop: 36,
+                        ),
+                        height: ResponsiveHelper.getResponsiveIconSize(
+                          context,
+                          mobile: 20,
+                          tablet: 24,
+                          ipad: 28,
+                          ipadPro: 32,
+                          desktop: 36,
+                        ),
                         decoration: BoxDecoration(
                           color: Colors.white,
-                          borderRadius: BorderRadius.circular(6),
+                          borderRadius: BorderRadius.circular(
+                            ResponsiveHelper.getResponsiveBorderRadius(
+                              context,
+                              mobile: 4,
+                              tablet: 5,
+                              ipad: 6,
+                              ipadPro: 7,
+                              desktop: 8,
+                            ),
+                          ),
                           boxShadow: [
                             BoxShadow(
                               color: Colors.black.withOpacity(0.1),
@@ -1090,7 +1194,14 @@ class _VehicleSearchResultsScreenState
                             ),
                           ],
                         ),
-                        padding: EdgeInsets.all(2),
+                        padding: ResponsiveHelper.getResponsivePadding(
+                          context,
+                          mobile: 2,
+                          tablet: 3,
+                          ipad: 4,
+                          ipadPro: 5,
+                          desktop: 6,
+                        ),
                         child: CarLogoHelper.getCarLogo(make),
                       ),
                       Expanded(
@@ -1100,7 +1211,14 @@ class _VehicleSearchResultsScreenState
                             Text(
                               '$make $model',
                               style: TextStyle(
-                                fontSize: 13,
+                                fontSize: ResponsiveHelper.getResponsiveFontSize(
+                                  context,
+                                  mobile: 12,
+                                  tablet: 13,
+                                  ipad: 14,
+                                  ipadPro: 15,
+                                  desktop: 16,
+                                ),
                                 fontWeight: FontWeight.bold,
                                 color: isDarkMode
                                     ? Colors.white
@@ -1113,7 +1231,14 @@ class _VehicleSearchResultsScreenState
                               Text(
                                 year,
                                 style: TextStyle(
-                                  fontSize: 11,
+                                  fontSize: ResponsiveHelper.getResponsiveFontSize(
+                                    context,
+                                    mobile: 10,
+                                    tablet: 11,
+                                    ipad: 12,
+                                    ipadPro: 13,
+                                    desktop: 14,
+                                  ),
                                   color: isDarkMode
                                       ? Colors.grey[400]
                                       : AppColors.neutralMedium,
@@ -1125,15 +1250,43 @@ class _VehicleSearchResultsScreenState
                     ],
                   ),
 
-                  SizedBox(height: 6),
+                  SizedBox(
+                    height: ResponsiveHelper.getResponsiveSpacing(
+                      context,
+                      mobile: 4,
+                      tablet: 5,
+                      ipad: 6,
+                      ipadPro: 7,
+                      desktop: 8,
+                    ),
+                  ),
 
                   // Location
                   if (locationString.isNotEmpty)
                     Row(
                       children: [
-                        Icon(Icons.location_on,
-                            color: AppColors.primary, size: 12),
-                        SizedBox(width: 4),
+                        Icon(
+                          Icons.location_on,
+                          color: AppColors.primary,
+                          size: ResponsiveHelper.getResponsiveIconSize(
+                            context,
+                            mobile: 12,
+                            tablet: 13,
+                            ipad: 14,
+                            ipadPro: 15,
+                            desktop: 16,
+                          ),
+                        ),
+                        SizedBox(
+                          width: ResponsiveHelper.getResponsiveSpacing(
+                            context,
+                            mobile: 2,
+                            tablet: 3,
+                            ipad: 4,
+                            ipadPro: 5,
+                            desktop: 6,
+                          ),
+                        ),
                         Expanded(
                           child: Text(
                             locationString,
@@ -1141,7 +1294,14 @@ class _VehicleSearchResultsScreenState
                               color: isDarkMode
                                   ? Colors.grey[300]
                                   : AppColors.neutralMedium,
-                              fontSize: 10,
+                              fontSize: ResponsiveHelper.getResponsiveFontSize(
+                                context,
+                                mobile: 9,
+                                tablet: 10,
+                                ipad: 11,
+                                ipadPro: 12,
+                                desktop: 13,
+                              ),
                             ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
@@ -1172,12 +1332,40 @@ class _VehicleSearchResultsScreenState
                             mainAxisSize: MainAxisSize.min,
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Icon(Icons.phone, size: 10),
-                              SizedBox(width: 4),
+                              Icon(
+                                Icons.phone,
+                                size: ResponsiveHelper.getResponsiveIconSize(
+                                  context,
+                                  mobile: 10,
+                                  tablet: 11,
+                                  ipad: 12,
+                                  ipadPro: 13,
+                                  desktop: 14,
+                                ),
+                              ),
+                              SizedBox(
+                                width: ResponsiveHelper.getResponsiveSpacing(
+                                  context,
+                                  mobile: 2,
+                                  tablet: 3,
+                                  ipad: 4,
+                                  ipadPro: 5,
+                                  desktop: 6,
+                                ),
+                              ),
                               Flexible(
                                 child: Text(
                                   'Call',
-                                  style: TextStyle(fontSize: 8),
+                                  style: TextStyle(
+                                    fontSize: ResponsiveHelper.getResponsiveFontSize(
+                                      context,
+                                      mobile: 8,
+                                      tablet: 9,
+                                      ipad: 10,
+                                      ipadPro: 11,
+                                      desktop: 12,
+                                    ),
+                                  ),
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                 ),
@@ -1187,16 +1375,50 @@ class _VehicleSearchResultsScreenState
                           style: ElevatedButton.styleFrom(
                             backgroundColor: AppColors.secondary,
                             foregroundColor: Colors.white,
-                            padding: EdgeInsets.symmetric(
-                                horizontal: 4, vertical: 6),
-                            minimumSize: Size(0, 26),
+                            padding: ResponsiveHelper.getResponsivePadding(
+                              context,
+                              mobile: 4,
+                              tablet: 5,
+                              ipad: 6,
+                              ipadPro: 7,
+                              desktop: 8,
+                            ),
+                            minimumSize: Size(
+                              0,
+                              ResponsiveHelper.getResponsiveSpacing(
+                                context,
+                                mobile: 24,
+                                tablet: 26,
+                                ipad: 28,
+                                ipadPro: 30,
+                                desktop: 32,
+                              ),
+                            ),
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
+                              borderRadius: BorderRadius.circular(
+                                ResponsiveHelper.getResponsiveBorderRadius(
+                                  context,
+                                  mobile: 8,
+                                  tablet: 9,
+                                  ipad: 10,
+                                  ipadPro: 11,
+                                  desktop: 12,
+                                ),
+                              ),
                             ),
                           ),
                         ),
                       ),
-                      SizedBox(width: 4),
+                      SizedBox(
+                        width: ResponsiveHelper.getResponsiveSpacing(
+                          context,
+                          mobile: 4,
+                          tablet: 5,
+                          ipad: 6,
+                          ipadPro: 7,
+                          desktop: 8,
+                        ),
+                      ),
                       Expanded(
                         flex: 4,
                         child: ElevatedButton(
@@ -1217,12 +1439,40 @@ class _VehicleSearchResultsScreenState
                             mainAxisSize: MainAxisSize.min,
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              FaIcon(FontAwesomeIcons.whatsapp, size: 10),
-                              SizedBox(width: 4),
+                              FaIcon(
+                                FontAwesomeIcons.whatsapp,
+                                size: ResponsiveHelper.getResponsiveIconSize(
+                                  context,
+                                  mobile: 10,
+                                  tablet: 11,
+                                  ipad: 12,
+                                  ipadPro: 13,
+                                  desktop: 14,
+                                ),
+                              ),
+                              SizedBox(
+                                width: ResponsiveHelper.getResponsiveSpacing(
+                                  context,
+                                  mobile: 2,
+                                  tablet: 3,
+                                  ipad: 4,
+                                  ipadPro: 5,
+                                  desktop: 6,
+                                ),
+                              ),
                               Flexible(
                                 child: Text(
                                   'WhatsApp',
-                                  style: TextStyle(fontSize: 8),
+                                  style: TextStyle(
+                                    fontSize: ResponsiveHelper.getResponsiveFontSize(
+                                      context,
+                                      mobile: 8,
+                                      tablet: 9,
+                                      ipad: 10,
+                                      ipadPro: 11,
+                                      desktop: 12,
+                                    ),
+                                  ),
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                 ),
@@ -1232,11 +1482,36 @@ class _VehicleSearchResultsScreenState
                           style: ElevatedButton.styleFrom(
                             backgroundColor: AppColors.tertiary,
                             foregroundColor: Colors.white,
-                            padding: EdgeInsets.symmetric(
-                                horizontal: 4, vertical: 6),
-                            minimumSize: Size(0, 26),
+                            padding: ResponsiveHelper.getResponsivePadding(
+                              context,
+                              mobile: 4,
+                              tablet: 5,
+                              ipad: 6,
+                              ipadPro: 7,
+                              desktop: 8,
+                            ),
+                            minimumSize: Size(
+                              0,
+                              ResponsiveHelper.getResponsiveSpacing(
+                                context,
+                                mobile: 24,
+                                tablet: 26,
+                                ipad: 28,
+                                ipadPro: 30,
+                                desktop: 32,
+                              ),
+                            ),
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
+                              borderRadius: BorderRadius.circular(
+                                ResponsiveHelper.getResponsiveBorderRadius(
+                                  context,
+                                  mobile: 8,
+                                  tablet: 9,
+                                  ipad: 10,
+                                  ipadPro: 11,
+                                  desktop: 12,
+                                ),
+                              ),
                             ),
                           ),
                         ),
@@ -1245,6 +1520,7 @@ class _VehicleSearchResultsScreenState
                   ),
                 ],
               ),
+            ),
             ),
           ],
         ),
@@ -1303,10 +1579,10 @@ class _VehicleSearchResultsScreenState
           childAspectRatio: ResponsiveHelper.getResponsiveAspectRatio(
             context,
             mobile: 1.2,
-            tablet: 0.75,
-            ipad: 0.75,
-            ipadPro: 0.75,
-            desktop: 0.8,
+            tablet: 0.85,
+            ipad: 0.9,
+            ipadPro: 0.95,
+            desktop: 1.0,
           ),
           crossAxisSpacing: ResponsiveHelper.getResponsiveSpacingIPad(
             context,
