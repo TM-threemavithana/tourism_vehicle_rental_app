@@ -153,7 +153,7 @@ class _SignupScreenState extends State<SignupScreen>
             left: 0,
             right: 0,
             child: CustomPaint(
-              size: Size(MediaQuery.of(context).size.width, ResponsiveHelper.getResponsiveSpacing(context, mobile: 80, tablet: 100, desktop: 120)),
+              size: Size(MediaQuery.of(context).size.width, ResponsiveHelper.getResponsiveSpacingIPad(context, mobile: 80, tablet: 100, ipad: 120, ipadPro: 140, desktop: 160)),
               painter: WavePainter(
                 color: Theme.of(context).colorScheme.tertiary.withOpacity(0.3),
               ),
@@ -164,7 +164,14 @@ class _SignupScreenState extends State<SignupScreen>
           SafeArea(
             child: SingleChildScrollView(
               child: Padding(
-                padding: ResponsiveHelper.getResponsiveHorizontalPadding(context),
+                padding: ResponsiveHelper.getResponsiveHorizontalPadding(
+                  context,
+                  mobile: 16,
+                  tablet: 24,
+                  ipad: 32,
+                  ipadPro: 40,
+                  desktop: 48,
+                ),
                 child: FadeTransition(
                   opacity: _fadeAnimation,
                   child: Column(
@@ -172,21 +179,22 @@ class _SignupScreenState extends State<SignupScreen>
                     children: [
                       // Back button
                       Padding(
-                        padding: EdgeInsets.only(top: ResponsiveHelper.getResponsiveSpacing(context, mobile: 16, tablet: 20, desktop: 24)),
+                        padding: EdgeInsets.only(top: ResponsiveHelper.getResponsiveSpacingIPad(context, mobile: 16, tablet: 20, ipad: 24, ipadPro: 32, desktop: 40)),
                         child: IconButton(
                           onPressed: () => Navigator.pop(context),
                           icon: Icon(
                             Icons.arrow_back_ios_rounded,
                             color: Colors.white,
-                            size: ResponsiveHelper.getResponsiveIconSize(context),
+                            size: ResponsiveHelper.getResponsiveIconSize(context,
+                                mobile: 24, tablet: 28, ipad: 32, ipadPro: 36, desktop: 40),
                           ),
                         ),
                       ),
-                      SizedBox(height: ResponsiveHelper.getResponsiveSpacing(context, mobile: 20, tablet: 24, desktop: 28)),
+                      SizedBox(height: ResponsiveHelper.getResponsiveSpacingIPad(context, mobile: 20, tablet: 24, ipad: 28, ipadPro: 32, desktop: 36)),
 
                       // Title text
                       Padding(
-                        padding: EdgeInsets.only(left: ResponsiveHelper.getResponsiveSpacing(context, mobile: 16, tablet: 20, desktop: 24)),
+                        padding: EdgeInsets.only(left: ResponsiveHelper.getResponsiveSpacingIPad(context, mobile: 16, tablet: 20, ipad: 24, ipadPro: 32, desktop: 40)),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -194,24 +202,24 @@ class _SignupScreenState extends State<SignupScreen>
                               'Create Account',
                               style: TextStyle(
                                 color: Colors.white,
-                                fontSize: ResponsiveHelper.getResponsiveFontSize(context, mobile: 32, tablet: 36, desktop: 40),
+                                fontSize: ResponsiveHelper.getResponsiveFontSizeIPad(context, mobile: 32, tablet: 36, ipad: 40, ipadPro: 44, desktop: 48),
                                 fontWeight: FontWeight.bold,
                                 letterSpacing: 1.0,
                               ),
                             ),
-                            SizedBox(height: ResponsiveHelper.getResponsiveSpacing(context, mobile: 8, tablet: 12, desktop: 16)),
+                            SizedBox(height: ResponsiveHelper.getResponsiveSpacingIPad(context, mobile: 8, tablet: 12, ipad: 16, ipadPro: 20, desktop: 24)),
                             Text(
                               'Join Wayz.lk for amazing adventures',
                               style: TextStyle(
                                 color: Colors.white.withOpacity(0.9),
-                                fontSize: ResponsiveHelper.getResponsiveFontSize(context, mobile: 16, tablet: 18, desktop: 20),
+                                fontSize: ResponsiveHelper.getResponsiveFontSizeIPad(context, mobile: 16, tablet: 18, ipad: 20, ipadPro: 22, desktop: 24),
                               ),
                             ),
                           ],
                         ),
                       ),
 
-                      SizedBox(height: ResponsiveHelper.getResponsiveSpacing(context, mobile: 30, tablet: 40, desktop: 50)),
+                      SizedBox(height: ResponsiveHelper.getResponsiveSpacingIPad(context, mobile: 30, tablet: 40, ipad: 50, ipadPro: 60, desktop: 70)),
 
                       // Signup Form Card
                       Card(
@@ -221,7 +229,7 @@ class _SignupScreenState extends State<SignupScreen>
                         ),
                         color: Colors.white.withOpacity(0.9),
                         child: Padding(
-                          padding: ResponsiveHelper.getResponsivePadding(context, mobile: 24, tablet: 32, desktop: 40),
+                          padding: ResponsiveHelper.getResponsivePaddingIPad(context, mobile: 24, tablet: 32, ipad: 40, ipadPro: 48, desktop: 56),
                           child: Form(
                             key: _formKey,
                             child: Column(
@@ -237,7 +245,8 @@ class _SignupScreenState extends State<SignupScreen>
                                       Icons.person_outline,
                                       color:
                                           Theme.of(context).colorScheme.primary,
-                                      size: ResponsiveHelper.getResponsiveIconSize(context),
+                                      size: ResponsiveHelper.getResponsiveIconSize(context,
+                                          mobile: 24, tablet: 28, ipad: 32, ipadPro: 36, desktop: 40),
                                     ),
                                     border: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(ResponsiveHelper.getResponsiveBorderRadius(context, mobile: 12, tablet: 16, desktop: 20)),
@@ -278,7 +287,8 @@ class _SignupScreenState extends State<SignupScreen>
                                       Icons.email_outlined,
                                       color:
                                           Theme.of(context).colorScheme.primary,
-                                      size: ResponsiveHelper.getResponsiveIconSize(context),
+                                      size: ResponsiveHelper.getResponsiveIconSize(context,
+                                          mobile: 24, tablet: 28, ipad: 32, ipadPro: 36, desktop: 40),
                                     ),
                                     border: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(ResponsiveHelper.getResponsiveBorderRadius(context, mobile: 12, tablet: 16, desktop: 20)),
@@ -324,7 +334,8 @@ class _SignupScreenState extends State<SignupScreen>
                                       Icons.lock_outline,
                                       color:
                                           Theme.of(context).colorScheme.primary,
-                                      size: ResponsiveHelper.getResponsiveIconSize(context),
+                                      size: ResponsiveHelper.getResponsiveIconSize(context,
+                                          mobile: 24, tablet: 28, ipad: 32, ipadPro: 36, desktop: 40),
                                     ),
                                     suffixIcon: IconButton(
                                       icon: Icon(
@@ -332,7 +343,8 @@ class _SignupScreenState extends State<SignupScreen>
                                             ? Icons.visibility_off
                                             : Icons.visibility,
                                         color: Colors.grey[600],
-                                        size: ResponsiveHelper.getResponsiveIconSize(context),
+                                        size: ResponsiveHelper.getResponsiveIconSize(context,
+                                            mobile: 20, tablet: 24, ipad: 28, ipadPro: 32, desktop: 36),
                                       ),
                                       onPressed: () {
                                         setState(() {
@@ -382,7 +394,8 @@ class _SignupScreenState extends State<SignupScreen>
                                       Icons.lock_outline,
                                       color:
                                           Theme.of(context).colorScheme.primary,
-                                      size: ResponsiveHelper.getResponsiveIconSize(context),
+                                      size: ResponsiveHelper.getResponsiveIconSize(context,
+                                          mobile: 24, tablet: 28, ipad: 32, ipadPro: 36, desktop: 40),
                                     ),
                                     suffixIcon: IconButton(
                                       icon: Icon(
@@ -390,7 +403,8 @@ class _SignupScreenState extends State<SignupScreen>
                                             ? Icons.visibility_off
                                             : Icons.visibility,
                                         color: Colors.grey[600],
-                                        size: ResponsiveHelper.getResponsiveIconSize(context),
+                                        size: ResponsiveHelper.getResponsiveIconSize(context,
+                                            mobile: 20, tablet: 24, ipad: 28, ipadPro: 32, desktop: 36),
                                       ),
                                       onPressed: () {
                                         setState(() {

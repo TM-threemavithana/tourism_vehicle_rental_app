@@ -15,31 +15,20 @@ class OneSignalService {
   final String oneSignalAppId = "a6f7512a-ede1-47b1-b48e-e7db720e20cc";
 
   // Your OneSignal REST API Key - Add your actual REST API key here
-  final String restApiKey = "os_v2_app_u33vckxn4fd3dneo47nxedrazq7aocw3qqge6kfkazeu5nicyglvccsh7bt6o5mdcknofnvss3e3dpgwqtfjii4pnt4zwdmi5455sja";
+  final String restApiKey =
+      "os_v2_app_u33vckxn4fd3dneo47nxedrazq7aocw3qqge6kfkazeu5nicyglvccsh7bt6o5mdcknofnvss3e3dpgwqtfjii4pnt4zwdmi5455sja";
 
   Future<void> initialize() async {
     try {
-      debugPrint("Initializing OneSignal with App ID: $oneSignalAppId");
-
-      // Set OneSignal log level
-      OneSignal.Debug.setLogLevel(OSLogLevel.verbose);
-
-      // Initialize OneSignal
+      // Initialize OneSignal for both web and mobile platforms
       OneSignal.initialize(oneSignalAppId);
 
-      // Request permission for notifications
-      final permission = await OneSignal.Notifications.requestPermission(true);
-      debugPrint("OneSignal permission granted: $permission");
+      // Request permission to show notifications
+      OneSignal.Notifications.requestPermission(true);
 
-      // Set notification handlers
       _setNotificationHandlers();
-
-      // Save player ID to user profile
       await _savePlayerIdToUserProfile();
-
-      // Listen for booking updates
       _listenToBookingUpdates();
-
       debugPrint("OneSignal initialized successfully");
     } catch (e) {
       debugPrint("Error initializing OneSignal: $e");
@@ -229,7 +218,7 @@ class OneSignalService {
       debugPrint("Sending notification to player ID: $playerId");
       debugPrint("Title: $title");
       debugPrint("Content: $content");
-      
+
       // Combine notification data
       final Map<String, dynamic> notificationData = {
         'notificationType': notificationType,
@@ -258,10 +247,12 @@ class OneSignalService {
       );
 
       if (response.statusCode >= 200 && response.statusCode < 300) {
-        debugPrint('✅ Notification sent successfully to user with ID: $playerId');
+        debugPrint(
+            '✅ Notification sent successfully to user with ID: $playerId');
         debugPrint('Response: ${response.body}');
       } else {
-        debugPrint('❌ Failed to send notification. Status: ${response.statusCode}');
+        debugPrint(
+            '❌ Failed to send notification. Status: ${response.statusCode}');
         debugPrint('Error: ${response.body}');
       }
     } catch (e) {

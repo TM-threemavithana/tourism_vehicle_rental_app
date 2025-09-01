@@ -19,7 +19,7 @@ void main() async {
       options: DefaultFirebaseOptions.currentPlatform,
     );
     print("Firebase initialized successfully");
-    
+
     // Test Firestore connection
     try {
       await FirebaseFirestore.instance.collection('test').doc('test').get();

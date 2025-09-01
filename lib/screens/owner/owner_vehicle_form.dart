@@ -320,8 +320,8 @@ class _OwnerVehicleFormState extends State<OwnerVehicleForm> {
         title: Text(
           'Register Your Vehicle',
           style: TextStyle(
-            fontSize: ResponsiveHelper.getResponsiveFontSize(context,
-                mobile: 18, tablet: 20, desktop: 22),
+            fontSize: ResponsiveHelper.getResponsiveFontSizeIPad(context,
+                mobile: 18, tablet: 20, ipad: 22, ipadPro: 24, desktop: 26),
           ),
         ),
         backgroundColor: theme.colorScheme.primary,
@@ -330,13 +330,13 @@ class _OwnerVehicleFormState extends State<OwnerVehicleForm> {
       body: _isLoading
           ? Center(
               child: CircularProgressIndicator(
-                strokeWidth: ResponsiveHelper.getResponsiveSpacing(context,
-                    mobile: 3, tablet: 4, desktop: 5),
+                strokeWidth: ResponsiveHelper.getResponsiveSpacingIPad(context,
+                    mobile: 3, tablet: 4, ipad: 5, ipadPro: 6, desktop: 7),
               ),
             )
           : SingleChildScrollView(
-              padding: ResponsiveHelper.getResponsivePadding(context,
-                  mobile: 16, tablet: 20, desktop: 24),
+              padding: ResponsiveHelper.getResponsivePaddingIPad(context,
+                  mobile: 16, tablet: 20, ipad: 24, ipadPro: 32, desktop: 40),
               child: Form(
                 key: _formKey,
                 child: Column(
@@ -352,8 +352,13 @@ class _OwnerVehicleFormState extends State<OwnerVehicleForm> {
                       },
                     ),
                     SizedBox(
-                        height: ResponsiveHelper.getResponsiveSpacing(context,
-                            mobile: 24, tablet: 28, desktop: 32)),
+                        height: ResponsiveHelper.getResponsiveSpacingIPad(
+                            context,
+                            mobile: 24,
+                            tablet: 28,
+                            ipad: 32,
+                            ipadPro: 40,
+                            desktop: 48)),
 
                     // Collection Point Section
                     CollectionPointSection(

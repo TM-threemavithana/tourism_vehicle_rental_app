@@ -170,8 +170,8 @@ class _RequestVehicleScreenState extends State<RequestVehicleScreen> {
           style: TextStyle(
             color: Colors.black,
             fontWeight: FontWeight.bold,
-            fontSize: ResponsiveHelper.getResponsiveFontSize(context,
-                mobile: 18, tablet: 20, desktop: 22),
+            fontSize: ResponsiveHelper.getResponsiveFontSizeIPad(context,
+                mobile: 18, tablet: 20, ipad: 22, ipadPro: 24, desktop: 26),
           ),
         ),
         centerTitle: true,
@@ -179,46 +179,59 @@ class _RequestVehicleScreenState extends State<RequestVehicleScreen> {
       backgroundColor: Colors.white,
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: ResponsiveHelper.getResponsivePadding(context),
+          padding: ResponsiveHelper.getResponsivePaddingIPad(
+            context,
+            mobile: 16,
+            tablet: 24,
+            ipad: 32,
+            ipadPro: 40,
+            desktop: 48,
+          ),
           child: Form(
             key: _formKey,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 SizedBox(
-                    height: ResponsiveHelper.getResponsiveSpacing(context,
-                        mobile: 8, tablet: 12, desktop: 16)),
+                    height: ResponsiveHelper.getResponsiveSpacingIPad(context,
+                        mobile: 8, tablet: 12, ipad: 16, ipadPro: 20, desktop: 24)),
                 // Vehicle Type Dropdown
                 Container(
                   decoration: BoxDecoration(
                     color: const Color(0xFFF6F9E7),
                     borderRadius: BorderRadius.circular(
                         ResponsiveHelper.getResponsiveBorderRadius(context,
-                            mobile: 8, tablet: 12, desktop: 16)),
+                            mobile: 8, tablet: 12, ipad: 16, ipadPro: 20, desktop: 24)),
                   ),
                   child: DropdownButtonFormField<String>(
                     value: _selectedVehicleType,
                     decoration: InputDecoration(
                       border: InputBorder.none,
                       contentPadding: EdgeInsets.symmetric(
-                          horizontal: ResponsiveHelper.getResponsiveSpacing(
+                          horizontal: ResponsiveHelper.getResponsiveSpacingIPad(
                               context,
                               mobile: 16,
                               tablet: 20,
-                              desktop: 24),
-                          vertical: ResponsiveHelper.getResponsiveSpacing(
+                              ipad: 24,
+                              ipadPro: 28,
+                              desktop: 32),
+                          vertical: ResponsiveHelper.getResponsiveSpacingIPad(
                               context,
                               mobile: 14,
                               tablet: 18,
-                              desktop: 22)),
+                              ipad: 22,
+                              ipadPro: 26,
+                              desktop: 30)),
                       hintText: 'Select Vehicle Type',
                       hintStyle: TextStyle(
                         color: Colors.black54,
-                        fontSize: ResponsiveHelper.getResponsiveFontSize(
+                        fontSize: ResponsiveHelper.getResponsiveFontSizeIPad(
                             context,
                             mobile: 14,
                             tablet: 16,
-                            desktop: 18),
+                            ipad: 18,
+                            ipadPro: 20,
+                            desktop: 22),
                       ),
                     ),
                     items: _vehicleTypes
@@ -237,8 +250,8 @@ class _RequestVehicleScreenState extends State<RequestVehicleScreen> {
                   ),
                 ),
                 SizedBox(
-                    height: ResponsiveHelper.getResponsiveSpacing(context,
-                        mobile: 16, tablet: 20, desktop: 24)),
+                    height: ResponsiveHelper.getResponsiveSpacingIPad(context,
+                        mobile: 16, tablet: 20, ipad: 24, ipadPro: 32, desktop: 40)),
                 // Date & Time Picker
                 TextFormField(
                   controller: _dateTimeController,
@@ -251,19 +264,26 @@ class _RequestVehicleScreenState extends State<RequestVehicleScreen> {
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(
                           ResponsiveHelper.getResponsiveBorderRadius(context,
-                              mobile: 8, tablet: 12, desktop: 16)),
+                              mobile: 8, tablet: 12, ipad: 16, ipadPro: 20, desktop: 24)),
                       borderSide: BorderSide.none,
                     ),
                     hintText: 'Tap to select date and time',
                     hintStyle: TextStyle(
                       color: Colors.black54,
-                      fontSize: ResponsiveHelper.getResponsiveFontSize(context,
-                          mobile: 14, tablet: 16, desktop: 18),
+                      fontSize: ResponsiveHelper.getResponsiveFontSizeIPad(context,
+                          mobile: 14, tablet: 16, ipad: 18, ipadPro: 20, desktop: 22),
                     ),
                     prefixIcon: Icon(
                       Icons.calendar_today,
                       color: const Color(0xFFB6E23A),
-                      size: ResponsiveHelper.getResponsiveIconSize(context),
+                      size: ResponsiveHelper.getResponsiveIconSize(
+                        context,
+                        mobile: 20,
+                        tablet: 24,
+                        ipad: 28,
+                        ipadPro: 32,
+                        desktop: 36,
+                      ),
                     ),
                   ),
                   validator: (value) => _selectedDateTime == null
@@ -271,8 +291,8 @@ class _RequestVehicleScreenState extends State<RequestVehicleScreen> {
                       : null,
                 ),
                 SizedBox(
-                    height: ResponsiveHelper.getResponsiveSpacing(context,
-                        mobile: 16, tablet: 20, desktop: 24)),
+                    height: ResponsiveHelper.getResponsiveSpacingIPad(context,
+                        mobile: 16, tablet: 20, ipad: 24, ipadPro: 32, desktop: 40)),
                 // Location Input
                 TextFormField(
                   controller: _locationController,

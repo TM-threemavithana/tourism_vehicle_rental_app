@@ -417,8 +417,8 @@ class _NonOwnerVehicleFormState extends State<NonOwnerVehicleForm> {
         title: Text(
           'Register Non-Owned Vehicle',
           style: TextStyle(
-            fontSize: ResponsiveHelper.getResponsiveFontSize(context,
-                mobile: 18, tablet: 20, desktop: 22),
+            fontSize: ResponsiveHelper.getResponsiveFontSizeIPad(context,
+                mobile: 18, tablet: 20, ipad: 22, ipadPro: 24, desktop: 26),
           ),
         ),
         backgroundColor: theme.colorScheme.primary,
@@ -427,13 +427,13 @@ class _NonOwnerVehicleFormState extends State<NonOwnerVehicleForm> {
       body: _isLoading
           ? Center(
               child: CircularProgressIndicator(
-                strokeWidth: ResponsiveHelper.getResponsiveSpacing(context,
-                    mobile: 3, tablet: 4, desktop: 5),
+                strokeWidth: ResponsiveHelper.getResponsiveSpacingIPad(context,
+                    mobile: 3, tablet: 4, ipad: 5, ipadPro: 6, desktop: 7),
               ),
             )
           : SingleChildScrollView(
-              padding: ResponsiveHelper.getResponsivePadding(context,
-                  mobile: 12, tablet: 16, desktop: 20),
+              padding: ResponsiveHelper.getResponsivePaddingIPad(context,
+                  mobile: 12, tablet: 16, ipad: 20, ipadPro: 24, desktop: 28),
               child: Form(
                 key: _formKey,
                 child: Column(
@@ -442,13 +442,22 @@ class _NonOwnerVehicleFormState extends State<NonOwnerVehicleForm> {
                     // Non-ownership status indicator
                     Container(
                       width: double.infinity,
-                      padding: ResponsiveHelper.getResponsivePadding(context,
-                          mobile: 12, tablet: 16, desktop: 20),
+                      padding: ResponsiveHelper.getResponsivePaddingIPad(
+                          context,
+                          mobile: 12,
+                          tablet: 16,
+                          ipad: 20,
+                          ipadPro: 24,
+                          desktop: 28),
                       decoration: BoxDecoration(
                         color: Colors.orange.withOpacity(0.1),
                         borderRadius: BorderRadius.circular(
                             ResponsiveHelper.getResponsiveBorderRadius(context,
-                                mobile: 6, tablet: 8, desktop: 10)),
+                                mobile: 6,
+                                tablet: 8,
+                                ipad: 10,
+                                ipadPro: 12,
+                                desktop: 14)),
                         border: Border.all(color: Colors.orange),
                       ),
                       child: Row(
@@ -460,25 +469,31 @@ class _NonOwnerVehicleFormState extends State<NonOwnerVehicleForm> {
                                 context,
                                 mobile: 20,
                                 tablet: 24,
-                                desktop: 28),
+                                ipad: 28,
+                                ipadPro: 32,
+                                desktop: 36),
                           ),
                           SizedBox(
-                              width: ResponsiveHelper.getResponsiveSpacing(
+                              width: ResponsiveHelper.getResponsiveSpacingIPad(
                                   context,
                                   mobile: 8,
                                   tablet: 12,
-                                  desktop: 16)),
+                                  ipad: 16,
+                                  ipadPro: 20,
+                                  desktop: 24)),
                           Expanded(
                             child: Text(
                               "You've indicated you are not the registered owner. Please provide additional information and documentation.",
                               style: TextStyle(
                                 color: Colors.orange,
                                 fontSize:
-                                    ResponsiveHelper.getResponsiveFontSize(
+                                    ResponsiveHelper.getResponsiveFontSizeIPad(
                                         context,
                                         mobile: 14,
                                         tablet: 16,
-                                        desktop: 18),
+                                        ipad: 18,
+                                        ipadPro: 20,
+                                        desktop: 22),
                               ),
                             ),
                           ),
@@ -486,8 +501,13 @@ class _NonOwnerVehicleFormState extends State<NonOwnerVehicleForm> {
                       ),
                     ),
                     SizedBox(
-                        height: ResponsiveHelper.getResponsiveSpacing(context,
-                            mobile: 16, tablet: 20, desktop: 24)),
+                        height: ResponsiveHelper.getResponsiveSpacingIPad(
+                            context,
+                            mobile: 16,
+                            tablet: 20,
+                            ipad: 24,
+                            ipadPro: 32,
+                            desktop: 40)),
 
                     // Owner Details Section - new section for registered owner details
                     OwnerDetailsSection(

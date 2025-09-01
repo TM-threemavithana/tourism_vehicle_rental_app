@@ -82,8 +82,8 @@ class _SplashScreenState extends State<SplashScreen>
                     animation: _controller,
                     builder: (context, child) {
                       return Container(
-                        width: ResponsiveHelper.getResponsiveProfileSize(context, mobile: 180, tablet: 220, desktop: 260),
-                        height: ResponsiveHelper.getResponsiveProfileSize(context, mobile: 180, tablet: 220, desktop: 260),
+                        width: ResponsiveHelper.getResponsiveProfileSize(context, mobile: 180, tablet: 220, ipad: 260, ipadPro: 300, desktop: 340),
+                        height: ResponsiveHelper.getResponsiveProfileSize(context, mobile: 180, tablet: 220, ipad: 260, ipadPro: 300, desktop: 340),
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           boxShadow: [
@@ -99,8 +99,8 @@ class _SplashScreenState extends State<SplashScreen>
                     },
                   ),
                   Container(
-                    width: ResponsiveHelper.getResponsiveProfileSize(context, mobile: 120, tablet: 150, desktop: 180),
-                    height: ResponsiveHelper.getResponsiveProfileSize(context, mobile: 120, tablet: 150, desktop: 180),
+                    width: ResponsiveHelper.getResponsiveProfileSize(context, mobile: 120, tablet: 150, ipad: 180, ipadPro: 200, desktop: 220),
+                    height: ResponsiveHelper.getResponsiveProfileSize(context, mobile: 120, tablet: 150, ipad: 180, ipadPro: 200, desktop: 220),
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       boxShadow: [
@@ -120,7 +120,7 @@ class _SplashScreenState extends State<SplashScreen>
                           color: Colors.grey[200],
                           child: Icon(
                             Icons.image,
-                            size: ResponsiveHelper.getResponsiveIconSize(context, mobile: 60, tablet: 80, desktop: 100),
+                            size: ResponsiveHelper.getResponsiveIconSize(context, mobile: 60, tablet: 80, ipad: 100, ipadPro: 120, desktop: 140),
                           ),
                         ),
                       ),
@@ -128,7 +128,7 @@ class _SplashScreenState extends State<SplashScreen>
                   ),
                 ],
               ),
-              SizedBox(height: ResponsiveHelper.getResponsiveSpacing(context, mobile: 40, tablet: 60, desktop: 80)),
+              SizedBox(height: ResponsiveHelper.getResponsiveSpacingIPad(context, mobile: 40, tablet: 60, ipad: 80, ipadPro: 100, desktop: 120)),
               // App name with fade animation
               FadeTransition(
                 opacity: _fadeAnimation,
@@ -136,7 +136,7 @@ class _SplashScreenState extends State<SplashScreen>
                   'Wayz.lk',
                   style: TextStyle(
                     color: Colors.white,
-                    fontSize: ResponsiveHelper.getResponsiveFontSize(context, mobile: 36, tablet: 42, desktop: 48),
+                    fontSize: ResponsiveHelper.getResponsiveFontSizeIPad(context, mobile: 36, tablet: 42, ipad: 48, ipadPro: 54, desktop: 60),
                     fontWeight: FontWeight.bold,
                     letterSpacing: 2.0,
                     shadows: [
@@ -149,7 +149,7 @@ class _SplashScreenState extends State<SplashScreen>
                   ),
                 ),
               ),
-              SizedBox(height: ResponsiveHelper.getResponsiveSpacing(context, mobile: 16, tablet: 20, desktop: 24)),
+              SizedBox(height: ResponsiveHelper.getResponsiveSpacingIPad(context, mobile: 16, tablet: 20, ipad: 24, ipadPro: 32, desktop: 40)),
               // Tagline with fade animation
               FadeTransition(
                 opacity: _fadeAnimation,
@@ -157,7 +157,7 @@ class _SplashScreenState extends State<SplashScreen>
                   'Where Paradise Meets Adventure',
                   style: TextStyle(
                     color: Colors.white.withOpacity(0.9),
-                    fontSize: ResponsiveHelper.getResponsiveFontSize(context, mobile: 18, tablet: 20, desktop: 22),
+                    fontSize: ResponsiveHelper.getResponsiveFontSizeIPad(context, mobile: 18, tablet: 20, ipad: 22, ipadPro: 24, desktop: 26),
                     letterSpacing: 1.0,
                     shadows: [
                       Shadow(

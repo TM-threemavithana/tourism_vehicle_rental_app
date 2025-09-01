@@ -175,17 +175,17 @@ class _MergedFilterDrawerState extends State<MergedFilterDrawer> {
                     decoration: BoxDecoration(
                       color: Colors.grey[900],
                       borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(ResponsiveHelper.getResponsiveBorderRadius(context, mobile: 10, tablet: 12, desktop: 16)),
-                        topRight: Radius.circular(ResponsiveHelper.getResponsiveBorderRadius(context, mobile: 10, tablet: 12, desktop: 16)),
+                        topLeft: Radius.circular(ResponsiveHelper.getResponsiveBorderRadius(context, mobile: 10, tablet: 12, ipad: 16, ipadPro: 20, desktop: 24)),
+                        topRight: Radius.circular(ResponsiveHelper.getResponsiveBorderRadius(context, mobile: 10, tablet: 12, ipad: 16, ipadPro: 20, desktop: 24)),
                       ),
-                      boxShadow: ResponsiveHelper.getResponsiveShadow(context, mobile: 6, tablet: 8, desktop: 10),
+                      boxShadow: ResponsiveHelper.getResponsiveShadow(context, mobile: 6, tablet: 8, ipad: 10, ipadPro: 12, desktop: 14),
                     ),
-                    padding: EdgeInsets.only(
-                      left: ResponsiveHelper.getResponsiveSpacing(context, mobile: 16, tablet: 20, desktop: 24),
-                      right: ResponsiveHelper.getResponsiveSpacing(context, mobile: 6, tablet: 8, desktop: 10),
-                      top: MediaQuery.of(context).padding.top + ResponsiveHelper.getResponsiveSpacing(context, mobile: 12, tablet: 16, desktop: 20),
-                      bottom: ResponsiveHelper.getResponsiveSpacing(context, mobile: 8, tablet: 12, desktop: 16),
-                    ),
+                                          padding: EdgeInsets.only(
+                        left: ResponsiveHelper.getResponsiveSpacingIPad(context, mobile: 16, tablet: 20, ipad: 24, ipadPro: 32, desktop: 40),
+                        right: ResponsiveHelper.getResponsiveSpacingIPad(context, mobile: 6, tablet: 8, ipad: 10, ipadPro: 12, desktop: 14),
+                        top: MediaQuery.of(context).padding.top + ResponsiveHelper.getResponsiveSpacingIPad(context, mobile: 12, tablet: 16, ipad: 20, ipadPro: 24, desktop: 28),
+                        bottom: ResponsiveHelper.getResponsiveSpacingIPad(context, mobile: 8, tablet: 12, ipad: 16, ipadPro: 20, desktop: 24),
+                      ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -193,7 +193,7 @@ class _MergedFilterDrawerState extends State<MergedFilterDrawer> {
                           'Search & Filter',
                           style: TextStyle(
                             color: Colors.white,
-                            fontSize: ResponsiveHelper.getResponsiveFontSize(context, mobile: 18, tablet: 20, desktop: 22),
+                            fontSize: ResponsiveHelper.getResponsiveFontSizeIPad(context, mobile: 18, tablet: 20, ipad: 22, ipadPro: 24, desktop: 26),
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -201,7 +201,7 @@ class _MergedFilterDrawerState extends State<MergedFilterDrawer> {
                           icon: Icon(
                             Icons.close, 
                             color: Colors.white,
-                            size: ResponsiveHelper.getResponsiveIconSize(context, mobile: 20, tablet: 24, desktop: 28),
+                            size: ResponsiveHelper.getResponsiveIconSize(context, mobile: 20, tablet: 24, ipad: 28, ipadPro: 32, desktop: 36),
                           ),
                           padding: EdgeInsets.zero,
                           constraints: const BoxConstraints(),
@@ -216,21 +216,21 @@ class _MergedFilterDrawerState extends State<MergedFilterDrawer> {
                       top: false,
                       bottom: true,
                       child: SingleChildScrollView(
-                        padding: ResponsiveHelper.getResponsivePadding(context, mobile: 16, tablet: 20, desktop: 24),
+                        padding: ResponsiveHelper.getResponsivePaddingIPad(context, mobile: 16, tablet: 20, ipad: 24, ipadPro: 32, desktop: 40),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             // Search Parameters Section
                             _buildSectionHeader(
                                 'Search Parameters', isDarkMode),
-                            SizedBox(height: ResponsiveHelper.getResponsiveSpacing(context, mobile: 12, tablet: 16, desktop: 20)),
+                            SizedBox(height: ResponsiveHelper.getResponsiveSpacingIPad(context, mobile: 12, tablet: 16, ipad: 20, ipadPro: 24, desktop: 28)),
 
                             // Vehicle Types
                             _buildSectionHeader('Vehicle Types', isDarkMode),
-                            SizedBox(height: ResponsiveHelper.getResponsiveSpacing(context, mobile: 6, tablet: 8, desktop: 10)),
+                            SizedBox(height: ResponsiveHelper.getResponsiveSpacingIPad(context, mobile: 6, tablet: 8, ipad: 10, ipadPro: 12, desktop: 14)),
                             Wrap(
-                              spacing: ResponsiveHelper.getResponsiveSpacing(context, mobile: 6, tablet: 8, desktop: 10),
-                              runSpacing: ResponsiveHelper.getResponsiveSpacing(context, mobile: 6, tablet: 8, desktop: 10),
+                              spacing: ResponsiveHelper.getResponsiveSpacingIPad(context, mobile: 6, tablet: 8, ipad: 10, ipadPro: 12, desktop: 14),
+                              runSpacing: ResponsiveHelper.getResponsiveSpacingIPad(context, mobile: 6, tablet: 8, ipad: 10, ipadPro: 12, desktop: 14),
                               children: _vehicleTypes.map((type) {
                                 final isSelected =
                                     _selectedVehicles.contains(type);
@@ -239,8 +239,8 @@ class _MergedFilterDrawerState extends State<MergedFilterDrawer> {
                                   child: AnimatedContainer(
                                     duration: const Duration(milliseconds: 200),
                                     padding: EdgeInsets.symmetric(
-                                        horizontal: ResponsiveHelper.getResponsiveSpacing(context, mobile: 12, tablet: 16, desktop: 20),
-                                        vertical: ResponsiveHelper.getResponsiveSpacing(context, mobile: 6, tablet: 8, desktop: 10)),
+                                        horizontal: ResponsiveHelper.getResponsiveSpacingIPad(context, mobile: 12, tablet: 16, ipad: 20, ipadPro: 24, desktop: 28),
+                                        vertical: ResponsiveHelper.getResponsiveSpacingIPad(context, mobile: 6, tablet: 8, ipad: 10, ipadPro: 12, desktop: 14)),
                                     decoration: BoxDecoration(
                                       color: isSelected
                                           ? AppColors.primary

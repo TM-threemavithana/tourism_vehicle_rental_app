@@ -135,25 +135,31 @@ class _FavoritesScreenState extends State<FavoritesScreen>
                                 context,
                                 mobile: 80,
                                 tablet: 100,
-                                desktop: 120),
+                                ipad: 120,
+                                ipadPro: 140,
+                                desktop: 160),
                             color: isDarkMode
                                 ? Colors.grey.shade700
                                 : Colors.grey.shade400,
                           ),
                           SizedBox(
-                              height: ResponsiveHelper.getResponsiveSpacing(
+                              height: ResponsiveHelper.getResponsiveSpacingIPad(
                                   context,
                                   mobile: 16,
                                   tablet: 20,
-                                  desktop: 24)),
+                                  ipad: 24,
+                                  ipadPro: 32,
+                                  desktop: 40)),
                           Text(
                             'No favorite vehicles yet',
                             style: TextStyle(
-                              fontSize: ResponsiveHelper.getResponsiveFontSize(
+                              fontSize: ResponsiveHelper.getResponsiveFontSizeIPad(
                                   context,
                                   mobile: 18,
                                   tablet: 20,
-                                  desktop: 22),
+                                  ipad: 22,
+                                  ipadPro: 24,
+                                  desktop: 26),
                               fontWeight: FontWeight.bold,
                               color: isDarkMode
                                   ? Colors.grey.shade400
@@ -161,11 +167,13 @@ class _FavoritesScreenState extends State<FavoritesScreen>
                             ),
                           ),
                           SizedBox(
-                              height: ResponsiveHelper.getResponsiveSpacing(
+                              height: ResponsiveHelper.getResponsiveSpacingIPad(
                                   context,
                                   mobile: 8,
                                   tablet: 12,
-                                  desktop: 16)),
+                                  ipad: 16,
+                                  ipadPro: 20,
+                                  desktop: 24)),
                           Text(
                             'Your favorite vehicles will appear here',
                             textAlign: TextAlign.center,
@@ -173,19 +181,23 @@ class _FavoritesScreenState extends State<FavoritesScreen>
                               color: isDarkMode
                                   ? Colors.grey.shade500
                                   : Colors.grey.shade600,
-                              fontSize: ResponsiveHelper.getResponsiveFontSize(
+                              fontSize: ResponsiveHelper.getResponsiveFontSizeIPad(
                                   context,
                                   mobile: 14,
                                   tablet: 16,
-                                  desktop: 18),
+                                  ipad: 18,
+                                  ipadPro: 20,
+                                  desktop: 22),
                             ),
                           ),
                           SizedBox(
-                              height: ResponsiveHelper.getResponsiveSpacing(
+                              height: ResponsiveHelper.getResponsiveSpacingIPad(
                                   context,
                                   mobile: 24,
                                   tablet: 32,
-                                  desktop: 40)),
+                                  ipad: 40,
+                                  ipadPro: 48,
+                                  desktop: 56)),
                           ElevatedButton(
                             onPressed: () {
                               Navigator.pushReplacementNamed(context, '/home');
@@ -209,7 +221,8 @@ class _FavoritesScreenState extends State<FavoritesScreen>
                       setState(() {}); // Refresh the UI
                     },
                     child: ListView.builder(
-                      padding: ResponsiveHelper.getResponsivePadding(context),
+                      padding: ResponsiveHelper.getResponsivePadding(context,
+                          mobile: 16, tablet: 24, ipad: 32, ipadPro: 40, desktop: 32),
                       itemCount: favorites.length,
                       itemBuilder: (context, index) {
                         final favorite = favorites[index];

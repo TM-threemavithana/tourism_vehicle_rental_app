@@ -73,8 +73,12 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
         slivers: [
           // App Bar with Image Carousel
           SliverAppBar(
-            expandedHeight: ResponsiveHelper.getResponsiveSpacing(context,
-                mobile: 250, tablet: 300, desktop: 350),
+            expandedHeight: ResponsiveHelper.getResponsiveSpacingIPad(context,
+                mobile: 250,
+                tablet: 300,
+                ipad: 350,
+                ipadPro: 400,
+                desktop: 450),
             pinned: true,
             backgroundColor: theme.colorScheme.primary,
             flexibleSpace: FlexibleSpaceBar(
@@ -99,31 +103,41 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
                   // Dots indicator
                   if (_imageUrls.length > 1)
                     Positioned(
-                      bottom: ResponsiveHelper.getResponsiveSpacing(context,
-                          mobile: 16, tablet: 20, desktop: 24),
+                      bottom: ResponsiveHelper.getResponsiveSpacingIPad(context,
+                          mobile: 16,
+                          tablet: 20,
+                          ipad: 24,
+                          ipadPro: 32,
+                          desktop: 40),
                       left: 0,
                       right: 0,
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: _imageUrls.asMap().entries.map((entry) {
                           return Container(
-                            width: ResponsiveHelper.getResponsiveSpacing(
+                            width: ResponsiveHelper.getResponsiveSpacingIPad(
                                 context,
                                 mobile: 6,
                                 tablet: 8,
-                                desktop: 10),
-                            height: ResponsiveHelper.getResponsiveSpacing(
+                                ipad: 10,
+                                ipadPro: 12,
+                                desktop: 14),
+                            height: ResponsiveHelper.getResponsiveSpacingIPad(
                                 context,
                                 mobile: 6,
                                 tablet: 8,
-                                desktop: 10),
+                                ipad: 10,
+                                ipadPro: 12,
+                                desktop: 14),
                             margin: EdgeInsets.symmetric(
                                 horizontal:
-                                    ResponsiveHelper.getResponsiveSpacing(
+                                    ResponsiveHelper.getResponsiveSpacingIPad(
                                         context,
                                         mobile: 3,
                                         tablet: 4,
-                                        desktop: 5)),
+                                        ipad: 5,
+                                        ipadPro: 6,
+                                        desktop: 7)),
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
                               color: _currentImageIndex == entry.key
@@ -138,8 +152,8 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
               ),
             ),
             leading: Container(
-              margin: ResponsiveHelper.getResponsivePadding(context,
-                  mobile: 6, tablet: 8, desktop: 10),
+              margin: ResponsiveHelper.getResponsivePaddingIPad(context,
+                  mobile: 6, tablet: 8, ipad: 10, ipadPro: 12, desktop: 14),
               decoration: BoxDecoration(
                 color: Colors.black.withOpacity(0.4),
                 shape: BoxShape.circle,
@@ -149,15 +163,19 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
                   Icons.arrow_back,
                   color: Colors.white,
                   size: ResponsiveHelper.getResponsiveIconSize(context,
-                      mobile: 20, tablet: 24, desktop: 28),
+                      mobile: 20,
+                      tablet: 24,
+                      ipad: 28,
+                      ipadPro: 32,
+                      desktop: 36),
                 ),
                 onPressed: () => Navigator.pop(context),
               ),
             ),
             actions: [
               Container(
-                margin: ResponsiveHelper.getResponsivePadding(context,
-                    mobile: 6, tablet: 8, desktop: 10),
+                margin: ResponsiveHelper.getResponsivePaddingIPad(context,
+                    mobile: 6, tablet: 8, ipad: 10, ipadPro: 12, desktop: 14),
                 decoration: BoxDecoration(
                   color: Colors.black.withOpacity(0.4),
                   shape: BoxShape.circle,

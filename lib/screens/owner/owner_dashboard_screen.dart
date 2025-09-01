@@ -364,7 +364,14 @@ class _OwnerDashboardScreenState extends State<OwnerDashboardScreen>
               children: [
                 // App Bar
                 Padding(
-                  padding: ResponsiveHelper.getResponsiveHorizontalPadding(context),
+                  padding: ResponsiveHelper.getResponsiveHorizontalPadding(
+                    context,
+                    mobile: 16,
+                    tablet: 24,
+                    ipad: 32,
+                    ipadPro: 40,
+                    desktop: 48,
+                  ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -372,7 +379,14 @@ class _OwnerDashboardScreenState extends State<OwnerDashboardScreen>
                         icon: Icon(
                           Icons.menu, 
                           color: Colors.white,
-                          size: ResponsiveHelper.getResponsiveIconSize(context),
+                          size: ResponsiveHelper.getResponsiveIconSize(
+                            context,
+                            mobile: 24,
+                            tablet: 28,
+                            ipad: 32,
+                            ipadPro: 36,
+                            desktop: 40,
+                          ),
                         ),
                         onPressed: _toggleMenu,
                       ),
@@ -380,7 +394,7 @@ class _OwnerDashboardScreenState extends State<OwnerDashboardScreen>
                         'OWNER DASHBOARD',
                         style: TextStyle(
                           color: Colors.white,
-                          fontSize: ResponsiveHelper.getResponsiveFontSize(context, mobile: 18, tablet: 22, desktop: 26),
+                          fontSize: ResponsiveHelper.getResponsiveFontSizeIPad(context, mobile: 18, tablet: 22, ipad: 26, ipadPro: 30, desktop: 34),
                           fontWeight: FontWeight.bold,
                           letterSpacing: 1.2,
                         ),
@@ -390,8 +404,8 @@ class _OwnerDashboardScreenState extends State<OwnerDashboardScreen>
                           IconButton(
                             icon: _isLoading
                                 ? SizedBox(
-                                    width: ResponsiveHelper.getResponsiveIconSize(context, mobile: 20, tablet: 24, desktop: 28),
-                                    height: ResponsiveHelper.getResponsiveIconSize(context, mobile: 20, tablet: 24, desktop: 28),
+                                    width: ResponsiveHelper.getResponsiveIconSize(context, mobile: 20, tablet: 24, ipad: 28, ipadPro: 32, desktop: 36),
+                                    height: ResponsiveHelper.getResponsiveIconSize(context, mobile: 20, tablet: 24, ipad: 28, ipadPro: 32, desktop: 36),
                                     child: CircularProgressIndicator(
                                       strokeWidth: 2,
                                       color: Colors.white,
@@ -400,7 +414,8 @@ class _OwnerDashboardScreenState extends State<OwnerDashboardScreen>
                                 : Icon(
                                     Icons.swap_horiz,
                                     color: Colors.white,
-                                    size: ResponsiveHelper.getResponsiveIconSize(context),
+                                    size: ResponsiveHelper.getResponsiveIconSize(context,
+                                        mobile: 24, tablet: 28, ipad: 32, ipadPro: 36, desktop: 40),
                                   ),
                             onPressed: _isLoading ? null : _switchToRenterMode,
                             tooltip: 'Switch to Renter Mode',
@@ -412,11 +427,11 @@ class _OwnerDashboardScreenState extends State<OwnerDashboardScreen>
                                 shape: BoxShape.circle,
                                 border: Border.all(
                                   color: Colors.white, 
-                                  width: ResponsiveHelper.getResponsiveSpacing(context, mobile: 2, tablet: 3, desktop: 4),
+                                  width: ResponsiveHelper.getResponsiveSpacingIPad(context, mobile: 2, tablet: 3, ipad: 4, ipadPro: 5, desktop: 6),
                                 ),
                               ),
                               child: CircleAvatar(
-                                radius: ResponsiveHelper.getResponsiveProfileSize(context, mobile: 14, tablet: 18, desktop: 22),
+                                radius: ResponsiveHelper.getResponsiveProfileSize(context, mobile: 14, tablet: 18, ipad: 22, ipadPro: 26, desktop: 30),
                                 backgroundColor: Colors.grey[300],
                                 backgroundImage: FirebaseAuth
                                             .instance.currentUser?.photoURL !=
@@ -434,7 +449,7 @@ class _OwnerDashboardScreenState extends State<OwnerDashboardScreen>
                                         style: TextStyle(
                                           fontWeight: FontWeight.bold,
                                           color: Colors.black54,
-                                          fontSize: ResponsiveHelper.getResponsiveFontSize(context, mobile: 14, tablet: 18, desktop: 22),
+                                          fontSize: ResponsiveHelper.getResponsiveFontSizeIPad(context, mobile: 14, tablet: 18, ipad: 22, ipadPro: 26, desktop: 30),
                                         ),
                                       )
                                     : null,

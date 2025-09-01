@@ -61,6 +61,8 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
   Widget build(BuildContext context) {
     final isTablet = ResponsiveHelper.isTablet(context);
     final isLargeTablet = ResponsiveHelper.isLargeTablet(context);
+    final isIPad = ResponsiveHelper.isIPad(context);
+    final isIPadPro = ResponsiveHelper.isIPadPro(context);
 
     return Scaffold(
       key: _scaffoldKey,
@@ -83,13 +85,24 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
           ),
           SafeArea(
             child: Padding(
-              padding: ResponsiveHelper.getResponsiveHorizontalPadding(context),
+              padding: ResponsiveHelper.getResponsiveHorizontalPadding(
+                context,
+                mobile: 16,
+                tablet: 24,
+                ipad: 40,
+                ipadPro: 60,
+                desktop: 80,
+              ),
               child: Column(
                 children: [
                   // Responsive spacing
                   SizedBox(
-                      height: ResponsiveHelper.getResponsiveSpacing(context,
-                          mobile: 12, tablet: 20, desktop: 24)),
+                      height: ResponsiveHelper.getResponsiveSpacingIPad(context,
+                          mobile: 12,
+                          tablet: 20,
+                          ipad: 24,
+                          ipadPro: 32,
+                          desktop: 40)),
 
                   // Side menu button and centered title in a row
                   Row(
@@ -98,7 +111,12 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                         icon: Icon(
                           Icons.menu,
                           color: Colors.black,
-                          size: ResponsiveHelper.getResponsiveIconSize(context),
+                          size: ResponsiveHelper.getResponsiveIconSize(context,
+                              mobile: 24,
+                              tablet: 28,
+                              ipad: 32,
+                              ipadPro: 36,
+                              desktop: 40),
                         ),
                         onPressed: () =>
                             _scaffoldKey.currentState?.openDrawer(),
@@ -108,11 +126,14 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                           child: Text(
                             'Wayz',
                             style: TextStyle(
-                              fontSize: ResponsiveHelper.getResponsiveFontSize(
-                                  context,
-                                  mobile: 20,
-                                  tablet: 28,
-                                  desktop: 32),
+                              fontSize:
+                                  ResponsiveHelper.getResponsiveFontSizeIPad(
+                                      context,
+                                      mobile: 20,
+                                      tablet: 28,
+                                      ipad: 32,
+                                      ipadPro: 36,
+                                      desktop: 40),
                               fontWeight: FontWeight.bold,
                               color: Colors.black.withOpacity(0.8),
                             ),
@@ -120,19 +141,27 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                         ),
                       ),
                       SizedBox(
-                          width:
-                              ResponsiveHelper.getResponsiveIconSize(context) +
-                                  20), // Responsive spacer
+                          width: ResponsiveHelper.getResponsiveIconSize(context,
+                                  mobile: 24,
+                                  tablet: 28,
+                                  ipad: 32,
+                                  ipadPro: 36,
+                                  desktop: 40) +
+                              20), // Responsive spacer
                     ],
                   ),
 
                   SizedBox(
-                      height: ResponsiveHelper.getResponsiveSpacing(context,
-                          mobile: 12, tablet: 20, desktop: 24)),
+                      height: ResponsiveHelper.getResponsiveSpacingIPad(context,
+                          mobile: 12,
+                          tablet: 20,
+                          ipad: 24,
+                          ipadPro: 32,
+                          desktop: 40)),
 
-                  // Responsive layout for tablets
-                  if (isTablet || isLargeTablet) ...[
-                    // Tablet layout - side by side cards
+                  // Responsive layout for tablets and iPads
+                  if (isTablet || isLargeTablet || isIPad || isIPadPro) ...[
+                    // Tablet/iPad layout - side by side cards with better spacing
                     Expanded(
                       child: Row(
                         children: [
@@ -150,11 +179,13 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                             ),
                           ),
                           SizedBox(
-                              width: ResponsiveHelper.getResponsiveSpacing(
+                              width: ResponsiveHelper.getResponsiveSpacingIPad(
                                   context,
                                   mobile: 12,
                                   tablet: 20,
-                                  desktop: 24)),
+                                  ipad: 24,
+                                  ipadPro: 28,
+                                  desktop: 32)),
                           Expanded(
                             child: _FeatureCard(
                               image: 'assets/images/request_vehicle.png',
@@ -178,42 +209,47 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                     ),
                   ] else ...[
                     // Mobile layout - stacked cards
-                    Expanded(
-                      flex: 1,
-                      child: _FeatureCard(
-                        image: 'assets/images/browse_vehicle.png',
-                        title: 'Browse Vehicles',
-                        description:
-                            "Explore our diverse fleet of vehicles, from scooters to luxury cars, perfect for your Sri Lankan adventure.",
-                        buttonText: 'Browse',
+                  Expanded(
+                    flex: 1,
+                    child: _FeatureCard(
+                      image: 'assets/images/browse_vehicle.png',
+                      title: 'Browse Vehicles',
+                      description:
+                          "Explore our diverse fleet of vehicles, from scooters to luxury cars, perfect for your Sri Lankan adventure.",
+                      buttonText: 'Browse',
                         onPressed: _isLoading
                             ? null
                             : () => _navigateToBrowse(context),
-                        isLoading: _isLoading,
-                      ),
+                      isLoading: _isLoading,
                     ),
+                  ),
                     SizedBox(
-                        height: ResponsiveHelper.getResponsiveSpacing(context,
-                            mobile: 12, tablet: 20, desktop: 24)),
-                    Expanded(
-                      flex: 1,
-                      child: _FeatureCard(
-                        image: 'assets/images/request_vehicle.png',
-                        title: 'Request a Vehicle',
-                        description:
-                            "Can't find what you're looking for? Post a request and let our network of providers find the perfect vehicle for you.",
-                        buttonText: 'Request',
-                        onPressed: () {
-                          Navigator.push(
+                        height: ResponsiveHelper.getResponsiveSpacingIPad(
                             context,
-                            MaterialPageRoute(
+                            mobile: 12,
+                            tablet: 16,
+                            ipad: 20,
+                            ipadPro: 24,
+                            desktop: 28)),
+                  Expanded(
+                    flex: 1,
+                    child: _FeatureCard(
+                      image: 'assets/images/request_vehicle.png',
+                      title: 'Request a Vehicle',
+                      description:
+                          "Can't find what you're looking for? Post a request and let our network of providers find the perfect vehicle for you.",
+                      buttonText: 'Request',
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
                               builder: (context) =>
                                   const RequestVehicleScreen(),
-                            ),
-                          );
-                        },
-                      ),
+                          ),
+                        );
+                      },
                     ),
+                  ),
                   ],
                 ],
               ),
@@ -267,70 +303,133 @@ class _FeatureCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final isTablet = ResponsiveHelper.isTablet(context);
     final isLargeTablet = ResponsiveHelper.isLargeTablet(context);
+    final isIPad = ResponsiveHelper.isIPad(context);
+    final isIPadPro = ResponsiveHelper.isIPadPro(context);
 
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(
-            ResponsiveHelper.getResponsiveBorderRadius(context)),
-        boxShadow: ResponsiveHelper.getResponsiveShadow(context),
+            ResponsiveHelper.getResponsiveBorderRadius(context,
+                mobile: 12, tablet: 16, ipad: 20, ipadPro: 24, desktop: 28)),
+        boxShadow: ResponsiveHelper.getResponsiveShadow(context,
+            mobile: 2, tablet: 4, ipad: 6, ipadPro: 8, desktop: 10),
       ),
+      clipBehavior: Clip.antiAlias,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           ClipRRect(
             borderRadius: BorderRadius.vertical(
-              top: Radius.circular(
-                  ResponsiveHelper.getResponsiveBorderRadius(context)),
+              top: Radius.circular(ResponsiveHelper.getResponsiveBorderRadius(
+                  context,
+                  mobile: 12,
+                  tablet: 16,
+                  ipad: 20,
+                  ipadPro: 24,
+                  desktop: 28)),
             ),
             child: AspectRatio(
-              aspectRatio: ResponsiveHelper.getResponsiveAspectRatio(context),
-              child: Image.asset(
-                image,
+              aspectRatio: ResponsiveHelper.getResponsiveAspectRatio(
+                context,
+                mobile: 2.0,
+                tablet: 2.2,
+                ipad: 1.8,
+                ipadPro: 1.6,
+                desktop: 2.5,
+              ),
+              child: Stack(
+                children: [
+                  // Background Image
+                  Positioned.fill(
+                    child: Container(
+                      decoration: BoxDecoration(
+                        image: DecorationImage(
+                          image: AssetImage(image),
                 fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) => Container(
-                  color: Colors.grey[200],
-                  child: Icon(
-                    Icons.directions_car,
-                    size: ResponsiveHelper.getResponsiveIconSize(context,
-                        mobile: 48, tablet: 64, desktop: 80),
-                    color: Colors.grey,
+                          alignment: Alignment.center,
+                        ),
+                      ),
+                    ),
                   ),
-                ),
+                  // Gradient Overlay
+                  Positioned.fill(
+                    child: Container(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [
+                            Colors.transparent,
+                            Colors.black.withOpacity(0.15),
+                          ],
+                          stops: const [0.6, 1.0],
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
           Padding(
-            padding: ResponsiveHelper.getResponsivePadding(context),
+            padding: ResponsiveHelper.getResponsivePaddingIPad(
+              context,
+              mobile: 16,
+              tablet: 20,
+              ipad: 24,
+              ipadPro: 28,
+              desktop: 32,
+            ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   title,
                   style: TextStyle(
-                    fontSize: ResponsiveHelper.getResponsiveFontSize(context,
-                        mobile: 16, tablet: 20, desktop: 24),
+                    fontSize: ResponsiveHelper.getResponsiveFontSizeIPad(
+                      context,
+                      mobile: 16,
+                      tablet: 20,
+                      ipad: 24,
+                      ipadPro: 28,
+                      desktop: 32,
+                    ),
                     fontWeight: FontWeight.bold,
                   ),
                 ),
                 SizedBox(
-                    height: ResponsiveHelper.getResponsiveSpacing(context,
-                        mobile: 4, tablet: 8, desktop: 12)),
+                    height: ResponsiveHelper.getResponsiveSpacingIPad(context,
+                        mobile: 4,
+                        tablet: 6,
+                        ipad: 8,
+                        ipadPro: 10,
+                        desktop: 12)),
                 Text(
                   description,
                   style: TextStyle(
-                    fontSize: ResponsiveHelper.getResponsiveFontSize(context,
-                        mobile: 13, tablet: 15, desktop: 17),
+                    fontSize: ResponsiveHelper.getResponsiveFontSizeIPad(
+                      context,
+                      mobile: 13,
+                      tablet: 15,
+                      ipad: 17,
+                      ipadPro: 19,
+                      desktop: 21,
+                    ),
                     color: Colors.grey[700],
                   ),
-                  maxLines: isTablet || isLargeTablet
-                      ? 3
-                      : 2, // More lines for tablets
+                  maxLines: (isTablet || isLargeTablet || isIPad || isIPadPro)
+                      ? 4
+                      : 2, // More lines for tablets and iPads
                   overflow: TextOverflow.ellipsis,
                 ),
                 SizedBox(
-                    height: ResponsiveHelper.getResponsiveSpacing(context,
-                        mobile: 8, tablet: 12, desktop: 16)),
+                    height: ResponsiveHelper.getResponsiveSpacingIPad(context,
+                        mobile: 8,
+                        tablet: 10,
+                        ipad: 12,
+                        ipadPro: 14,
+                        desktop: 16)),
                 Align(
                   alignment: Alignment.centerRight,
                   child: ElevatedButton(
@@ -340,17 +439,34 @@ class _FeatureCard extends StatelessWidget {
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(
                             ResponsiveHelper.getResponsiveBorderRadius(context,
-                                mobile: 20, tablet: 25, desktop: 30)),
+                                mobile: 20,
+                                tablet: 25,
+                                ipad: 30,
+                                ipadPro: 35,
+                                desktop: 30)),
                       ),
-                      padding:
-                          ResponsiveHelper.getResponsiveButtonPadding(context),
+                      padding: ResponsiveHelper.getResponsiveButtonPadding(
+                        context,
+                        mobile: const EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 8),
+                        tablet: const EdgeInsets.symmetric(
+                            horizontal: 18, vertical: 10),
+                        ipad: const EdgeInsets.symmetric(
+                            horizontal: 20, vertical: 12),
+                        ipadPro: const EdgeInsets.symmetric(
+                            horizontal: 24, vertical: 14),
+                        desktop: const EdgeInsets.symmetric(
+                            horizontal: 22, vertical: 12),
+                      ),
                       textStyle: TextStyle(
                         fontWeight: FontWeight.bold,
-                        fontSize: ResponsiveHelper.getResponsiveFontSize(
+                        fontSize: ResponsiveHelper.getResponsiveFontSizeIPad(
                             context,
                             mobile: 14,
                             tablet: 16,
-                            desktop: 18),
+                            ipad: 18,
+                            ipadPro: 20,
+                            desktop: 22),
                       ),
                       elevation: 0,
                     ),

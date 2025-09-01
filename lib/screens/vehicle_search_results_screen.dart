@@ -194,13 +194,13 @@ class _VehicleSearchResultsScreenState
         backgroundColor: const Color(0xFFFFC107),
         elevation: 0,
         toolbarHeight: ResponsiveHelper.getResponsiveIconSize(context,
-            mobile: 44, tablet: 56, desktop: 64),
+            mobile: 44, tablet: 56, ipad: 64, ipadPro: 72, desktop: 80),
         leading: IconButton(
           icon: Icon(
             Icons.arrow_back,
             color: Colors.black,
             size: ResponsiveHelper.getResponsiveIconSize(context,
-                mobile: 24, tablet: 28, desktop: 32),
+                mobile: 24, tablet: 28, ipad: 32, ipadPro: 36, desktop: 40),
           ),
           onPressed: () => Navigator.pop(context),
         ),
@@ -209,27 +209,50 @@ class _VehicleSearchResultsScreenState
           style: TextStyle(
             color: Colors.black,
             fontWeight: FontWeight.bold,
-            fontSize: ResponsiveHelper.getResponsiveFontSize(context,
-                mobile: 18, tablet: 22, desktop: 26),
+            fontSize: ResponsiveHelper.getResponsiveFontSizeIPad(context,
+                mobile: 18, tablet: 22, ipad: 26, ipadPro: 30, desktop: 34),
           ),
         ),
         automaticallyImplyLeading: false,
         actions: [
           // Compact Filter Button
           Container(
-            margin: const EdgeInsets.only(right: 16),
+            margin: EdgeInsets.only(
+              right: ResponsiveHelper.getResponsiveSpacingIPad(
+                context,
+                mobile: 16,
+                tablet: 20,
+                ipad: 24,
+                ipadPro: 32,
+                desktop: 40,
+              ),
+            ),
             child: ElevatedButton.icon(
               onPressed: _showMergedFilterDrawer,
               icon: Icon(
                 Icons.filter_alt,
                 color: const Color(0xFFFFC107),
-                size: 20,
+                size: ResponsiveHelper.getResponsiveIconSize(
+                  context,
+                  mobile: 20,
+                  tablet: 22,
+                  ipad: 24,
+                  ipadPro: 26,
+                  desktop: 28,
+                ),
               ),
-              label: const Text(
+              label: Text(
                 'Filter',
                 style: TextStyle(
-                  color: Color(0xFFFFC107),
-                  fontSize: 14,
+                  color: const Color(0xFFFFC107),
+                  fontSize: ResponsiveHelper.getResponsiveFontSizeIPad(
+                    context,
+                    mobile: 14,
+                    tablet: 16,
+                    ipad: 18,
+                    ipadPro: 20,
+                    desktop: 22,
+                  ),
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -237,12 +260,45 @@ class _VehicleSearchResultsScreenState
                 backgroundColor: Colors.black,
                 foregroundColor: const Color(0xFFFFC107),
                 elevation: 3,
-                padding:
+                padding: ResponsiveHelper.getResponsiveButtonPadding(
+                  context,
+                  mobile:
                     const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20),
+                  tablet:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  desktop:
+                      const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                 ),
-                minimumSize: const Size(80, 36),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(
+                    ResponsiveHelper.getResponsiveBorderRadius(
+                      context,
+                      mobile: 20,
+                      tablet: 22,
+                      ipad: 24,
+                      ipadPro: 26,
+                      desktop: 28,
+                    ),
+                  ),
+                ),
+                minimumSize: Size(
+                  ResponsiveHelper.getResponsiveSpacingIPad(
+                    context,
+                    mobile: 80,
+                    tablet: 90,
+                    ipad: 100,
+                    ipadPro: 110,
+                    desktop: 120,
+                  ),
+                  ResponsiveHelper.getResponsiveSpacingIPad(
+                    context,
+                    mobile: 36,
+                    tablet: 40,
+                    ipad: 44,
+                    ipadPro: 48,
+                    desktop: 52,
+                  ),
+                ),
               ),
             ),
           ),
@@ -910,20 +966,53 @@ class _VehicleSearchResultsScreenState
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     final isTablet = ResponsiveHelper.isTablet(context);
     final isLargeTablet = ResponsiveHelper.isLargeTablet(context);
+    final isIPad = ResponsiveHelper.isIPad(context);
+    final isIPadPro = ResponsiveHelper.isIPadPro(context);
 
     // Use grid layout for tablets and iPads
-    if (isTablet || isLargeTablet) {
+    if (isTablet || isLargeTablet || isIPad || isIPadPro) {
       return GridView.builder(
-        padding: ResponsiveHelper.getResponsivePadding(context),
+        padding: ResponsiveHelper.getResponsivePaddingIPad(
+          context,
+          mobile: 16,
+          tablet: 24,
+          ipad: 32,
+          ipadPro: 40,
+          desktop: 48,
+        ),
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: ResponsiveHelper.getResponsiveGridColumns(context,
-              mobile: 1, tablet: 2, desktop: 3),
-          childAspectRatio: ResponsiveHelper.getResponsiveAspectRatio(context,
-              mobile: 1.2, tablet: 1.4, desktop: 1.6),
-          crossAxisSpacing: ResponsiveHelper.getResponsiveSpacing(context,
-              mobile: 16, tablet: 20, desktop: 24),
-          mainAxisSpacing: ResponsiveHelper.getResponsiveSpacing(context,
-              mobile: 16, tablet: 20, desktop: 24),
+          crossAxisCount: ResponsiveHelper.getResponsiveGridColumns(
+            context,
+            mobile: 1,
+            tablet: 2,
+            ipad: 3,
+            ipadPro: 3,
+            desktop: 4,
+          ),
+          childAspectRatio: ResponsiveHelper.getResponsiveAspectRatio(
+            context,
+            mobile: 1.2,
+            tablet: 1.4,
+            ipad: 1.6,
+            ipadPro: 1.8,
+            desktop: 2.0,
+          ),
+          crossAxisSpacing: ResponsiveHelper.getResponsiveSpacingIPad(
+            context,
+            mobile: 16,
+            tablet: 20,
+            ipad: 24,
+            ipadPro: 32,
+            desktop: 40,
+          ),
+          mainAxisSpacing: ResponsiveHelper.getResponsiveSpacingIPad(
+            context,
+            mobile: 16,
+            tablet: 20,
+            ipad: 24,
+            ipadPro: 32,
+            desktop: 40,
+          ),
         ),
         itemCount: _searchResults.length,
         itemBuilder: (context, index) {
@@ -934,7 +1023,14 @@ class _VehicleSearchResultsScreenState
 
     // Use list layout for mobile
     return ListView.builder(
-      padding: ResponsiveHelper.getResponsivePadding(context),
+      padding: ResponsiveHelper.getResponsivePaddingIPad(
+        context,
+        mobile: 16,
+        tablet: 24,
+        ipad: 32,
+        ipadPro: 40,
+        desktop: 48,
+      ),
       itemCount: _searchResults.length,
       itemBuilder: (context, index) {
         return _buildVehicleCard(context, _searchResults[index], isDarkMode);

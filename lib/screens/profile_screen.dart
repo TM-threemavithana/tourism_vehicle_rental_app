@@ -606,8 +606,14 @@ class _ProfileScreenState extends State<ProfileScreen>
                   ),
                   child: SafeArea(
                     child: Padding(
-                      padding: ResponsiveHelper.getResponsivePadding(context,
-                          mobile: 20, tablet: 32, desktop: 48),
+                      padding: ResponsiveHelper.getResponsivePaddingIPad(
+                        context,
+                        mobile: 20,
+                        tablet: 32,
+                        ipad: 40,
+                        ipadPro: 48,
+                        desktop: 56,
+                      ),
                       child: Column(
                         children: [
                           // Profile picture with edit button
@@ -617,9 +623,13 @@ class _ProfileScreenState extends State<ProfileScreen>
                               _isUploadingImage
                                   ? Container(
                                       width: ResponsiveHelper
-                                          .getResponsiveProfileSize(context),
+                                              .getResponsiveProfileSize(
+                                                  context) *
+                                          1.2,
                                       height: ResponsiveHelper
-                                          .getResponsiveProfileSize(context),
+                                              .getResponsiveProfileSize(
+                                                  context) *
+                                          1.2,
                                       decoration: BoxDecoration(
                                         shape: BoxShape.circle,
                                         color: Colors.white.withOpacity(0.2),
@@ -633,7 +643,9 @@ class _ProfileScreenState extends State<ProfileScreen>
                                     )
                                   : CircleAvatar(
                                       radius: ResponsiveHelper
-                                          .getResponsiveProfileSize(context),
+                                              .getResponsiveProfileSize(
+                                                  context) *
+                                          1.2,
                                       backgroundColor:
                                           Colors.white.withOpacity(0.3),
                                       backgroundImage:
@@ -646,11 +658,13 @@ class _ProfileScreenState extends State<ProfileScreen>
                                               _getInitials(),
                                               style: TextStyle(
                                                 fontSize: ResponsiveHelper
-                                                    .getResponsiveFontSize(
+                                                    .getResponsiveFontSizeIPad(
                                                         context,
                                                         mobile: 42,
                                                         tablet: 60,
-                                                        desktop: 72),
+                                                        ipad: 72,
+                                                        ipadPro: 80,
+                                                        desktop: 88),
                                                 fontWeight: FontWeight.bold,
                                                 color: Colors.white,
                                               ),
@@ -660,16 +674,22 @@ class _ProfileScreenState extends State<ProfileScreen>
 
                               // Edit button
                               Positioned(
-                                bottom: ResponsiveHelper.getResponsiveSpacing(
-                                    context,
-                                    mobile: 5,
-                                    tablet: 8,
-                                    desktop: 10),
-                                right: ResponsiveHelper.getResponsiveSpacing(
-                                    context,
-                                    mobile: 5,
-                                    tablet: 8,
-                                    desktop: 10),
+                                bottom:
+                                    ResponsiveHelper.getResponsiveSpacingIPad(
+                                        context,
+                                        mobile: 5,
+                                        tablet: 8,
+                                        ipad: 12,
+                                        ipadPro: 15,
+                                        desktop: 18),
+                                right:
+                                    ResponsiveHelper.getResponsiveSpacingIPad(
+                                        context,
+                                        mobile: 5,
+                                        tablet: 8,
+                                        ipad: 12,
+                                        ipadPro: 15,
+                                        desktop: 18),
                                 child: Container(
                                   decoration: BoxDecoration(
                                     color: Colors.white,
@@ -703,12 +723,13 @@ class _ProfileScreenState extends State<ProfileScreen>
                                               tablet: 48,
                                               desktop: 56),
                                     ),
-                                    padding:
-                                        ResponsiveHelper.getResponsivePadding(
-                                            context,
+                                    padding: ResponsiveHelper
+                                        .getResponsivePaddingIPad(context,
                                             mobile: 8,
                                             tablet: 12,
-                                            desktop: 16),
+                                            ipad: 16,
+                                            ipadPro: 20,
+                                            desktop: 24),
                                   ),
                                 ),
                               ),
@@ -716,21 +737,26 @@ class _ProfileScreenState extends State<ProfileScreen>
                           ),
 
                           SizedBox(
-                              height: ResponsiveHelper.getResponsiveSpacing(
+                              height: ResponsiveHelper.getResponsiveSpacingIPad(
                                   context,
                                   mobile: 20,
                                   tablet: 24,
-                                  desktop: 32)),
+                                  ipad: 32,
+                                  ipadPro: 40,
+                                  desktop: 48)),
 
                           // User name
                           Text(
                             widget.user?.displayName ?? 'User',
                             style: TextStyle(
-                              fontSize: ResponsiveHelper.getResponsiveFontSize(
-                                  context,
-                                  mobile: 24,
-                                  tablet: 32,
-                                  desktop: 40),
+                              fontSize:
+                                  ResponsiveHelper.getResponsiveFontSizeIPad(
+                                      context,
+                                      mobile: 24,
+                                      tablet: 32,
+                                      ipad: 40,
+                                      ipadPro: 48,
+                                      desktop: 56),
                               fontWeight: FontWeight.bold,
                               color: Colors.white,
                             ),
@@ -740,21 +766,26 @@ class _ProfileScreenState extends State<ProfileScreen>
                           Text(
                             widget.user?.email ?? '',
                             style: TextStyle(
-                              fontSize: ResponsiveHelper.getResponsiveFontSize(
-                                  context,
-                                  mobile: 16,
-                                  tablet: 20,
-                                  desktop: 24),
+                              fontSize:
+                                  ResponsiveHelper.getResponsiveFontSizeIPad(
+                                      context,
+                                      mobile: 16,
+                                      tablet: 20,
+                                      ipad: 24,
+                                      ipadPro: 28,
+                                      desktop: 32),
                               color: Colors.white.withOpacity(0.8),
                             ),
                           ),
 
                           SizedBox(
-                              height: ResponsiveHelper.getResponsiveSpacing(
+                              height: ResponsiveHelper.getResponsiveSpacingIPad(
                                   context,
                                   mobile: 30,
                                   tablet: 40,
-                                  desktop: 50)),
+                                  ipad: 50,
+                                  ipadPro: 60,
+                                  desktop: 70)),
                         ],
                       ),
                     ),
@@ -763,7 +794,14 @@ class _ProfileScreenState extends State<ProfileScreen>
 
                 // Content area
                 Padding(
-                  padding: ResponsiveHelper.getResponsivePadding(context),
+                  padding: ResponsiveHelper.getResponsivePaddingIPad(
+                    context,
+                    mobile: 16,
+                    tablet: 24,
+                    ipad: 32,
+                    ipadPro: 40,
+                    desktop: 48,
+                  ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -771,18 +809,25 @@ class _ProfileScreenState extends State<ProfileScreen>
                       Text(
                         'Personal Information',
                         style: TextStyle(
-                          fontSize: ResponsiveHelper.getResponsiveFontSize(
+                          fontSize: ResponsiveHelper.getResponsiveFontSizeIPad(
                               context,
                               mobile: 18,
                               tablet: 22,
-                              desktop: 26),
+                              ipad: 26,
+                              ipadPro: 30,
+                              desktop: 34),
                           fontWeight: FontWeight.bold,
                           color: Colors.black87,
                         ),
                       ),
                       SizedBox(
-                          height: ResponsiveHelper.getResponsiveSpacing(context,
-                              mobile: 16, tablet: 20, desktop: 24)),
+                          height: ResponsiveHelper.getResponsiveSpacingIPad(
+                              context,
+                              mobile: 16,
+                              tablet: 20,
+                              ipad: 24,
+                              ipadPro: 32,
+                              desktop: 40)),
 
                       Card(
                         elevation: 2,
@@ -792,8 +837,13 @@ class _ProfileScreenState extends State<ProfileScreen>
                                   context)),
                         ),
                         child: Padding(
-                          padding:
-                              ResponsiveHelper.getResponsivePadding(context),
+                          padding: ResponsiveHelper.getResponsivePadding(
+                              context,
+                              mobile: 16,
+                              tablet: 24,
+                              ipad: 32,
+                              ipadPro: 40,
+                              desktop: 32),
                           child: Column(
                             children: [
                               _buildInfoField(

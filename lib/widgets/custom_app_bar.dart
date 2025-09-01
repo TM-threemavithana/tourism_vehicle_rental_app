@@ -47,11 +47,13 @@ class _CustomAppBarState extends State<CustomAppBar> {
   }
 
   Future<void> _checkFavoriteStatus() async {
-    if (widget.vehicleDetails == null || widget.vehicleDetails!['id'] == null) return;
-    
+    if (widget.vehicleDetails == null || widget.vehicleDetails!['id'] == null)
+      return;
+
     setState(() => _loading = true);
     try {
-      final bool isFav = await _favoritesService.isFavorite(widget.vehicleDetails!['id']);
+      final bool isFav =
+          await _favoritesService.isFavorite(widget.vehicleDetails!['id']);
       if (mounted) {
         setState(() {
           _isFavorite = isFav;
@@ -70,18 +72,18 @@ class _CustomAppBarState extends State<CustomAppBar> {
 
     try {
       setState(() => _loading = true);
-      final bool newStatus = await _favoritesService.toggleFavorite(widget.vehicleDetails!);
+      final bool newStatus =
+          await _favoritesService.toggleFavorite(widget.vehicleDetails!);
       if (mounted) {
         setState(() {
           _isFavorite = newStatus;
           _loading = false;
         });
-        
+
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(_isFavorite 
-              ? 'Added to favorites' 
-              : 'Removed from favorites'),
+            content: Text(
+                _isFavorite ? 'Added to favorites' : 'Removed from favorites'),
             duration: const Duration(seconds: 2),
           ),
         );
@@ -112,23 +114,26 @@ class _CustomAppBarState extends State<CustomAppBar> {
       ),
       backgroundColor: widget.backgroundColor,
       elevation: 0,
-      leading: widget.leadingWidget ?? (widget.showBackButton ? IconButton(
-        icon: Container(
-          padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            color: Colors.black.withOpacity(0.4),
-            shape: BoxShape.circle,
-          ),
-          child: Icon(Icons.arrow_back, color: widget.iconColor),
-        ),
-        onPressed: () {
-          if (widget.onBackPressed != null) {
-            widget.onBackPressed!();
-          } else {
-            Navigator.pop(context);
-          }
-        },
-      ) : null),
+      leading: widget.leadingWidget ??
+          (widget.showBackButton
+              ? IconButton(
+                  icon: Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Colors.black.withOpacity(0.4),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(Icons.arrow_back, color: widget.iconColor),
+                  ),
+                  onPressed: () {
+                    if (widget.onBackPressed != null) {
+                      widget.onBackPressed!();
+                    } else {
+                      Navigator.pop(context);
+                    }
+                  },
+                )
+              : null),
       actions: [
         // Share button
         if (widget.showShareButton)
@@ -143,7 +148,7 @@ class _CustomAppBarState extends State<CustomAppBar> {
             ),
             onPressed: _shareVehicle,
           ),
-          
+
         // Favorite button
         if (widget.showFavoriteButton)
           IconButton(
@@ -153,19 +158,19 @@ class _CustomAppBarState extends State<CustomAppBar> {
                 color: Colors.black.withOpacity(0.4),
                 shape: BoxShape.circle,
               ),
-              child: _loading 
-                ? SizedBox(
-                    width: 18, 
-                    height: 18, 
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2, 
-                      color: widget.iconColor,
+              child: _loading
+                  ? SizedBox(
+                      width: 18,
+                      height: 18,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: widget.iconColor,
+                      ),
+                    )
+                  : Icon(
+                      _isFavorite ? Icons.favorite : Icons.favorite_border,
+                      color: _isFavorite ? Colors.red : widget.iconColor,
                     ),
-                  )
-                : Icon(
-                    _isFavorite ? Icons.favorite : Icons.favorite_border,
-                    color: _isFavorite ? Colors.red : widget.iconColor,
-                  ),
             ),
             onPressed: _toggleFavorite,
           ),

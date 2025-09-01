@@ -183,7 +183,7 @@ class _VehicleDetailPageState extends State<VehicleDetailPage> {
                     _buildContactButtonsSection(),
 
                     // Bottom padding
-                    SizedBox(height: ResponsiveHelper.getResponsiveSpacing(context, mobile: 24, tablet: 32, desktop: 40)),
+                    SizedBox(height: ResponsiveHelper.getResponsiveSpacingIPad(context, mobile: 24, tablet: 32, ipad: 40, ipadPro: 48, desktop: 56)),
                   ],
                 ),
               ),
@@ -208,19 +208,19 @@ class _VehicleDetailPageState extends State<VehicleDetailPage> {
     }
 
     return Container(
-      padding: ResponsiveHelper.getResponsivePadding(context, mobile: 16, tablet: 20, desktop: 24),
+      padding: ResponsiveHelper.getResponsivePaddingIPad(context, mobile: 16, tablet: 20, ipad: 24, ipadPro: 32, desktop: 40),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             'Contact Vehicle Owner',
             style: TextStyle(
-              fontSize: ResponsiveHelper.getResponsiveFontSize(context, mobile: 20, tablet: 22, desktop: 24),
+              fontSize: ResponsiveHelper.getResponsiveFontSizeIPad(context, mobile: 20, tablet: 22, ipad: 24, ipadPro: 28, desktop: 32),
               fontWeight: FontWeight.bold,
               color: Colors.black,
             ),
           ),
-          SizedBox(height: ResponsiveHelper.getResponsiveSpacing(context, mobile: 16, tablet: 20, desktop: 24)),
+          SizedBox(height: ResponsiveHelper.getResponsiveSpacingIPad(context, mobile: 16, tablet: 20, ipad: 24, ipadPro: 32, desktop: 40)),
           Row(
             children: [
               Expanded(
@@ -231,7 +231,7 @@ class _VehicleDetailPageState extends State<VehicleDetailPage> {
                   () => _makePhoneCall(contactNumber),
                 ),
               ),
-              SizedBox(width: ResponsiveHelper.getResponsiveSpacing(context, mobile: 12, tablet: 16, desktop: 20)),
+              SizedBox(width: ResponsiveHelper.getResponsiveSpacingIPad(context, mobile: 12, tablet: 16, ipad: 20, ipadPro: 24, desktop: 28)),
               Expanded(
                 child: _buildContactButton(
                   'WhatsApp',
@@ -254,13 +254,13 @@ class _VehicleDetailPageState extends State<VehicleDetailPage> {
     return ElevatedButton.icon(
       onPressed: onPressed,
       icon: isFaIcon
-          ? FaIcon(icon as IconData, color: Colors.white, size: ResponsiveHelper.getResponsiveIconSize(context, mobile: 18, tablet: 20, desktop: 22))
-          : Icon(icon as IconData, color: Colors.white, size: ResponsiveHelper.getResponsiveIconSize(context, mobile: 18, tablet: 20, desktop: 22)),
+          ? FaIcon(icon as IconData, color: Colors.white, size: ResponsiveHelper.getResponsiveIconSize(context, mobile: 18, tablet: 20, ipad: 22, ipadPro: 24, desktop: 26))
+          : Icon(icon as IconData, color: Colors.white, size: ResponsiveHelper.getResponsiveIconSize(context, mobile: 18, tablet: 20, ipad: 22, ipadPro: 24, desktop: 26)),
       label: Text(
         text,
         style: TextStyle(
           fontWeight: FontWeight.w600,
-          fontSize: ResponsiveHelper.getResponsiveFontSize(context, mobile: 14, tablet: 16, desktop: 18),
+          fontSize: ResponsiveHelper.getResponsiveFontSizeIPad(context, mobile: 14, tablet: 16, ipad: 18, ipadPro: 20, desktop: 22),
           color: Colors.white,
         ),
       ),
@@ -268,7 +268,7 @@ class _VehicleDetailPageState extends State<VehicleDetailPage> {
         backgroundColor: color,
         foregroundColor: Colors.white,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(ResponsiveHelper.getResponsiveBorderRadius(context, mobile: 20, tablet: 24, desktop: 28)),
+          borderRadius: BorderRadius.circular(ResponsiveHelper.getResponsiveBorderRadius(context, mobile: 20, tablet: 24, ipad: 28, ipadPro: 32, desktop: 36)),
         ),
         elevation: 2,
         padding: ResponsiveHelper.getResponsiveButtonPadding(context),
