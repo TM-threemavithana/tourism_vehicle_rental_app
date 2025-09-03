@@ -1,6 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'dart:io' show Platform;
 
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -79,6 +81,72 @@ class AuthService {
         throw _handleAuthException(e);
       }
       throw Exception('Failed to sign in with Google: ${e.toString()}');
+    }
+  }
+
+  // Sign in with Apple
+  Future<UserCredential> signInWithApple() async {
+    try {
+      // Check if Apple Sign In is available (iOS 13+, macOS 10.15+)
+      final isAvailable = await SignInWithApple.isAvailable();
+      if (!isAvailable) {
+        throw Exception('Apple Sign In is not available on this device');
+      }
+
+      // Request credential from Apple
+      final appleCredential = await SignInWithApple.getAppleIDCredential(
+        scopes: [
+          AppleIDAuthorizationScopes.email,
+          AppleIDAuthorizationScopes.fullName,
+        ],
+      );
+
+      // Create an OAuthCredential from the Apple credential
+      final oauthCredential = OAuthProvider("apple.com").credential(
+        idToken: appleCredential.identityToken,
+        accessToken: appleCredential.authorizationCode,
+      );
+
+      // Sign in to Firebase with the Apple credential
+      final userCredential = await _auth.signInWithCredential(oauthCredential);
+
+      // For Apple Sign In, we might need to get the display name from the credential
+      // since Apple only provides the name on the first sign in
+      String? displayName = userCredential.user?.displayName;
+      if (displayName == null || displayName.isEmpty) {
+        if (appleCredential.givenName != null && appleCredential.familyName != null) {
+          displayName = '${appleCredential.givenName} ${appleCredential.familyName}';
+          await userCredential.user?.updateDisplayName(displayName);
+        }
+      }
+
+      // Check if this is a new user (first time sign in)
+      if (userCredential.additionalUserInfo?.isNewUser ?? false) {
+        // Create user document with default userType
+        await _createUserDocument(userCredential.user!, 'renter');
+      }
+
+      return userCredential;
+    } on SignInWithAppleAuthorizationException catch (e) {
+      switch (e.code) {
+        case AuthorizationErrorCode.canceled:
+          throw Exception('Apple Sign In was canceled');
+        case AuthorizationErrorCode.failed:
+          throw Exception('Apple Sign In failed. Please check your Apple ID configuration and try again.');
+        case AuthorizationErrorCode.invalidResponse:
+          throw Exception('Invalid response from Apple. Please try again.');
+        case AuthorizationErrorCode.notHandled:
+          throw Exception('Apple Sign In not handled. Please try again.');
+        case AuthorizationErrorCode.unknown:
+          throw Exception('Unknown error occurred during Apple Sign In');
+        default:
+          throw Exception('Apple Sign In failed: ${e.message}');
+      }
+    } catch (e) {
+      if (e is FirebaseAuthException) {
+        throw _handleAuthException(e);
+      }
+      throw Exception('Failed to sign in with Apple: ${e.toString()}');
     }
   }
 

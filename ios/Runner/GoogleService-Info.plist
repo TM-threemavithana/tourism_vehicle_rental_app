@@ -3,17 +3,17 @@
 <plist version="1.0">
 <dict>
 	<key>CLIENT_ID</key>
-	<string>921265432897-ifmr0kaut4fbdnuimokro90i76nfbv4l.apps.googleusercontent.com</string>
+	<string>921265432897-6hvbnskrjv93a7chm535iu6miai06rp8.apps.googleusercontent.com</string>
 	<key>REVERSED_CLIENT_ID</key>
-	<string>com.googleusercontent.apps.921265432897-ifmr0kaut4fbdnuimokro90i76nfbv4l</string>
+	<string>com.googleusercontent.apps.921265432897-6hvbnskrjv93a7chm535iu6miai06rp8</string>
 	<key>API_KEY</key>
-	<string>AIzaSyDM0Ltd6pXEQOGypvr4-_1Oha5Ce37lQZ8</string>
+	<string>AIzaSyARCqDWAn7REswXCHCPRFSiXTFrIorAVXQ</string>
 	<key>GCM_SENDER_ID</key>
 	<string>921265432897</string>
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>com.wayzlk.wayz</string>
+	<string>com.wayzlk.wayzapp</string>
 	<key>PROJECT_ID</key>
 	<string>wayz-e430e</string>
 	<key>STORAGE_BUCKET</key>
@@ -29,6 +29,6 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:921265432897:ios:164eef49bbc692778759c0</string>
+	<string>1:921265432897:ios:15a4fa14b72fdfe88759c0</string>
 </dict>
 </plist>

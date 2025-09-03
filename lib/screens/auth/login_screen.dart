@@ -4,6 +4,7 @@ import 'signup_screen.dart';
 import 'forgot_password_screen.dart';
 import '../../services/auth_service.dart';
 import '../../widgets/google_sign_in_button.dart';
+import '../../widgets/apple_sign_in_button.dart';
 import '../welcome_screen.dart';
 import '../../utils/responsive_helper.dart';
 
@@ -720,6 +721,38 @@ class _LoginScreenState extends State<LoginScreen>
                                 // Center the Google sign-in button
                                 Center(
                                   child: GoogleSignInButton(
+                                    isLogin: true,
+                                    onSuccess: () {
+                                      Navigator.of(context).pushReplacement(
+                                        PageRouteBuilder(
+                                          transitionDuration:
+                                              const Duration(milliseconds: 800),
+                                          pageBuilder: (_, __, ___) =>
+                                              const WelcomeScreen(),
+                                          transitionsBuilder:
+                                              (_, animation, __, child) {
+                                            return FadeTransition(
+                                              opacity: animation,
+                                              child: child,
+                                            );
+                                          },
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                ),
+
+                                SizedBox(
+                                    height:
+                                        ResponsiveHelper.getResponsiveSpacing(
+                                            context,
+                                            mobile: 12,
+                                            tablet: 16,
+                                            desktop: 20)),
+
+                                // Center the Apple sign-in button
+                                Center(
+                                  child: AppleSignInButton(
                                     isLogin: true,
                                     onSuccess: () {
                                       Navigator.of(context).pushReplacement(

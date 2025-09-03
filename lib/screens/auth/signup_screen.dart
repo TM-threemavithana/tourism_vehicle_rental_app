@@ -4,6 +4,7 @@ import '../welcome_screen.dart';
 import 'login_screen.dart';
 import '../../services/auth_service.dart';
 import '../../widgets/google_sign_in_button.dart'; // Add this import if it's not already there
+import '../../widgets/apple_sign_in_button.dart';
 import '../../utils/responsive_helper.dart';
 
 class SignupScreen extends StatefulWidget {
@@ -601,6 +602,33 @@ class _SignupScreenState extends State<SignupScreen>
                               // Google sign-in button
                               Center(
                                 child: GoogleSignInButton(
+                                  isLogin: false,
+                                  onSuccess: () {
+                                    Navigator.of(context).pushAndRemoveUntil(
+                                      PageRouteBuilder(
+                                        transitionDuration:
+                                            const Duration(milliseconds: 800),
+                                        pageBuilder: (_, __, ___) =>
+                                            const WelcomeScreen(),
+                                        transitionsBuilder:
+                                            (_, animation, __, child) {
+                                          return FadeTransition(
+                                            opacity: animation,
+                                            child: child,
+                                          );
+                                        },
+                                      ),
+                                      (route) => false,
+                                    );
+                                  },
+                                ),
+                              ),
+
+                              SizedBox(height: ResponsiveHelper.getResponsiveSpacing(context, mobile: 12, tablet: 16, desktop: 20)),
+
+                              // Apple sign-in button
+                              Center(
+                                child: AppleSignInButton(
                                   isLogin: false,
                                   onSuccess: () {
                                     Navigator.of(context).pushAndRemoveUntil(
