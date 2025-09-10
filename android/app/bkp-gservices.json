@@ -14,22 +14,6 @@
       },
       "oauth_client": [
         {
-          "client_id": "921265432897-8jpg1592sulhmsvu1s3lhp5pp7eu1t67.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.wayzlk.wayz",
-            "certificate_hash": "8751a90d922b6255d248b429a4538000e36a4372"
-          }
-        },
-        {
-          "client_id": "921265432897-j2runku38dojb6akcrs28igksd2mdsc5.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.wayzlk.wayz",
-            "certificate_hash": "b2c20a8605548127470ea62ca48946ac616ddd58"
-          }
-        },
-        {
           "client_id": "921265432897-ifmr0kaut4fbdnuimokro90i76nfbv4l.apps.googleusercontent.com",
           "client_type": 3
         }
@@ -45,13 +29,6 @@
             {
               "client_id": "921265432897-ifmr0kaut4fbdnuimokro90i76nfbv4l.apps.googleusercontent.com",
               "client_type": 3
-            },
-            {
-              "client_id": "921265432897-6hvbnskrjv93a7chm535iu6miai06rp8.apps.googleusercontent.com",
-              "client_type": 2,
-              "ios_info": {
-                "bundle_id": "com.wayzlk.wayzapp"
-              }
             }
           ]
         }

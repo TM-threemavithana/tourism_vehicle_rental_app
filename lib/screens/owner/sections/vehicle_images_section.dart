@@ -78,7 +78,7 @@ class _VehicleImagesSectionState extends State<VehicleImagesSection> {
       minHeight: 1280,
       format: CompressFormat.jpeg,
     );
-    return result as File? ?? file;
+    return result != null ? File(result.path) : file;
   }
 
   Future<void> _pickImage(int index, bool isRequired) async {

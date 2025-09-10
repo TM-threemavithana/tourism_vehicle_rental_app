@@ -6,7 +6,10 @@ import 'dart:io' show Platform;
 
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  final GoogleSignIn _googleSignIn = GoogleSignIn();
+  final GoogleSignIn _googleSignIn = GoogleSignIn(
+    // If you still have issues, uncomment the line below with your web client ID
+    clientId: '921265432897-ifmr0kaut4fbdnuimokro90i76nfbv4l.apps.googleusercontent.com',
+  );
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   // Get current user
