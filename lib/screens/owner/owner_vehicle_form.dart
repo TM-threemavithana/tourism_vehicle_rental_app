@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../services/cloudinary_service.dart';
 import '../../models/vehicle_form_models.dart';
@@ -14,7 +13,6 @@ import 'sections/pricing_section.dart';
 import 'sections/extras_section.dart';
 import 'sections/insurance_section.dart';
 import 'sections/vehicle_images_section.dart';
-import '../../widgets/form_widgets.dart';
 
 class OwnerVehicleForm extends StatefulWidget {
   const OwnerVehicleForm({super.key});
@@ -26,7 +24,6 @@ class OwnerVehicleForm extends StatefulWidget {
 class _OwnerVehicleFormState extends State<OwnerVehicleForm> {
   final _formKey = GlobalKey<FormState>();
   final CloudinaryService _cloudinaryService = CloudinaryService();
-  final ImagePicker _picker = ImagePicker();
   bool _isLoading = false;
 
   // Form data state
@@ -38,7 +35,6 @@ class _OwnerVehicleFormState extends State<OwnerVehicleForm> {
   late VehicleExtras _vehicleExtras;
   late VehicleInsurance _vehicleInsurance; // Add to your state variables
   late VehicleImages _vehicleImages;
-  List<XFile> _registrationDocImages = [];
   bool _agreementChecked =
       false; // Add this to your state variables in _OwnerVehicleFormState
 
@@ -54,16 +50,6 @@ class _OwnerVehicleFormState extends State<OwnerVehicleForm> {
     _vehicleExtras = VehicleExtras();
     _vehicleInsurance = VehicleInsurance();
     _vehicleImages = VehicleImages(); // Add this line
-  }
-
-  Future<void> _pickRegistrationDocImages() async {
-    final List<XFile> pickedFiles = await _picker.pickMultiImage();
-
-    if (pickedFiles.isNotEmpty) {
-      setState(() {
-        _registrationDocImages = pickedFiles;
-      });
-    }
   }
 
   Future<void> _submitForm() async {
@@ -83,15 +69,6 @@ class _OwnerVehicleFormState extends State<OwnerVehicleForm> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
             content: Text('Please select at least one rental time period')),
-      );
-      return;
-    }
-
-    // Check for registration documents
-    if (_registrationDocImages.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-            content: Text('Please add registration document images')),
       );
       return;
     }
@@ -148,21 +125,6 @@ class _OwnerVehicleFormState extends State<OwnerVehicleForm> {
         primaryImageUrl = uploadedImageUrls[0];
       }
 
-      // Upload registration documents in parallel
-      final regDocUploadFutures = _registrationDocImages.map((image) {
-        return _cloudinaryService.uploadImage(
-          File(image.path),
-          FirebaseAuth.instance.currentUser?.uid ?? 'unknown',
-        );
-      }).toList();
-      final regDocUploadResponses = await Future.wait(regDocUploadFutures);
-      List<String> registrationDocUrls = [];
-      for (final response in regDocUploadResponses) {
-        if (response != null) {
-          registrationDocUrls.add(response.secureUrl);
-        }
-      }
-
       // First create the pricing map with the correct types
       Map<String, dynamic> pricingMap = {
         'vehicleValue': _pricing.vehicleValue,
@@ -197,14 +159,10 @@ class _OwnerVehicleFormState extends State<OwnerVehicleForm> {
         'grade': _vehicleDetails.grade,
         'year': _vehicleDetails.year,
         'vehicleNo': _vehicleDetails.vehicleNo,
-        'chassisNo': _vehicleDetails.chassisNo,
-        'engineNo': _vehicleDetails.engineNo,
         'engineCapacity': _vehicleDetails.engineCapacity,
         'transmission': _vehicleDetails.transmission,
         'fuelType': _vehicleDetails.fuelType,
-        'color': _vehicleDetails.color,
         'seatingCapacity': _vehicleDetails.seatingCapacity,
-        'doors': _vehicleDetails.doors,
 
         // Collection point
         'collectionPoint': {
@@ -245,11 +203,6 @@ class _OwnerVehicleFormState extends State<OwnerVehicleForm> {
         'images': {
           'imageUrls': uploadedImageUrls,
           'primaryImageUrl': primaryImageUrl,
-        },
-
-        // Documents section
-        'documents': {
-          'registrationDocs': registrationDocUrls,
         },
 
         // Status and ownership
@@ -304,11 +257,6 @@ class _OwnerVehicleFormState extends State<OwnerVehicleForm> {
         setState(() => _isLoading = false);
       }
     }
-  }
-
-  bool _shouldShowDriverDetails() {
-    return _rentalConditions.rentMode == 'With Driver' ||
-        _rentalConditions.rentMode == 'With or Without Driver';
   }
 
   @override
@@ -450,151 +398,6 @@ class _OwnerVehicleFormState extends State<OwnerVehicleForm> {
                           _vehicleImages = updatedImages;
                         });
                       },
-                    ),
-                    SizedBox(
-                        height: ResponsiveHelper.getResponsiveSpacing(context,
-                            mobile: 24, tablet: 28, desktop: 32)),
-
-                    // Registration Documents Section
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        FormWidgets.buildSectionHeader(
-                            'Vehicle Registration Documents'),
-                        SizedBox(
-                            height: ResponsiveHelper.getResponsiveSpacing(
-                                context,
-                                mobile: 8,
-                                tablet: 10,
-                                desktop: 12)),
-                        Text(
-                          'Upload clear images of the vehicle registration certificate',
-                          style: TextStyle(
-                            fontSize: ResponsiveHelper.getResponsiveFontSize(
-                                context,
-                                mobile: 14,
-                                tablet: 15,
-                                desktop: 16),
-                            color: Colors.grey,
-                          ),
-                        ),
-                        SizedBox(
-                            height: ResponsiveHelper.getResponsiveSpacing(
-                                context,
-                                mobile: 16,
-                                tablet: 20,
-                                desktop: 24)),
-                        GestureDetector(
-                          onTap: _pickRegistrationDocImages,
-                          child: Container(
-                            height: ResponsiveHelper.getResponsiveSpacing(
-                                context,
-                                mobile: 120,
-                                tablet: 140,
-                                desktop: 160),
-                            decoration: BoxDecoration(
-                              border: Border.all(color: Colors.grey),
-                              borderRadius: BorderRadius.circular(
-                                  ResponsiveHelper.getResponsiveBorderRadius(
-                                      context,
-                                      mobile: 8,
-                                      tablet: 10,
-                                      desktop: 12)),
-                            ),
-                            alignment: Alignment.center,
-                            child: _registrationDocImages.isEmpty
-                                ? Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Icon(
-                                        Icons.upload_file,
-                                        size: ResponsiveHelper
-                                            .getResponsiveIconSize(context,
-                                                mobile: 40,
-                                                tablet: 48,
-                                                desktop: 56),
-                                      ),
-                                      SizedBox(
-                                          height: ResponsiveHelper
-                                              .getResponsiveSpacing(context,
-                                                  mobile: 8,
-                                                  tablet: 10,
-                                                  desktop: 12)),
-                                      Text(
-                                        'Upload Registration Documents',
-                                        style: TextStyle(
-                                          fontSize: ResponsiveHelper
-                                              .getResponsiveFontSize(context,
-                                                  mobile: 16,
-                                                  tablet: 18,
-                                                  desktop: 20),
-                                        ),
-                                      ),
-                                    ],
-                                  )
-                                : ListView.builder(
-                                    scrollDirection: Axis.horizontal,
-                                    itemCount: _registrationDocImages.length,
-                                    itemBuilder: (context, index) {
-                                      return Stack(
-                                        children: [
-                                          Padding(
-                                            padding: ResponsiveHelper
-                                                .getResponsivePadding(context,
-                                                    mobile: 4,
-                                                    tablet: 5,
-                                                    desktop: 6),
-                                            child: Image.file(
-                                              File(_registrationDocImages[index]
-                                                  .path),
-                                              height: ResponsiveHelper
-                                                  .getResponsiveSpacing(context,
-                                                      mobile: 100,
-                                                      tablet: 120,
-                                                      desktop: 140),
-                                              width: ResponsiveHelper
-                                                  .getResponsiveSpacing(context,
-                                                      mobile: 100,
-                                                      tablet: 120,
-                                                      desktop: 140),
-                                              fit: BoxFit.cover,
-                                            ),
-                                          ),
-                                          Positioned(
-                                            top: 0,
-                                            right: 0,
-                                            child: GestureDetector(
-                                              onTap: () {
-                                                setState(() {
-                                                  _registrationDocImages
-                                                      .removeAt(index);
-                                                });
-                                              },
-                                              child: Container(
-                                                decoration: const BoxDecoration(
-                                                  color: Colors.red,
-                                                  shape: BoxShape.circle,
-                                                ),
-                                                child: Icon(
-                                                  Icons.close,
-                                                  color: Colors.white,
-                                                  size: ResponsiveHelper
-                                                      .getResponsiveIconSize(
-                                                          context,
-                                                          mobile: 18,
-                                                          tablet: 20,
-                                                          desktop: 22),
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      );
-                                    },
-                                  ),
-                          ),
-                        ),
-                      ],
                     ),
                     SizedBox(
                         height: ResponsiveHelper.getResponsiveSpacing(context,

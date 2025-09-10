@@ -7,14 +7,10 @@ class VehicleFormData {
   String? grade;
   String? year;
   String vehicleNo;
-  String chassisNo;
-  String engineNo;
   String engineCapacity;
   String? transmission;
   String? fuelType;
-  String? color;
   String seatingCapacity;
-  String doors;
 
   // Collection point
   String? district;
@@ -50,14 +46,10 @@ class VehicleFormData {
     this.grade,
     this.year,
     this.vehicleNo = '',
-    this.chassisNo = '',
-    this.engineNo = '',
     this.engineCapacity = '',
     this.transmission,
     this.fuelType,
-    this.color,
     this.seatingCapacity = '',
-    this.doors = '',
     this.district,
     this.city = '',
     this.address = '',
@@ -92,14 +84,10 @@ class VehicleFormData {
       'grade': grade,
       'year': year,
       'vehicleNo': vehicleNo,
-      'chassisNo': chassisNo,
-      'engineNo': engineNo,
       'engineCapacity': engineCapacity,
       'transmission': transmission,
       'fuelType': fuelType,
-      'color': color,
       'seatingCapacity': seatingCapacity,
-      'doors': doors,
       'collectionPoint': {
         'district': district,
         'city': city,
@@ -208,14 +196,10 @@ class VehicleBasicDetails {
   String? grade;
   String? year;
   String vehicleNo;
-  String chassisNo;
-  String engineNo;
   String engineCapacity;
   String? transmission;
   String? fuelType;
-  String? color;
   String seatingCapacity;
-  String doors;
 
   VehicleBasicDetails({
     this.vehicleType,
@@ -225,14 +209,10 @@ class VehicleBasicDetails {
     this.grade,
     this.year,
     this.vehicleNo = '',
-    this.chassisNo = '',
-    this.engineNo = '',
     this.engineCapacity = '',
     this.transmission,
     this.fuelType,
-    this.color,
     this.seatingCapacity = '',
-    this.doors = '',
   });
 }
 

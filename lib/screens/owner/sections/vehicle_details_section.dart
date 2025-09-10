@@ -20,11 +20,8 @@ class VehicleDetailsSection extends StatefulWidget {
 class _VehicleDetailsSectionState extends State<VehicleDetailsSection> {
   late TextEditingController _gradeController;
   late TextEditingController _vehicleNoController;
-  late TextEditingController _chassisNoController;
-  late TextEditingController _engineNoController;
   late TextEditingController _engineCapacityController;
   late TextEditingController _seatingCapacityController;
-  late TextEditingController _doorsController;
 
   List<String> _yearOptions = [];
 
@@ -35,15 +32,10 @@ class _VehicleDetailsSectionState extends State<VehicleDetailsSection> {
         TextEditingController(text: widget.vehicleDetails.grade ?? '');
     _vehicleNoController =
         TextEditingController(text: widget.vehicleDetails.vehicleNo);
-    _chassisNoController =
-        TextEditingController(text: widget.vehicleDetails.chassisNo);
-    _engineNoController =
-        TextEditingController(text: widget.vehicleDetails.engineNo);
     _engineCapacityController =
         TextEditingController(text: widget.vehicleDetails.engineCapacity);
     _seatingCapacityController =
         TextEditingController(text: widget.vehicleDetails.seatingCapacity);
-    _doorsController = TextEditingController(text: widget.vehicleDetails.doors);
 
     // Generate year options from current year down to 1990
     final currentYear = DateTime.now().year;
@@ -58,11 +50,8 @@ class _VehicleDetailsSectionState extends State<VehicleDetailsSection> {
   void _setupControllerListeners() {
     _gradeController.addListener(_updateVehicleDetails);
     _vehicleNoController.addListener(_updateVehicleDetails);
-    _chassisNoController.addListener(_updateVehicleDetails);
-    _engineNoController.addListener(_updateVehicleDetails);
     _engineCapacityController.addListener(_updateVehicleDetails);
     _seatingCapacityController.addListener(_updateVehicleDetails);
-    _doorsController.addListener(_updateVehicleDetails);
   }
 
   void _updateVehicleDetails() {
@@ -74,60 +63,12 @@ class _VehicleDetailsSectionState extends State<VehicleDetailsSection> {
       year: widget.vehicleDetails.year,
       transmission: widget.vehicleDetails.transmission,
       fuelType: widget.vehicleDetails.fuelType,
-      color: widget.vehicleDetails.color,
 
       // Updated values from controllers
       grade: _gradeController.text,
       vehicleNo: _vehicleNoController.text,
-      chassisNo: _chassisNoController.text,
-      engineNo: _engineNoController.text,
       engineCapacity: _engineCapacityController.text,
       seatingCapacity: _seatingCapacityController.text,
-      doors: _doorsController.text,
-    );
-
-    widget.onVehicleDetailsChanged(updatedDetails);
-  }
-
-  void _updateModelOptions() {
-    final updatedDetails = VehicleBasicDetails(
-      vehicleType: widget.vehicleDetails.vehicleType,
-      make: widget.vehicleDetails.make,
-      model: null, // Reset model when make changes
-      category: widget.vehicleDetails.category,
-      grade: _gradeController.text,
-      year: widget.vehicleDetails.year,
-      vehicleNo: _vehicleNoController.text,
-      chassisNo: _chassisNoController.text,
-      engineNo: _engineNoController.text,
-      engineCapacity: _engineCapacityController.text,
-      transmission: widget.vehicleDetails.transmission,
-      fuelType: widget.vehicleDetails.fuelType,
-      color: widget.vehicleDetails.color,
-      seatingCapacity: _seatingCapacityController.text,
-      doors: _doorsController.text,
-    );
-
-    widget.onVehicleDetailsChanged(updatedDetails);
-  }
-
-  void _updateMakeOptions() {
-    final updatedDetails = VehicleBasicDetails(
-      vehicleType: widget.vehicleDetails.vehicleType,
-      make: null, // Reset make when vehicle type changes
-      model: null, // Reset model when vehicle type changes
-      category: null, // Reset category when vehicle type changes
-      grade: _gradeController.text,
-      year: widget.vehicleDetails.year,
-      vehicleNo: _vehicleNoController.text,
-      chassisNo: _chassisNoController.text,
-      engineNo: _engineNoController.text,
-      engineCapacity: _engineCapacityController.text,
-      transmission: widget.vehicleDetails.transmission,
-      fuelType: widget.vehicleDetails.fuelType,
-      color: widget.vehicleDetails.color,
-      seatingCapacity: _seatingCapacityController.text,
-      doors: _doorsController.text,
     );
 
     widget.onVehicleDetailsChanged(updatedDetails);
@@ -137,11 +78,8 @@ class _VehicleDetailsSectionState extends State<VehicleDetailsSection> {
   void dispose() {
     _gradeController.dispose();
     _vehicleNoController.dispose();
-    _chassisNoController.dispose();
-    _engineNoController.dispose();
     _engineCapacityController.dispose();
     _seatingCapacityController.dispose();
-    _doorsController.dispose();
     super.dispose();
   }
 
@@ -177,14 +115,10 @@ class _VehicleDetailsSectionState extends State<VehicleDetailsSection> {
                 grade: _gradeController.text,
                 year: widget.vehicleDetails.year,
                 vehicleNo: _vehicleNoController.text,
-                chassisNo: _chassisNoController.text,
-                engineNo: _engineNoController.text,
                 engineCapacity: _engineCapacityController.text,
                 transmission: widget.vehicleDetails.transmission,
                 fuelType: widget.vehicleDetails.fuelType,
-                color: widget.vehicleDetails.color,
                 seatingCapacity: _seatingCapacityController.text,
-                doors: _doorsController.text,
               );
               widget.onVehicleDetailsChanged(updatedDetails);
             }
@@ -216,14 +150,10 @@ class _VehicleDetailsSectionState extends State<VehicleDetailsSection> {
               grade: _gradeController.text,
               year: widget.vehicleDetails.year,
               vehicleNo: _vehicleNoController.text,
-              chassisNo: _chassisNoController.text,
-              engineNo: _engineNoController.text,
               engineCapacity: _engineCapacityController.text,
               transmission: widget.vehicleDetails.transmission,
               fuelType: widget.vehicleDetails.fuelType,
-              color: widget.vehicleDetails.color,
               seatingCapacity: _seatingCapacityController.text,
-              doors: _doorsController.text,
             );
             widget.onVehicleDetailsChanged(updatedDetails);
           },
@@ -255,14 +185,10 @@ class _VehicleDetailsSectionState extends State<VehicleDetailsSection> {
               grade: _gradeController.text,
               year: widget.vehicleDetails.year,
               vehicleNo: _vehicleNoController.text,
-              chassisNo: _chassisNoController.text,
-              engineNo: _engineNoController.text,
               engineCapacity: _engineCapacityController.text,
               transmission: widget.vehicleDetails.transmission,
               fuelType: widget.vehicleDetails.fuelType,
-              color: widget.vehicleDetails.color,
               seatingCapacity: _seatingCapacityController.text,
-              doors: _doorsController.text,
             );
             widget.onVehicleDetailsChanged(updatedDetails);
           },
@@ -290,14 +216,10 @@ class _VehicleDetailsSectionState extends State<VehicleDetailsSection> {
               grade: _gradeController.text,
               year: widget.vehicleDetails.year,
               vehicleNo: _vehicleNoController.text,
-              chassisNo: _chassisNoController.text,
-              engineNo: _engineNoController.text,
               engineCapacity: _engineCapacityController.text,
               transmission: widget.vehicleDetails.transmission,
               fuelType: widget.vehicleDetails.fuelType,
-              color: widget.vehicleDetails.color,
               seatingCapacity: _seatingCapacityController.text,
-              doors: _doorsController.text,
             );
             widget.onVehicleDetailsChanged(updatedDetails);
           },
@@ -331,14 +253,10 @@ class _VehicleDetailsSectionState extends State<VehicleDetailsSection> {
               grade: _gradeController.text,
               year: value,
               vehicleNo: _vehicleNoController.text,
-              chassisNo: _chassisNoController.text,
-              engineNo: _engineNoController.text,
               engineCapacity: _engineCapacityController.text,
               transmission: widget.vehicleDetails.transmission,
               fuelType: widget.vehicleDetails.fuelType,
-              color: widget.vehicleDetails.color,
               seatingCapacity: _seatingCapacityController.text,
-              doors: _doorsController.text,
             );
             widget.onVehicleDetailsChanged(updatedDetails);
           },
@@ -355,32 +273,6 @@ class _VehicleDetailsSectionState extends State<VehicleDetailsSection> {
           ),
           validator: (value) => value == null || value.isEmpty
               ? 'Please enter vehicle number'
-              : null,
-        ),
-        const SizedBox(height: 16),
-        TextFormField(
-          controller: _chassisNoController,
-          decoration: InputDecoration(
-            labelText: 'Chassis Number *',
-            border: OutlineInputBorder(),
-            fillColor: Colors.white,
-            filled: true,
-          ),
-          validator: (value) => value == null || value.isEmpty
-              ? 'Please enter chassis number'
-              : null,
-        ),
-        const SizedBox(height: 16),
-        TextFormField(
-          controller: _engineNoController,
-          decoration: InputDecoration(
-            labelText: 'Engine Number *',
-            border: OutlineInputBorder(),
-            fillColor: Colors.white,
-            filled: true,
-          ),
-          validator: (value) => value == null || value.isEmpty
-              ? 'Please enter engine number'
               : null,
         ),
         const SizedBox(height: 16),
@@ -421,14 +313,10 @@ class _VehicleDetailsSectionState extends State<VehicleDetailsSection> {
               grade: _gradeController.text,
               year: widget.vehicleDetails.year,
               vehicleNo: _vehicleNoController.text,
-              chassisNo: _chassisNoController.text,
-              engineNo: _engineNoController.text,
               engineCapacity: _engineCapacityController.text,
               transmission: value,
               fuelType: widget.vehicleDetails.fuelType,
-              color: widget.vehicleDetails.color,
               seatingCapacity: _seatingCapacityController.text,
-              doors: _doorsController.text,
             );
             widget.onVehicleDetailsChanged(updatedDetails);
           },
@@ -452,63 +340,14 @@ class _VehicleDetailsSectionState extends State<VehicleDetailsSection> {
               grade: _gradeController.text,
               year: widget.vehicleDetails.year,
               vehicleNo: _vehicleNoController.text,
-              chassisNo: _chassisNoController.text,
-              engineNo: _engineNoController.text,
               engineCapacity: _engineCapacityController.text,
               transmission: widget.vehicleDetails.transmission,
               fuelType: value,
-              color: widget.vehicleDetails.color,
               seatingCapacity: _seatingCapacityController.text,
-              doors: _doorsController.text,
             );
             widget.onVehicleDetailsChanged(updatedDetails);
           },
           labelText: 'Fuel Type *',
-        ),
-        const SizedBox(height: 16),
-        FormWidgets.buildDropdown(
-          value: widget.vehicleDetails.color,
-          items: VehicleFormConstants.colorOptions
-              .map((color) => DropdownMenuItem<String>(
-                    value: color,
-                    child: Row(
-                      children: [
-                        Container(
-                          width: 16,
-                          height: 16,
-                          decoration: BoxDecoration(
-                            color: VehicleFormConstants.getColorValue(color),
-                            border: Border.all(color: Colors.grey),
-                            borderRadius: BorderRadius.circular(4),
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Text(color),
-                      ],
-                    ),
-                  ))
-              .toList(),
-          onChanged: (value) {
-            final updatedDetails = VehicleBasicDetails(
-              vehicleType: widget.vehicleDetails.vehicleType,
-              make: widget.vehicleDetails.make,
-              model: widget.vehicleDetails.model,
-              category: widget.vehicleDetails.category,
-              grade: _gradeController.text,
-              year: widget.vehicleDetails.year,
-              vehicleNo: _vehicleNoController.text,
-              chassisNo: _chassisNoController.text,
-              engineNo: _engineNoController.text,
-              engineCapacity: _engineCapacityController.text,
-              transmission: widget.vehicleDetails.transmission,
-              fuelType: widget.vehicleDetails.fuelType,
-              color: value,
-              seatingCapacity: _seatingCapacityController.text,
-              doors: _doorsController.text,
-            );
-            widget.onVehicleDetailsChanged(updatedDetails);
-          },
-          labelText: 'Color *',
         ),
         const SizedBox(height: 16),
         FormWidgets.buildNoteContainer(
@@ -528,26 +367,6 @@ class _VehicleDetailsSectionState extends State<VehicleDetailsSection> {
           validator: (value) {
             if (value == null || value.isEmpty) {
               return 'Please enter seating capacity';
-            }
-            if (int.tryParse(value) == null || int.parse(value) < 0) {
-              return 'Please enter a valid non-negative number';
-            }
-            return null;
-          },
-        ),
-        const SizedBox(height: 16),
-        TextFormField(
-          controller: _doorsController,
-          decoration: InputDecoration(
-            labelText: 'Number of Doors *',
-            border: OutlineInputBorder(),
-            fillColor: Colors.white,
-            filled: true,
-          ),
-          keyboardType: TextInputType.number,
-          validator: (value) {
-            if (value == null || value.isEmpty) {
-              return 'Please enter number of doors';
             }
             if (int.tryParse(value) == null || int.parse(value) < 0) {
               return 'Please enter a valid non-negative number';
