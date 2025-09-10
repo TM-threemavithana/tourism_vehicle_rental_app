@@ -598,10 +598,6 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen>
           _buildSectionHeader('Registration Information'),
           _buildSpecificationRow(
               'Vehicle Number', _vehicleDetails['vehicleNo'] ?? 'N/A'),
-          _buildSpecificationRow(
-              'Chassis Number', _vehicleDetails['chassisNo'] ?? 'N/A'),
-          _buildSpecificationRow(
-              'Engine Number', _vehicleDetails['engineNo'] ?? 'N/A'),
           const Divider(height: 24),
 
           // Collection Point Section

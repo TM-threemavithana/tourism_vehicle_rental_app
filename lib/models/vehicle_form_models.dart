@@ -214,6 +214,22 @@ class VehicleBasicDetails {
     this.fuelType,
     this.seatingCapacity = '',
   });
+
+  Map<String, dynamic> toMap() {
+    return {
+      'vehicleType': vehicleType,
+      'make': make,
+      'model': model,
+      'category': category,
+      'grade': grade,
+      'year': year,
+      'vehicleNo': vehicleNo,
+      'engineCapacity': engineCapacity,
+      'transmission': transmission,
+      'fuelType': fuelType,
+      'seatingCapacity': seatingCapacity,
+    };
+  }
 }
 
 class CollectionPoint {
@@ -226,6 +242,14 @@ class CollectionPoint {
     this.city = '',
     this.address = '',
   });
+
+  Map<String, dynamic> toMap() {
+    return {
+      'district': district,
+      'city': city,
+      'address': address,
+    };
+  }
 }
 
 class RentalPeriod {
@@ -262,6 +286,25 @@ class RentalConditions {
               'Weekly': false,
               'Monthly': false,
             };
+
+  Map<String, dynamic> toMap() {
+    return {
+      'minRentalPeriod': {
+        'value': minRentalPeriod.value,
+        'unit': minRentalPeriod.unit,
+      },
+      'maxRentalPeriod': {
+        'value': maxRentalPeriod.value,
+        'unit': maxRentalPeriod.unit,
+      },
+      'advanceRentalPeriod': {
+        'value': advanceRentalPeriod.value,
+        'unit': advanceRentalPeriod.unit,
+      },
+      'rentMode': rentMode,
+      'rentalPeriods': rentalPeriods,
+    };
+  }
 }
 
 class DriverDetails {
@@ -274,6 +317,14 @@ class DriverDetails {
     this.licenseNo = '',
     this.whatsappNumber,
   });
+
+  Map<String, dynamic> toMap() {
+    return {
+      'name': name,
+      'licenseNo': licenseNo,
+      'whatsappNumber': whatsappNumber,
+    };
+  }
 }
 
 class PeriodPricing {
@@ -340,6 +391,18 @@ class VehiclePricing {
               'Weekly': false,
               'Monthly': false,
             };
+
+  Map<String, dynamic> toMap() {
+    return {
+      'vehicleValue': vehicleValue,
+      'rentalPeriods': rentalPeriods,
+      'isNegotiable': isNegotiable,
+      'hourly': hourly?.toMap(),
+      'daily': daily?.toMap(),
+      'weekly': weekly?.toMap(),
+      'monthly': monthly?.toMap(),
+    };
+  }
 }
 
 // Add this class to your vehicle_form_models.dart file
@@ -371,8 +434,10 @@ class VehicleExtras {
             };
 
   // Convert to a map for storing in Firebase
-  Map<String, bool> toMap() {
-    return features;
+  Map<String, dynamic> toMap() {
+    return {
+      'features': features,
+    };
   }
 }
 

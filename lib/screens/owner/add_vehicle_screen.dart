@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:wayz/screens/owner/owner_vehicle_form.dart';
-import 'package:wayz/screens/owner/non_owner_vehicle_form.dart';
+import 'package:wayz/screens/owner/multi_step_owner_vehicle_form.dart';
+import 'package:wayz/screens/owner/multi_step_non_owner_vehicle_form.dart';
 import '../../utils/responsive_helper.dart';
 import '../../utils/app_colors.dart';
 
@@ -674,8 +674,8 @@ class _AddVehicleScreenState extends State<AddVehicleScreen>
                   context,
                   MaterialPageRoute(
                     builder: (context) => _isRegisteredOwner!
-                        ? const OwnerVehicleForm()
-                        : const NonOwnerVehicleForm(),
+                        ? const MultiStepOwnerVehicleForm()
+                        : const MultiStepNonOwnerVehicleForm(),
                   ),
                 );
               },

@@ -195,15 +195,10 @@ class _VehicleImagesSectionState extends State<VehicleImagesSection> {
   @override
   Widget build(BuildContext context) {
     // Calculate available width based on screen size
-    double screenWidth = MediaQuery.of(context).size.width;
-    // Use 3 columns instead of 4 to make images larger
+
     int crossAxisCount = 3;
-    double horizontalPadding = 16.0; // Padding on both sides
     double spacing = 8.0;
-    double availableWidth = screenWidth -
-        (horizontalPadding * 2) -
-        (spacing * (crossAxisCount - 1));
-    double itemWidth = availableWidth / crossAxisCount;
+   
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
