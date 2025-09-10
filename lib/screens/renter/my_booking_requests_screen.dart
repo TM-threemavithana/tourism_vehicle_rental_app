@@ -156,8 +156,9 @@ class MyBookingRequestsScreen extends StatelessWidget {
                                       a['timestamp'] as Timestamp?;
                                   final bTimestamp =
                                       b['timestamp'] as Timestamp?;
-                                  if (aTimestamp == null && bTimestamp == null)
+                                  if (aTimestamp == null && bTimestamp == null) {
                                     return 0;
+                                  }
                                   if (aTimestamp == null) return 1;
                                   if (bTimestamp == null) return -1;
                                   return bTimestamp.compareTo(aTimestamp);

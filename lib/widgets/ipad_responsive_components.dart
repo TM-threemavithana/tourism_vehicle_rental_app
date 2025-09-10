@@ -15,7 +15,7 @@ class IPadResponsiveAppBar extends StatelessWidget
   final TextStyle? titleTextStyle;
 
   const IPadResponsiveAppBar({
-    Key? key,
+    super.key,
     this.title,
     this.actions,
     this.leading,
@@ -25,7 +25,7 @@ class IPadResponsiveAppBar extends StatelessWidget
     this.elevation,
     this.centerTitle = true,
     this.titleTextStyle,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -80,7 +80,7 @@ class IPadResponsiveScaffold extends StatelessWidget {
   final EdgeInsets? padding;
 
   const IPadResponsiveScaffold({
-    Key? key,
+    super.key,
     this.appBar,
     required this.body,
     this.bottomNavigationBar,
@@ -91,7 +91,7 @@ class IPadResponsiveScaffold extends StatelessWidget {
     this.extendBody = false,
     this.extendBodyBehindAppBar = false,
     this.padding,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -152,7 +152,7 @@ class IPadResponsiveFormField extends StatelessWidget {
   final bool enabled;
 
   const IPadResponsiveFormField({
-    Key? key,
+    super.key,
     this.labelText,
     this.hintText,
     this.controller,
@@ -163,7 +163,7 @@ class IPadResponsiveFormField extends StatelessWidget {
     this.suffixIcon,
     this.maxLines = 1,
     this.enabled = true,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -217,13 +217,13 @@ class IPadResponsiveListView extends StatelessWidget {
   final Axis scrollDirection;
 
   const IPadResponsiveListView({
-    Key? key,
+    super.key,
     required this.children,
     this.physics,
     this.shrinkWrap = false,
     this.padding,
     this.scrollDirection = Axis.vertical,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

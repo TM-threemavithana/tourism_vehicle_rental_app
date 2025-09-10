@@ -30,7 +30,7 @@ class BookingConfirmationSection extends StatefulWidget {
 
 class _BookingConfirmationSectionState
     extends State<BookingConfirmationSection> {
-  bool _isRequesting = false;
+  final bool _isRequesting = false;
   bool _requestSent = false;
   String _requestStatus = ""; // "pending", "approved", "rejected"
   // String? _requestId; // COMMENTED OUT - Not used since booking is disabled

@@ -367,7 +367,7 @@ class _BookingFormSectionState extends State<BookingFormSection> {
                   subtitle: Text(
                       'Add LKR ${widget.vehicleDetails['pricing']['daily']['withDriver']['price'] - widget.vehicleDetails['pricing']['daily']['vehicleOnly']['price']} per day'),
                   value: _withDriver,
-                  activeColor: AppColors.primary,
+                  activeThumbColor: AppColors.primary,
                   contentPadding: EdgeInsets.zero,
                   onChanged: (value) {
                     setState(() {

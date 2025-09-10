@@ -7,10 +7,10 @@ class ResponsiveDebugInfo extends StatelessWidget {
   final Widget child;
 
   const ResponsiveDebugInfo({
-    Key? key,
+    super.key,
     required this.child,
     this.showOverlay = false,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -69,7 +69,7 @@ class ResponsiveDebugInfo extends StatelessWidget {
 
 /// A widget that shows responsive breakpoint indicators
 class ResponsiveBreakpointIndicator extends StatelessWidget {
-  const ResponsiveBreakpointIndicator({Key? key}) : super(key: key);
+  const ResponsiveBreakpointIndicator({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -107,10 +107,10 @@ class ResponsiveApp extends StatefulWidget {
   final bool showDebugInfo;
 
   const ResponsiveApp({
-    Key? key,
+    super.key,
     required this.app,
     this.showDebugInfo = false,
-  }) : super(key: key);
+  });
 
   @override
   State<ResponsiveApp> createState() => _ResponsiveAppState();
@@ -147,16 +147,15 @@ class ResponsiveSpacing extends StatelessWidget {
   final bool horizontal;
 
   const ResponsiveSpacing({
-    Key? key,
+    super.key,
     this.factor = 1.0,
     this.horizontal = false,
-  }) : super(key: key);
+  });
 
   const ResponsiveSpacing.horizontal({
-    Key? key,
+    super.key,
     this.factor = 1.0,
-  })  : horizontal = true,
-        super(key: key);
+  })  : horizontal = true;
 
   @override
   Widget build(BuildContext context) {
@@ -176,11 +175,11 @@ class ResponsiveDivider extends StatelessWidget {
   final EdgeInsets? margin;
 
   const ResponsiveDivider({
-    Key? key,
+    super.key,
     this.color,
     this.thickness,
     this.margin,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

@@ -43,7 +43,7 @@ class FormWidgets {
           fillColor: Colors.white,
           filled: true,
         ),
-        value: value,
+        initialValue: value,
         items: items,
         onChanged: onChanged,
         validator: isRequired

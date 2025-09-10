@@ -16,7 +16,7 @@ class ResponsiveScaffoldNew extends StatelessWidget {
   final bool safeArea;
 
   const ResponsiveScaffoldNew({
-    Key? key,
+    super.key,
     this.appBar,
     required this.body,
     this.bottomNavigationBar,
@@ -28,7 +28,7 @@ class ResponsiveScaffoldNew extends StatelessWidget {
     this.extendBodyBehindAppBar = false,
     this.padding,
     this.safeArea = true,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -89,14 +89,14 @@ class ResponsiveColumn extends StatelessWidget {
   final EdgeInsets? padding;
 
   const ResponsiveColumn({
-    Key? key,
+    super.key,
     required this.children,
     this.mainAxisAlignment = MainAxisAlignment.start,
     this.crossAxisAlignment = CrossAxisAlignment.center,
     this.mainAxisSize = MainAxisSize.max,
     this.preventOverflow = true,
     this.padding,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -132,14 +132,14 @@ class ResponsiveRow extends StatelessWidget {
   final EdgeInsets? padding;
 
   const ResponsiveRow({
-    Key? key,
+    super.key,
     required this.children,
     this.mainAxisAlignment = MainAxisAlignment.start,
     this.crossAxisAlignment = CrossAxisAlignment.center,
     this.mainAxisSize = MainAxisSize.max,
     this.preventOverflow = true,
     this.padding,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -176,13 +176,13 @@ class ResponsiveTextNew extends StatelessWidget {
 
   const ResponsiveTextNew(
     this.text, {
-    Key? key,
+    super.key,
     this.style,
     this.maxLines,
     this.overflow = TextOverflow.ellipsis,
     this.textAlign = TextAlign.start,
     this.autoSize = true,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -222,7 +222,7 @@ class ResponsiveContainerNew extends StatelessWidget {
   final bool adaptiveHeight;
 
   const ResponsiveContainerNew({
-    Key? key,
+    super.key,
     required this.child,
     this.padding,
     this.margin,
@@ -231,7 +231,7 @@ class ResponsiveContainerNew extends StatelessWidget {
     this.decoration,
     this.adaptiveWidth = true,
     this.adaptiveHeight = false,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -279,14 +279,14 @@ class ResponsiveCardNew extends StatelessWidget {
   final ShapeBorder? shape;
 
   const ResponsiveCardNew({
-    Key? key,
+    super.key,
     required this.child,
     this.padding,
     this.margin,
     this.elevation,
     this.color,
     this.shape,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -319,7 +319,7 @@ class ResponsiveListTile extends StatelessWidget {
   final bool dense;
 
   const ResponsiveListTile({
-    Key? key,
+    super.key,
     this.leading,
     this.title,
     this.subtitle,
@@ -327,7 +327,7 @@ class ResponsiveListTile extends StatelessWidget {
     this.onTap,
     this.contentPadding,
     this.dense = false,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

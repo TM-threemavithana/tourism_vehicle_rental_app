@@ -9,12 +9,12 @@ class ResponsiveLayout extends StatelessWidget {
   final Widget? largeDesktop;
 
   const ResponsiveLayout({
-    Key? key,
+    super.key,
     required this.mobile,
     this.tablet,
     this.desktop,
     this.largeDesktop,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -38,14 +38,14 @@ class ResponsiveContainer extends StatelessWidget {
   final List<BoxShadow>? boxShadow;
 
   const ResponsiveContainer({
-    Key? key,
+    super.key,
     required this.child,
     this.padding,
     this.maxWidth,
     this.backgroundColor,
     this.borderRadius,
     this.boxShadow,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -78,13 +78,13 @@ class ResponsiveGrid extends StatelessWidget {
   final EdgeInsets? padding;
 
   const ResponsiveGrid({
-    Key? key,
+    super.key,
     required this.children,
     this.childAspectRatio,
     this.mainAxisSpacing,
     this.crossAxisSpacing,
     this.padding,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -121,14 +121,14 @@ class ResponsiveCard extends StatelessWidget {
   final VoidCallback? onTap;
 
   const ResponsiveCard({
-    Key? key,
+    super.key,
     required this.child,
     this.padding,
     this.margin,
     this.backgroundColor,
     this.elevation,
     this.onTap,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -172,13 +172,13 @@ class ResponsiveText extends StatelessWidget {
 
   const ResponsiveText(
     this.text, {
-    Key? key,
+    super.key,
     this.style,
     this.textAlign,
     this.maxLines,
     this.overflow,
     this.autoScale = true,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -209,13 +209,13 @@ class ResponsiveButton extends StatelessWidget {
   final bool isLoading;
 
   const ResponsiveButton({
-    Key? key,
+    super.key,
     required this.text,
     this.onPressed,
     this.style,
     this.icon,
     this.isLoading = false,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -275,7 +275,7 @@ class ResponsiveScaffold extends StatelessWidget {
   final Color? backgroundColor;
 
   const ResponsiveScaffold({
-    Key? key,
+    super.key,
     this.title,
     required this.body,
     this.floatingActionButton,
@@ -285,7 +285,7 @@ class ResponsiveScaffold extends StatelessWidget {
     this.actions,
     this.leading,
     this.backgroundColor,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

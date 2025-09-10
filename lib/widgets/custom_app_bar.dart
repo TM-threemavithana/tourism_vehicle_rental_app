@@ -47,8 +47,9 @@ class _CustomAppBarState extends State<CustomAppBar> {
   }
 
   Future<void> _checkFavoriteStatus() async {
-    if (widget.vehicleDetails == null || widget.vehicleDetails!['id'] == null)
+    if (widget.vehicleDetails == null || widget.vehicleDetails!['id'] == null) {
       return;
+    }
 
     setState(() => _loading = true);
     try {

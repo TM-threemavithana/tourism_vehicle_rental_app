@@ -10,13 +10,13 @@ class IPadResponsiveScreen extends StatelessWidget {
   final Color? backgroundColor;
 
   const IPadResponsiveScreen({
-    Key? key,
+    super.key,
     required this.child,
     this.padding,
     this.useMaxWidth = true,
     this.preventOverflow = true,
     this.backgroundColor,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -82,14 +82,14 @@ class IPadResponsiveCard extends StatelessWidget {
   final BorderRadius? borderRadius;
 
   const IPadResponsiveCard({
-    Key? key,
+    super.key,
     required this.child,
     this.padding,
     this.margin,
     this.backgroundColor,
     this.elevation,
     this.borderRadius,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -129,7 +129,7 @@ class IPadResponsiveGrid extends StatelessWidget {
   final ScrollPhysics? physics;
 
   const IPadResponsiveGrid({
-    Key? key,
+    super.key,
     required this.children,
     this.childAspectRatio,
     this.mainAxisSpacing,
@@ -137,7 +137,7 @@ class IPadResponsiveGrid extends StatelessWidget {
     this.padding,
     this.shrinkWrap = true,
     this.physics,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -185,13 +185,13 @@ class IPadResponsiveText extends StatelessWidget {
 
   const IPadResponsiveText(
     this.text, {
-    Key? key,
+    super.key,
     this.style,
     this.maxLines,
     this.overflow,
     this.textAlign,
     this.autoScale = true,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -230,13 +230,13 @@ class IPadResponsiveButton extends StatelessWidget {
   final IconData? icon;
 
   const IPadResponsiveButton({
-    Key? key,
+    super.key,
     required this.text,
     this.onPressed,
     this.style,
     this.isLoading = false,
     this.icon,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

@@ -10,13 +10,13 @@ class IPadSafeColumn extends StatelessWidget {
   final double? spacing;
 
   const IPadSafeColumn({
-    Key? key,
+    super.key,
     required this.children,
     this.mainAxisAlignment = MainAxisAlignment.start,
     this.crossAxisAlignment = CrossAxisAlignment.center,
     this.mainAxisSize = MainAxisSize.min,
     this.spacing,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -60,12 +60,12 @@ class IPadSafeRow extends StatelessWidget {
   final MainAxisSize mainAxisSize;
 
   const IPadSafeRow({
-    Key? key,
+    super.key,
     required this.children,
     this.mainAxisAlignment = MainAxisAlignment.start,
     this.crossAxisAlignment = CrossAxisAlignment.center,
     this.mainAxisSize = MainAxisSize.min,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -93,14 +93,14 @@ class IPadSafeNavItem extends StatelessWidget {
   final Color unselectedColor;
 
   const IPadSafeNavItem({
-    Key? key,
+    super.key,
     required this.icon,
     required this.label,
     required this.selected,
     required this.onTap,
     required this.selectedColor,
     required this.unselectedColor,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -188,10 +188,10 @@ class IPadOptimizedBottomNavBar extends StatelessWidget {
   final ValueChanged<int> onTap;
 
   const IPadOptimizedBottomNavBar({
-    Key? key,
+    super.key,
     required this.currentIndex,
     required this.onTap,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

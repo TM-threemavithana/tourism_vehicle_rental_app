@@ -4,7 +4,7 @@ import '../utils/responsive_helper.dart';
 
 /// Example screen demonstrating the responsive design system
 class ResponsiveExampleScreen extends StatelessWidget {
-  const ResponsiveExampleScreen({Key? key}) : super(key: key);
+  const ResponsiveExampleScreen({super.key});
 
   @override
   Widget build(BuildContext context) {

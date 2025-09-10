@@ -204,7 +204,7 @@ class _RequestVehicleScreenState extends State<RequestVehicleScreen> {
                             mobile: 8, tablet: 12, ipad: 16, ipadPro: 20, desktop: 24)),
                   ),
                   child: DropdownButtonFormField<String>(
-                    value: _selectedVehicleType,
+                    initialValue: _selectedVehicleType,
                     decoration: InputDecoration(
                       border: InputBorder.none,
                       contentPadding: EdgeInsets.symmetric(

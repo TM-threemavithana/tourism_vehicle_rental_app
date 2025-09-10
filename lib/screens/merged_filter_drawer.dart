@@ -165,7 +165,7 @@ class _MergedFilterDrawerState extends State<MergedFilterDrawer> {
               // Dismiss keyboard when tapping outside of text fields
               FocusScope.of(context).unfocus();
             },
-            child: Container(
+            child: SizedBox(
               height: MediaQuery.of(context).size.height -
                   MediaQuery.of(context).padding.top,
               child: Column(
