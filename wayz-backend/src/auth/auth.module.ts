@@ -11,6 +11,7 @@ import { LocalStrategy } from './strategies/local.strategy';
 import { TokenBlacklistService } from './services/token-blacklist.service';
 import { RateLimitService } from './services/rate-limit.service';
 import { CacheServiceModule } from '../cache/cache.module';
+import { EmailModule } from '../email/email.module';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { CacheServiceModule } from '../cache/cache.module';
       inject: [ConfigService],
     }),
     CacheServiceModule,
+    EmailModule,
   ],
   controllers: [AuthController],
   providers: [

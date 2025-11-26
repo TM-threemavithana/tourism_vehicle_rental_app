@@ -70,6 +70,49 @@ export class CreateVehicleDto {
   @IsOptional()
   @IsString()
   locationCity?: string;
+
+  @ApiPropertyOptional({
+    example: [
+      'https://example.com/vehicles/image1.jpg',
+      'https://example.com/vehicles/image2.jpg',
+    ],
+    description: 'Array of vehicle image URLs',
+  })
+  @IsOptional()
+  images?: string[];
+
+  @ApiPropertyOptional({
+    example: ['AC', 'GPS', 'Bluetooth', 'USB'],
+    description: 'Array of vehicle features',
+  })
+  @IsOptional()
+  features?: string[];
+
+  @ApiPropertyOptional({ example: 'category-uuid-here' })
+  @IsOptional()
+  @IsString()
+  categoryId?: string;
+
+  @ApiPropertyOptional({ example: 200.0 })
+  @IsOptional()
+  @IsNumber({ maxDecimalPlaces: 2 })
+  @Type(() => Number)
+  securityDeposit?: number;
+
+  @ApiPropertyOptional({ example: 'No smoking, No pets' })
+  @IsOptional()
+  @IsString()
+  rules?: string;
+
+  @ApiPropertyOptional({ example: '1HGBH41JXMN109186' })
+  @IsOptional()
+  @IsString()
+  vin?: string;
+
+  @ApiPropertyOptional({ example: '123 Main St, New York, NY 10001' })
+  @IsOptional()
+  @IsString()
+  locationAddress?: string;
 }
 
 export class UpdateVehicleDto {
@@ -98,4 +141,47 @@ export class UpdateVehicleDto {
   @IsOptional()
   @IsString()
   description?: string;
+
+  @ApiPropertyOptional({
+    example: [
+      'https://example.com/vehicles/image1.jpg',
+      'https://example.com/vehicles/image2.jpg',
+    ],
+    description: 'Array of vehicle image URLs',
+  })
+  @IsOptional()
+  images?: string[];
+
+  @ApiPropertyOptional({
+    example: ['AC', 'GPS', 'Bluetooth', 'USB'],
+    description: 'Array of vehicle features',
+  })
+  @IsOptional()
+  features?: string[];
+
+  @ApiPropertyOptional({ example: 200.0 })
+  @IsOptional()
+  @IsNumber({ maxDecimalPlaces: 2 })
+  @Type(() => Number)
+  securityDeposit?: number;
+
+  @ApiPropertyOptional({ example: 40.7128 })
+  @IsOptional()
+  @IsNumber()
+  locationLat?: number;
+
+  @ApiPropertyOptional({ example: -74.006 })
+  @IsOptional()
+  @IsNumber()
+  locationLng?: number;
+
+  @ApiPropertyOptional({ example: 'New York, NY' })
+  @IsOptional()
+  @IsString()
+  locationCity?: string;
+
+  @ApiPropertyOptional({ example: '123 Main St, New York, NY 10001' })
+  @IsOptional()
+  @IsString()
+  locationAddress?: string;
 }

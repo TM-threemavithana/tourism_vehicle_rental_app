@@ -14,6 +14,7 @@ import { FavoritesModule } from './favorites/favorites.module';
 import { NotificationsModule } from './notifications/notifications.module';
 import { VehicleCategoriesModule } from './vehicle-categories/vehicle-categories.module';
 import { CacheServiceModule } from './cache/cache.module';
+import { MigrationModule } from './migrations/migration.module';
 
 @Module({
   imports: [
@@ -48,14 +49,37 @@ import { CacheServiceModule } from './cache/cache.module';
     CacheModule.registerAsync({
       isGlobal: true,
       inject: [ConfigService],
-      useFactory: (configService: ConfigService) => ({
-        ttl: 300, // 5 minutes default TTL
-        max: 1000, // Maximum number of items in cache
-        // For now using memory cache, will upgrade to Redis in production
-        // TODO: Implement proper Redis store configuration
-        host: configService.get('REDIS_HOST'),
-        port: configService.get('REDIS_PORT'),
-      }),
+      useFactory: async (configService: ConfigService) => {
+        const redisUrl = configService.get<string>('REDIS_URL');
+        
+        if (redisUrl) {
+          try {
+            // Use Redis/Valkey for caching
+            const { redisStore } = await import('cache-manager-ioredis');
+            return {
+              store: redisStore,
+              url: redisUrl,
+              ttl: 300, // 5 minutes default TTL
+              max: 1000, // Maximum number of items in cache
+              retryAttempts: 3,
+              retryDelay: 1000,
+            };
+          } catch (error) {
+            console.warn('Failed to load Redis store, falling back to memory cache:', error);
+            return {
+              ttl: 300,
+              max: 1000,
+            };
+          }
+        } else {
+          // Fallback to memory cache for development
+          console.warn('REDIS_URL not found, using memory cache');
+          return {
+            ttl: 300,
+            max: 1000,
+          };
+        }
+      },
     }),
 
     // Common module with Firebase and dual-write services
@@ -75,6 +99,9 @@ import { CacheServiceModule } from './cache/cache.module';
     FavoritesModule,
     NotificationsModule,
     VehicleCategoriesModule,
+
+    // Migration module for Firebase to PostgreSQL migration
+    MigrationModule,
   ],
   controllers: [AppController],
   providers: [AppService],

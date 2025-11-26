@@ -229,10 +229,10 @@ export class VehiclesService {
       await this.cacheService.delByPattern('vehicles:all');
       await this.cacheService.delByPattern('vehicles:available');
       await this.cacheService.delByPattern('vehicles:search:*');
-      
+
       // Invalidate owner vehicles
       await this.cacheService.del(`vehicles:owner:${ownerId}`);
-      
+
       // Invalidate specific vehicle if provided
       if (vehicleId) {
         await this.cacheService.del(`vehicle:${vehicleId}`);
@@ -242,5 +242,63 @@ export class VehiclesService {
     } catch (error) {
       this.logger.error('Error invalidating vehicle caches:', error);
     }
+  }
+
+  /**
+   * Add images to a vehicle
+   */
+  async addImages(id: string, imageUrls: string[]): Promise<Vehicle> {
+    const vehicle = await this.findOne(id);
+
+    // Get existing images or initialize empty array
+    const existingImages = (vehicle.images as string[]) || [];
+
+    // Add new images
+    vehicle.images = [...existingImages, ...imageUrls];
+
+    const updatedVehicle = await this.vehicleRepository.save(vehicle);
+
+    // Invalidate caches
+    if (vehicle.ownerId) {
+      await this.invalidateVehicleCaches(vehicle.ownerId, id);
+    }
+
+    return updatedVehicle;
+  }
+
+  /**
+   * Update vehicle images (replace all)
+   */
+  async updateImages(id: string, imageUrls: string[]): Promise<Vehicle> {
+    const vehicle = await this.findOne(id);
+
+    vehicle.images = imageUrls;
+
+    const updatedVehicle = await this.vehicleRepository.save(vehicle);
+
+    // Invalidate caches
+    if (vehicle.ownerId) {
+      await this.invalidateVehicleCaches(vehicle.ownerId, id);
+    }
+
+    return updatedVehicle;
+  }
+
+  /**
+   * Delete all images from a vehicle
+   */
+  async deleteImages(id: string): Promise<Vehicle> {
+    const vehicle = await this.findOne(id);
+
+    vehicle.images = [];
+
+    const updatedVehicle = await this.vehicleRepository.save(vehicle);
+
+    // Invalidate caches
+    if (vehicle.ownerId) {
+      await this.invalidateVehicleCaches(vehicle.ownerId, id);
+    }
+
+    return updatedVehicle;
   }
 }

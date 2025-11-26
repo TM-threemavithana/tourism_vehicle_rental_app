@@ -19,6 +19,7 @@ import {
   UserRole,
 } from '../dto/auth.dto';
 import { TokenBlacklistService } from './services/token-blacklist.service';
+import { EmailService } from '../email/email.service';
 
 interface RefreshPayload {
   sub: string;
@@ -39,6 +40,7 @@ export class AuthService {
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
     private readonly tokenBlacklistService: TokenBlacklistService,
+    private readonly emailService: EmailService,
   ) {}
 
   async register(registerDto: RegisterDto): Promise<AuthResponseDto> {
@@ -252,8 +254,13 @@ export class AuthService {
     user.passwordResetExpires = new Date(Date.now() + 3600000); // 1 hour
     await this.userRepository.save(user);
 
-    // TODO: Send email with reset link (implement email service)
-    console.log(`Password reset token for ${email}: ${resetToken}`);
+    // Send email with reset link
+    try {
+      await this.emailService.sendPasswordResetEmail(email, resetToken);
+    } catch (error) {
+      console.error(`Failed to send password reset email to ${email}:`, error);
+      // Don't throw error to prevent revealing if email exists
+    }
 
     return { message: 'If the email exists, a reset link has been sent' };
   }
@@ -433,9 +440,7 @@ export class AuthService {
     return this.sanitizeUser(user);
   }
 
-  async refreshToken(
-    refreshToken: string,
-  ): Promise<AuthResponseDto> {
+  async refreshToken(refreshToken: string): Promise<AuthResponseDto> {
     try {
       const payload = await this.jwtService.verifyAsync<RefreshPayload>(
         refreshToken,
@@ -482,8 +487,14 @@ export class AuthService {
   async logout(userId: string, token: string): Promise<{ message: string }> {
     try {
       // Decode token to get expiration
-      const decoded = this.jwtService.decode(token) as any;
-      const expiresIn = decoded.exp ? decoded.exp - Math.floor(Date.now() / 1000) : 3600;
+      interface DecodedToken {
+        exp?: number;
+        [key: string]: any;
+      }
+      const decoded = this.jwtService.decode(token) as DecodedToken | null;
+      const expiresIn = decoded?.exp
+        ? decoded.exp - Math.floor(Date.now() / 1000)
+        : 3600;
 
       // Blacklist the token
       await this.tokenBlacklistService.blacklistToken(
@@ -493,7 +504,7 @@ export class AuthService {
       );
 
       return { message: 'Logged out successfully' };
-    } catch (error) {
+    } catch {
       throw new BadRequestException('Invalid token');
     }
   }
